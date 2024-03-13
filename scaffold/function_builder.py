@@ -1,6 +1,6 @@
 import os
 
-from file_service import FileService
+from scaffold.file_service import FileService
 
 
 
@@ -64,21 +64,21 @@ def test_{self.function_name}_status_code_is_200():
     def with_main(self):
         docs = "import json\n"
         if self.endpoint:
+            docs += "from dataclasses import dataclass\n"
             if "{" in self.endpoint and "}" in self.endpoint:
                 docs += """
-# @dataclass
+@dataclass
 class Path:
     pass
 """         
             docs += """
-# @dataclass
+@dataclass
 class Input:
     pass
 
-
-# @dataclass
+@dataclass
 class Output:
-    pass
+    message: str
 """
         self.main = f"""{docs}
 

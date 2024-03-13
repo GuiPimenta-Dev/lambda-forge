@@ -39,19 +39,29 @@
     "@aws-cdk/aws-route53-patters:useCertificate": true,
     "@aws-cdk/customresources:installLatestAwsSdkDefault": false,
     "region": "us-east-2",
-    "account": "211125768252",
-    "name": "Template",
-    "repo": "Template-CDK",
-    "alarm_topic_arn": "",
-    "docs_bucket": "",
+    "account": "",
+    "name": "",
+    "repo": {
+      "owner": "",
+      "name": ""
+    },
     "dev": {
-      "arns": {}
+      "arns": {
+        "alarm_topic_arn": "",
+        "docs_bucket": ""
+      }
     },
     "staging": {
-      "arns": {}
+      "arns": {
+        "alarm_topic_arn": "",
+        "docs_bucket": ""
+      }
     },
     "prod": {
-      "arns": {}
+      "arns": {
+        "alarm_topic_arn": "",
+        "docs_bucket": ""
+      }
     }
   }
 }
