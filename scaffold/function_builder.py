@@ -104,25 +104,23 @@ def test_lambda_handler():
         return self
     
     def with_lambda_stack(self):
-        with open("infra/stacks/lambda_stack.py", "r") as f:
-            lines = f.readlines()
+        self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
-            folder = f"functions.{self.belongs}.{self.function_name}" if self.belongs else f"functions.{self.function_name}"
+        folder = f"functions.{self.belongs}.{self.function_name}" if self.belongs else f"functions.{self.function_name}"
 
-            lines.insert(0, f"from {folder}.config import {self.pascal_name}\n")
+        self.lambda_stack.insert(0, f"from {folder}.config import {self.pascal_name}\n")
 
-            directory = self.belongs or self.function_name
-            comment = "".join(word.capitalize() for word in directory.split("_"))
+        directory = self.belongs or self.function_name
+        comment = "".join(word.capitalize() for word in directory.split("_"))
 
-            try:
-                comment_index = lines.index(f"        # {comment}\n")
-                lines.insert(comment_index + 1, f"        {self.pascal_name}(self.services)\n")
-            except:
-                lines.append(f"\n")
-                lines.append(f"        # {comment}\n")
-                lines.append(f"        {self.pascal_name}(self.services)\n")
+        try:
+            comment_index = self.lambda_stack.index(f"        # {comment}\n")
+            self.lambda_stack.insert(comment_index + 1, f"        {self.pascal_name}(self.services)\n")
+        except:
+            self.lambda_stack.append(f"\n")
+            self.lambda_stack.append(f"        # {comment}\n")
+            self.lambda_stack.append(f"        {self.pascal_name}(self.services)\n")
         
-        self.lambda_stack = lines
         return self
 
     def build(self):

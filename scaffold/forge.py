@@ -21,7 +21,6 @@ def create(name, description, method, belongs, endpoint, no_api):
     """
     create_function(name, description, method.upper(), belongs, endpoint, no_api)
 
-
 def create_function(
     name, description, http_method=None, belongs=None, endpoint=None, no_api=False
 ):
@@ -38,6 +37,13 @@ def create_function(
     function_builder.build()
     
 
+
+@forge.command()
+def start():
+    """
+    Starts the project structure
+    """
+    pass
 
 if __name__ == "__main__":
     forge()

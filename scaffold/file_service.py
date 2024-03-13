@@ -17,3 +17,7 @@ class FileService:
     with open(path, "w") as f:
       for line in lines:
           f.write(line)
+  
+  def read_lines(self, path: str) -> List:
+    with open(path, "r") as f:
+        return f.readlines()
