@@ -1,6 +1,6 @@
 import click
 
-from scaffold.file_builder import FunctionBuilder
+from scaffold.function_builder import FunctionBuilder
 
 @click.group()
 def forge():
@@ -28,8 +28,7 @@ def create_function(
     if no_api is False and not http_method:
         raise click.UsageError("You must provide a method for the API Gateway endpoint or use the flag --no-api")
     
-    function_builder = FunctionBuilder.a_file(name, description)
-    function_builder = function_builder.with_config(belongs)
+    function_builder = FunctionBuilder.a_file(name, description).with_config(belongs)
 
     if no_api is False:
         endpoint = endpoint or belongs or name
