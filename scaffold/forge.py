@@ -1,6 +1,8 @@
 import click
 
-from scaffold.function_builder import FunctionBuilder
+from function_builder import FunctionBuilder
+from project_builder import ProjectBuilder
+
 
 @click.group()
 def forge():
@@ -43,7 +45,16 @@ def start():
     """
     Starts the project structure
     """
-    pass
+    create_project()
+
+
+def create_project():
+    
+    project_builder = ProjectBuilder.a_project()
+
+    project_builder.build()
+    
 
 if __name__ == "__main__":
-    forge()
+    # forge()
+    create_project()
