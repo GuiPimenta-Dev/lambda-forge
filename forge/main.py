@@ -126,9 +126,6 @@ def service(service):
 def create_service(service):
     service_builder = ServiceBuilder.a_service()
 
-    if service not in AVALABLE_SERVICES:
-        raise click.UsageError(f"Service {service} not available")
-
     if service == "sns":
         service_builder = service_builder.with_sns()
 
