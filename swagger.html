@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Swagger UI</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui.css" >
+  <style>
+    html
+    {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+    *,
+    *:before,
+    *:after
+    {
+      box-sizing: inherit;
+    }
+    body {
+      margin:0;
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui-bundle.js"> </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui-standalone-preset.js"> </script>
+<script>
+  
+
+window.onload = function() {
+  
+  var spec = {"openapi": "3.0.3", "info": {"title": "Entri Template CDK", "description": "", "version": "1.0.0"}, "paths": {"/example": {"get": {"tags": ["Example"], "summary": "A example function", "operationId": "ExampleFunction", "parameters": [{"name": "required_input", "in": "query", "required": true, "schema": {"type": "string"}}, {"name": "optional_input", "in": "query", "required": false, "schema": {"type": "string"}}], "responses": {"200": {"description": "Successful response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ExampleFunctionOutput"}}}}}}}}, "components": {"schemas": {"ExampleFunctionInput": {"properties": {"required_input": {"type": "string"}, "optional_input": {"type": "string"}}, "required": ["required_input"]}, "ExampleFunctionOutput": {"properties": {"response": {"type": "string"}}, "required": ["response"]}}}};
+  // Build a system
+  const ui = SwaggerUIBundle({
+    spec: spec,
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: "StandaloneLayout",
+    onComplete: function() {
+        const schemaPanel = document.querySelector('.opblock-description-wrapper .model');
+        if (schemaPanel) {
+          schemaPanel.style.display = 'none';
+        }
+      }
+  })
+  window.ui = ui
+}
+</script>
+</body>
+</html>
