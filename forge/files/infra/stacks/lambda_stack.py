@@ -9,12 +9,10 @@ class LambdaStack(Stack):
         scope: Construct,
         stage,
         arns,
-        alarms=False,
-        versioning=False,
         **kwargs,
     ) -> None:
 
         name = scope.node.try_get_context("name")
         super().__init__(scope, f"{name}-CDK", **kwargs)
 
-        self.services = Services(self, stage, arns, alarms, versioning)
+        self.services = Services(self, stage, arns)

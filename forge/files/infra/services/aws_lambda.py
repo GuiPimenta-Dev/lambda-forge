@@ -7,12 +7,9 @@ from aws_cdk.aws_lambda import Code, Function, Runtime
 
 
 class AWSLambda:
-    def __init__(self, scope, stage, alarm, versioning, sns) -> None:
+    def __init__(self, scope, stage) -> None:
         self.scope = scope
         self.stage = stage
-        self.alarm = alarm
-        self.versioning = versioning
-        self.sns = sns
         self.functions = []
 
     def create_function(
@@ -57,32 +54,8 @@ class AWSLambda:
             }
         )
 
-        if self.alarm:
-            self.__create_alarm(function, name)
-
-        if self.versioning:
-            self.__create_versioning(function)
-
         return function
-
-    def __create_alarm(self, function, function_name):
-        alarm = Alarm(
-            scope=self.scope,
-            id=f"{self.stage}-{function_name}-Alarm",
-            metric=function.metric_errors(),
-            threshold=1,
-            evaluation_periods=1,
-            alarm_description="The latest deployment errors > 0",
-            alarm_name=f"{self.stage}-{function_name}-Alarm",
-            comparison_operator=ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-        )
-
-        alarm.add_alarm_action(SnsAction(topic=self.sns.alarm_topic))
-
-    @staticmethod
-    def __create_versioning(function):
-        new_version = function.current_version
-        new_version.apply_removal_policy(RemovalPolicy.RETAIN)
+    
 
     @staticmethod
     def __top_level_path(src):

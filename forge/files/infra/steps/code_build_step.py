@@ -5,11 +5,10 @@ from aws_cdk.pipelines import CodePipelineSource
 
 
 class CodeBuildStep:
-    def __init__(self, scope, stage, source: CodePipelineSource, arns):
+    def __init__(self, scope, stage, source: CodePipelineSource):
         self.scope = scope
         self.stage = stage
         self.source = source
-        self.arns = arns
 
     def run_unit_tests(self):
         report_group = codebuild.ReportGroup(
@@ -208,8 +207,7 @@ class CodeBuildStep:
             ],
         )
 
-    def generate_docs(self, name, stage):
-        docs_bucket = self.arns["docs_bucket"]
+    def generate_docs(self, name, stage, bucket):
         return pipelines.CodeBuildStep(
             f"Generate {stage} Docs",
             input=self.source,
@@ -221,8 +219,8 @@ class CodeBuildStep:
                 "python generate_docs.py",
                 "python swagger_yml_to_ui.py < docs.yaml > swagger.html",
                 "redoc-cli bundle -o redoc.html docs.yaml",
-                f"aws s3 cp swagger.html s3://{docs_bucket}/{name}/{stage.lower()}-swagger.html",
-                f"aws s3 cp redoc.html s3://{docs_bucket}/{name}/{stage.lower()}-redoc.html",
+                f"aws s3 cp swagger.html s3://{bucket}/{name}/{stage.lower()}-swagger.html",
+                f"aws s3 cp redoc.html s3://{bucket}/{name}/{stage.lower()}-redoc.html",
             ],
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,

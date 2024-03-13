@@ -4,7 +4,6 @@ from infra.services.sns import SNS
 
 
 class Services:
-    def __init__(self, scope, stage, arns, alarms, versioning) -> None:
-        self.sns = SNS(scope, arns)
+    def __init__(self, scope, stage, arns) -> None:
         self.api_gateway = APIGateway(scope, stage)
-        self.aws_lambda = AWSLambda(scope, stage, alarms, versioning, self.sns)
+        self.aws_lambda = AWSLambda(scope, stage)

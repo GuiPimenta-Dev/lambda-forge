@@ -1,7 +1,7 @@
 import click
 
-from scaffold.function_builder import FunctionBuilder
-from scaffold.project_builder import ProjectBuilder
+from forge.function_builder import FunctionBuilder
+from forge.project_builder import ProjectBuilder
 
 
 @click.group()
@@ -63,29 +63,20 @@ def create_function(
     "--no-prod", help="Do not create prod environment", is_flag=True, default=False
 )
 @click.option(
-    "--no-alarms",
-    help="Do not create alarm for production functions",
-    is_flag=True,
-    default=False,
-)
-@click.option(
     "--no-docs",
     help="Do not create documentation for the api endpoints",
     is_flag=True,
     default=False,
 )
-def project(no_dev, no_staging, no_prod, no_alarms, no_docs):
+def project(no_dev, no_staging, no_prod, no_docs):
     """
-    Forjes the project structure with the given name.
+    Forjes the project structure.
     """
-    create_project(no_dev, no_staging, no_prod, no_alarms, no_docs)
+    create_project(no_dev, no_staging, no_prod, no_docs)
 
 
-def create_project(no_dev, no_staging, no_prod, no_alarms, no_docs):
+def create_project(no_dev, no_staging, no_prod, no_docs):
     project_builder = ProjectBuilder.a_project()
-
-    if no_alarms is False:
-        project_builder = project_builder.with_alarms()
 
     if no_docs is False:
         project_builder = project_builder.with_docs()
@@ -104,4 +95,5 @@ def create_project(no_dev, no_staging, no_prod, no_alarms, no_docs):
 
 
 if __name__ == "__main__":
-    forge()
+    # forge()
+    create_project(False, False, False, False)

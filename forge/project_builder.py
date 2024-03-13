@@ -1,4 +1,4 @@
-from scaffold.file_service import FileService
+from forge.file_service import FileService
 
 
 
@@ -9,14 +9,9 @@ class ProjectBuilder(FileService):
     
     def __init__(self):
         self.docs = False
-        self.alarms = False
         self.dev = None
         self.staging = None
         self.prod = None
-
-    def with_alarms(self):
-        self.alarms = True
-        return self
 
     def with_docs(self):
         self.docs = True
@@ -102,7 +97,7 @@ class StagingPipelineStack(cdk.Stack):
         context = self.node.try_get_context("staging")
         stage = "Staging"
 
-        code_build = CodeBuildStep(self, stage, source, context["arns"])
+        code_build = CodeBuildStep(self, stage, source)
 
         # pre
         unit_tests = code_build.run_unit_tests()
@@ -111,7 +106,8 @@ class StagingPipelineStack(cdk.Stack):
         validate_integration_tests = code_build.validate_integration_tests()
 
         # post
-        generate_docs = code_build.generate_docs(name, stage)
+        bucket = self.node.try_get_context("docs")["bucket"]
+        generate_docs = code_build.generate_docs(name, stage, bucket)
         integration_tests = code_build.run_integration_tests()
 
         pipeline.add_stage(
@@ -166,7 +162,7 @@ class ProdPipelineStack(cdk.Stack):
         staging_context = self.node.try_get_context("staging")
         staging_stage = "Staging"
 
-        code_build = CodeBuildStep(self, staging_stage, source, staging_context["arns"])
+        code_build = CodeBuildStep(self, staging_stage, source)
 
         # pre
         unit_tests = code_build.run_unit_tests()
@@ -175,7 +171,8 @@ class ProdPipelineStack(cdk.Stack):
         validate_integration_tests = code_build.validate_integration_tests()
 
         # post
-        generate_staging_docs = code_build.generate_docs(name, staging_stage)
+        bucket = self.node.try_get_context("docs")["bucket"]
+        generate_staging_docs = code_build.generate_docs(name, staging_stage, bucket)
         integration_tests = code_build.run_integration_tests()
 
         pipeline.add_stage(
@@ -193,12 +190,10 @@ class ProdPipelineStack(cdk.Stack):
         prod_stage = "Prod"
 
         # post
-        generate_prod_docs = code_build.generate_docs(name, prod_stage, prod_context["arns"])
+        generate_prod_docs = code_build.generate_docs(name, prod_stage, bucket)
 
         pipeline.add_stage(
-            DeployStage(
-                self, prod_stage, prod_context["arns"], alarms={self.alarms}, versioning=True
-            ),
+            DeployStage(self, prod_stage, prod_context["arns"]),
             post=[{"generate_prod_docs" if self.docs else ""}],
         )
 """
@@ -231,7 +226,7 @@ class ProdPipelineStack(cdk.Stack):
         return self
 
     def build(self):
-        self.copy_folders("/scaffold/files", "")
+        self.copy_folders("/forge/files", "")
         if self.dev:
             self.make_file("infra/stacks", "dev_pipeline_stack.py", self.dev)
         

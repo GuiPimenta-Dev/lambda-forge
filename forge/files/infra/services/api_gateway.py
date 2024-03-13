@@ -92,7 +92,7 @@ class APIGateway:
         )
 
     def __create_docs_endpoints(self, scope, name, stage):
-        docs_bucket = self.arns["docs_bucket"]
+        docs_bucket_arn = self.arns["docs_bucket_arn"]
         s3_integration_role = iam.Role(
             scope,
             "api-gateway-s3",
@@ -120,7 +120,7 @@ class APIGateway:
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{docs_bucket}/{name}/{stage.lower()}-swagger.html",
+                path=f"{docs_bucket_arn}/{name}/{stage.lower()}-swagger.html",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,

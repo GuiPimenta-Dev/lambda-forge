@@ -45,23 +45,17 @@
       "owner": "",
       "name": ""
     },
+    "docs": {
+      "bucket": ""
+    },
     "dev": {
-      "arns": {
-        "alarm_topic_arn": "",
-        "docs_bucket": ""
-      }
+      "arns": {}
     },
     "staging": {
-      "arns": {
-        "alarm_topic_arn": "",
-        "docs_bucket": ""
-      }
+      "arns": {}
     },
     "prod": {
-      "arns": {
-        "alarm_topic_arn": "",
-        "docs_bucket": ""
-      }
+      "arns": {}
     }
   }
 }
