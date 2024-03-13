@@ -28,7 +28,7 @@ def create_function(
     if no_api is False and not http_method:
         raise click.UsageError("You must provide a method for the API Gateway endpoint or use the flag --no-api")
     
-    function_builder = FunctionBuilder.a_file(name, description).with_config(belongs)
+    function_builder = FunctionBuilder.a_function(name, description).with_config(belongs)
 
     if no_api is False:
         endpoint = endpoint or belongs or name

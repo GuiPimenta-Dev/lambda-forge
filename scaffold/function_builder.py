@@ -6,7 +6,7 @@ from scaffold.file_service import FileService
 
 class FunctionBuilder(FileService):
     @staticmethod
-    def a_file(function_name, description):
+    def a_function(function_name, description):
         return FunctionBuilder(function_name, description)
     
     def __init__(self, function_name, description):
