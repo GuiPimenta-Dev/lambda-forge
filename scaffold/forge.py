@@ -41,20 +41,40 @@ def create_function(
 
 
 @forge.command()
-def start():
+@click.option("--no-dev", help="Do not create dev environment", is_flag=False)
+@click.option("--no-staging", help="Do not create staging environment", is_flag=False)
+@click.option("--no-prod", help="Do not create prod environment", is_flag=False)
+@click.option("--no-alarms", help="Do not create alarm for production functions", is_flag=False)
+@click.option("--no-docs", help="Do not create documentation for the api endpoints", is_flag=False)
+def start(no_dev, no_staging, no_prod, no_alarms, no_docs):
     """
     Starts the project structure
     """
-    create_project()
+    create_project(no_dev, no_staging, no_prod, no_alarms, no_docs)
 
 
-def create_project():
-    
+def create_project(no_dev, no_staging, no_prod, no_alarms, no_docs):
     project_builder = ProjectBuilder.a_project()
 
+    if no_alarms is False:
+        project_builder = project_builder.with_alarms()
+    
+    if no_docs is False:
+        project_builder = project_builder.with_docs()
+
+    if no_dev is False:
+        project_builder = project_builder.with_dev()
+    
+    if no_staging is False:
+        project_builder = project_builder.with_staging()
+
+    if no_prod is False:
+        project_builder = project_builder.with_prod()
+    
+    project_builder = project_builder.with_app()
     project_builder.build()
     
 
 if __name__ == "__main__":
     # forge()
-    create_project()
+    create_project(False, False, False, False, False)

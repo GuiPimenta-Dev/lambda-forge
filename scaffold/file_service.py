@@ -7,6 +7,9 @@ from typing import List
 
 
 class FileService:
+
+  root_dir = os.getcwd()
+
   def join(self, *args) -> str:
     return os.path.join(*args)
 
@@ -27,8 +30,8 @@ class FileService:
         return f.readlines()
   
   def copy_folders(self, source: str, destination: str) -> None:
-    src = Path(source)
-    dst = Path(destination)
+    src = Path(self.root_dir + source)
+    dst = Path(self.root_dir + destination)
 
     for src_path in src.glob('**/*'):
         if src_path.is_file():

@@ -42,7 +42,12 @@
     "account": "211125768252",
     "name": "Template",
     "repo": "Template-CDK",
+    "alarm_topic_arn": "",
+    "docs_bucket": "",
     "dev": {
+      "arns": {}
+    },
+    "staging": {
       "arns": {}
     },
     "prod": {

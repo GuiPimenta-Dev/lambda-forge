@@ -6,11 +6,11 @@ from aws_cdk.aws_lambda import Code, Function, Runtime
 
 
 class APIGateway:
-    def __init__(self, scope, stage, arns) -> None:
+    def __init__(self, scope, stage, sm) -> None:
         self.endpoints = {}
         self.stage = stage
         self.scope = scope
-        self.arns = arns
+        self.sm = sm
         name = scope.node.try_get_context("name")
         self.api = apigateway.RestApi(
             scope,
@@ -83,6 +83,8 @@ class APIGateway:
             timeout=Duration.minutes(1),
         )
 
+        self.sm.authorizer_secret.grant_read(authorizer)
+
         return apigateway.RequestAuthorizer(
             scope,
             id="RequestAuthorizer",
@@ -92,7 +94,6 @@ class APIGateway:
         )
 
     def __create_docs_endpoints(self, scope, name, stage):
-        docs_bucket = self.arns["docs_bucket"]
         s3_integration_role = iam.Role(
             scope,
             "api-gateway-s3",
@@ -120,7 +121,7 @@ class APIGateway:
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{docs_bucket}/{name}/{stage.lower()}-swagger.html",
+                path=f"gui-docs/{name}/{stage.lower()}-swagger.html",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,
@@ -144,4 +145,32 @@ class APIGateway:
             ],
         )
 
-        
+        redoc_resource = docs_resource.add_resource("redoc")
+
+        redoc_resource.add_method(
+            "GET",
+            apigateway.AwsIntegration(
+                service="s3",
+                path=f"gui-docs/{name}/{stage.lower()}-redoc.html",
+                integration_http_method="GET",
+                options=apigateway.IntegrationOptions(
+                    credentials_role=s3_integration_role,
+                    integration_responses=[
+                        apigateway.IntegrationResponse(
+                            status_code="200",
+                        )
+                    ],
+                ),
+            ),
+            method_responses=[
+                {
+                    "statusCode": "200",
+                    "responseModels": {
+                        "text/html": apigateway.Model.EMPTY_MODEL,
+                    },
+                    "responseParameters": {
+                        "method.response.header.Content-Type": True,
+                    },
+                }
+            ],
+        )

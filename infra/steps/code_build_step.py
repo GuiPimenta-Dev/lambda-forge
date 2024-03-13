@@ -5,11 +5,10 @@ from aws_cdk.pipelines import CodePipelineSource
 
 
 class CodeBuildStep:
-    def __init__(self, scope, stage, source: CodePipelineSource, arns):
+    def __init__(self, scope, stage, source: CodePipelineSource):
         self.scope = scope
         self.stage = stage
         self.source = source
-        self.arns = arns
 
     def run_unit_tests(self):
         report_group = codebuild.ReportGroup(
@@ -209,7 +208,7 @@ class CodeBuildStep:
         )
 
     def generate_docs(self, name, stage):
-        docs_bucket = self.arns["docs_bucket"]
+        docs_bucket = self.scope.node.try_get_context("docs_bucket")
         return pipelines.CodeBuildStep(
             f"Generate {stage} Docs",
             input=self.source,

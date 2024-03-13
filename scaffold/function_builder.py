@@ -65,7 +65,7 @@ def test_{self.function_name}_status_code_is_200():
         docs = "import json\n"
         if self.endpoint:
             if "{" in self.endpoint and "}" in self.endpoint:
-                docs += f"""
+                docs += """
 # @dataclass
 class Path:
     pass

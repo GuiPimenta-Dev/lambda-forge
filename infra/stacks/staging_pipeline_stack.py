@@ -1,3 +1,4 @@
+
 import aws_cdk as cdk
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
@@ -7,13 +8,13 @@ from infra.stages.deploy import DeployStage
 from infra.steps.code_build_step import CodeBuildStep
 
 
-class DevPipelineStack(cdk.Stack):
+class StagingPipelineStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
         name = scope.node.try_get_context("name").capitalize()
-        super().__init__(scope, f"Dev{name}PipelineStack", **kwargs)
+        super().__init__(scope, f"Staging-{name}-Pipeline-Stack", **kwargs)
 
-        repo_name = self.node.try_get_context("repo")
-        source = CodePipelineSource.git_hub(f"GuiPimenta-Dev/{repo_name}", "dev")
+        repo = self.node.try_get_context("repo")
+        source = CodePipelineSource.git_hub(f"{repo["owner"]}/{repo["name"]}", "staging")
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -32,8 +33,8 @@ class DevPipelineStack(cdk.Stack):
             pipeline_name=f"Dev-{name}-Pipeline",
         )
 
-        context = self.node.try_get_context("dev")
-        stage = "Dev"
+        context = self.node.try_get_context("staging")
+        stage = "Staging"
 
         code_build = CodeBuildStep(self, stage, source)
 
@@ -55,5 +56,5 @@ class DevPipelineStack(cdk.Stack):
                 validate_integration_tests,
                 validate_docs,
             ],
-            post=[generate_docs, integration_tests],
+            post=[integration_tests, generate_docs],
         )

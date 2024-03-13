@@ -1,18 +1,18 @@
+
 import aws_cdk as cdk
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
-import os
 from infra.stages.deploy import DeployStage
 
 
-class PlaygroundPipelineStack(cdk.Stack):
+class DevPipelineStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
         name = scope.node.try_get_context("name").capitalize()
-        super().__init__(scope, f"Playground{name}PipelineStack", **kwargs)
+        super().__init__(scope, f"Dev-{name}-Pipeline-Stack", **kwargs)
 
-        repo_name = self.node.try_get_context("repo")
-        source = CodePipelineSource.git_hub(f"GuiPimenta-Dev/{repo_name}", "playground")
+        repo = self.node.try_get_context("repo")
+        source = CodePipelineSource.git_hub(f"{repo["owner"]}/{repo["name"]}", "dev")
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -32,6 +32,6 @@ class PlaygroundPipelineStack(cdk.Stack):
         )
 
         context = self.node.try_get_context("dev")
-        stage = "Playground"
+        stage = "Dev"
 
         pipeline.add_stage(DeployStage(self, stage, context["arns"]))
