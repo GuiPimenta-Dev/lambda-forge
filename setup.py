@@ -18,7 +18,7 @@ setup(
         "pytest==7.2.0",
         "pytest-dotenv==0.5.2",
         "moto==4.1.7",
-        "coverage==7.2.3"
+        "coverage==7.2.3",
     ],
     author="Guilherme Alves Pimenta",
     author_email="guialvespimenta27@gmail.com",

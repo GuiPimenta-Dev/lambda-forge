@@ -1,20 +1,16 @@
-import os
-
 from forge.file_service import FileService
-
 
 
 class FunctionBuilder(FileService):
     @staticmethod
     def a_function(function_name, description):
         return FunctionBuilder(function_name, description)
-    
+
     def __init__(self, function_name, description):
         self.function_name = function_name
         self.description = description
         self.endpoint = None
         self.integration = None
-        
 
     def with_endpoint(self, endpoint):
         if endpoint.startswith("/"):
@@ -24,8 +20,10 @@ class FunctionBuilder(FileService):
 
     def with_config(self, belongs):
         self.belongs = belongs
-        self.pascal_name = "".join(word.capitalize() for word in self.function_name.split("_"))
-        directory = f"directory=\"{self.function_name}\"" if belongs else ""
+        self.pascal_name = "".join(
+            word.capitalize() for word in self.function_name.split("_")
+        )
+        directory = f'directory="{self.function_name}"' if belongs else ""
         self.config = f"""from infra.services import Services
 
 class {self.pascal_name}Config:
@@ -37,17 +35,17 @@ class {self.pascal_name}Config:
             description="{self.description}",
             {directory}
         )
-""" 
+"""
         return self
-    
+
     def with_api(self, http_method):
         self.http_method = http_method
         self.config += f"""
         services.api_gateway.create_endpoint("{http_method}", "/{self.endpoint}", function)
 
-        """        
+        """
         return self
-    
+
     def with_integration(self, http_method):
         self.integration = f"""import pytest
 import requests
@@ -60,7 +58,7 @@ def test_{self.function_name}_status_code_is_200():
     assert response.status_code == 200 
 """
         return self
-    
+
     def with_main(self):
         docs = "import json\n"
         if self.endpoint:
@@ -70,7 +68,7 @@ def test_{self.function_name}_status_code_is_200():
 @dataclass
 class Path:
     pass
-"""         
+"""
             docs += """
 @dataclass
 class Input:
@@ -90,9 +88,9 @@ def lambda_handler(event, context):
     }}
 """
         return self
-    
+
     def with_unit(self):
-        self.unit =  """import json
+        self.unit = """import json
 from .main import lambda_handler
 
 def test_lambda_handler():
@@ -102,11 +100,15 @@ def test_lambda_handler():
     assert response["body"] == json.dumps({"message": "Hello World!"})
 """
         return self
-    
+
     def with_lambda_stack(self):
         self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
-        folder = f"functions.{self.belongs}.{self.function_name}" if self.belongs else f"functions.{self.function_name}"
+        folder = (
+            f"functions.{self.belongs}.{self.function_name}"
+            if self.belongs
+            else f"functions.{self.function_name}"
+        )
 
         self.lambda_stack.insert(0, f"from {folder}.config import {self.pascal_name}\n")
 
@@ -115,23 +117,25 @@ def test_lambda_handler():
 
         try:
             comment_index = self.lambda_stack.index(f"        # {comment}\n")
-            self.lambda_stack.insert(comment_index + 1, f"        {self.pascal_name}(self.services)\n")
+            self.lambda_stack.insert(
+                comment_index + 1, f"        {self.pascal_name}(self.services)\n"
+            )
         except:
             self.lambda_stack.append(f"\n")
             self.lambda_stack.append(f"        # {comment}\n")
             self.lambda_stack.append(f"        {self.pascal_name}(self.services)\n")
-        
+
         return self
 
     def build(self):
         if self.belongs:
-           folder_path = self.join("functions", self.belongs, self.function_name)
-           self.make_dir(folder_path)
-           self.make_dir(f"functions/{self.belongs}/utils")
-           self.make_file(folder_path, "__init__.py")
-           self.make_file(f"functions/{self.belongs}/utils", "__init__.py")
+            folder_path = self.join("functions", self.belongs, self.function_name)
+            self.make_dir(folder_path)
+            self.make_dir(f"functions/{self.belongs}/utils")
+            self.make_file(folder_path, "__init__.py")
+            self.make_file(f"functions/{self.belongs}/utils", "__init__.py")
         else:
-            folder_path = os.path.join("functions", self.function_name)
+            folder_path = self.join("functions", self.function_name)
             self.make_dir(folder_path)
             self.make_file(folder_path, "__init__.py")
 
@@ -141,8 +145,3 @@ def test_lambda_handler():
         self.write_lines("infra/stacks/lambda_stack.py", self.lambda_stack)
         if self.integration:
             self.make_file(folder_path, "integration.py", self.integration)
-        
-
-        
-
-    

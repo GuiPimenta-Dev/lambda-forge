@@ -22,7 +22,10 @@ def get_authorizer_secret():
 
 
 def lambda_handler(event, context):
-    if event["headers"].get("secret") and event["headers"].get("secret") == get_authorizer_secret():
+    if (
+        event["headers"].get("secret")
+        and event["headers"].get("secret") == get_authorizer_secret()
+    ):
         effect = "allow"
         message = "success"
     else:

@@ -1,12 +1,11 @@
 from forge.file_service import FileService
 
 
-
 class ProjectBuilder(FileService):
     @staticmethod
     def a_project():
         return ProjectBuilder()
-    
+
     def __init__(self):
         self.docs = False
         self.dev = None
@@ -55,7 +54,7 @@ class DevPipelineStack(cdk.Stack):
         stage = "Dev"
 
         pipeline.add_stage(DeployStage(self, stage, context["arns"]))
-"""       
+"""
         return self
 
     def with_staging(self):
@@ -122,7 +121,7 @@ class StagingPipelineStack(cdk.Stack):
         )
 """
         return self
-    
+
     def with_prod(self):
         self.prod = f"""
 import aws_cdk as cdk
@@ -198,42 +197,48 @@ class ProdPipelineStack(cdk.Stack):
         )
 """
         return self
-    
+
     def with_app(self):
         self.app = ["import aws_cdk as cdk\n"]
 
         if self.dev:
-            self.app.append("from infra.stacks.dev_pipeline_stack import DevPipelineStack\n")
+            self.app.append(
+                "from infra.stacks.dev_pipeline_stack import DevPipelineStack\n"
+            )
 
         if self.staging:
-            self.app.append("from infra.stacks.staging_pipeline_stack import StagingPipelineStack\n")
+            self.app.append(
+                "from infra.stacks.staging_pipeline_stack import StagingPipelineStack\n"
+            )
 
         if self.prod:
-            self.app.append("from infra.stacks.prod_pipeline_stack import ProdPipelineStack\n")
+            self.app.append(
+                "from infra.stacks.prod_pipeline_stack import ProdPipelineStack\n"
+            )
 
         self.app.append("\napp = cdk.App()\n\n")
-        
+
         if self.dev:
             self.app.append("DevPipelineStack = DevPipelineStack(app)\n")
-        
+
         if self.staging:
             self.app.append("StagingStack = StagingPipelineStack(app)\n")
-        
+
         if self.prod:
             self.app.append("ProdStack = ProdPipelineStack(app)\n")
 
-        self.app.append("\napp.synth()")   
+        self.app.append("\napp.synth()")
         return self
 
     def build(self):
         self.copy_folders("/forge/files", "")
         if self.dev:
             self.make_file("infra/stacks", "dev_pipeline_stack.py", self.dev)
-        
+
         if self.staging:
             self.make_file("infra/stacks", "staging_pipeline_stack.py", self.staging)
-        
+
         if self.prod:
             self.make_file("infra/stacks", "prod_pipeline_stack.py", self.prod)
-        
+
         self.write_lines("app.py", self.app)

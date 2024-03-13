@@ -2,6 +2,7 @@ import click
 
 from forge.function_builder import FunctionBuilder
 from forge.project_builder import ProjectBuilder
+from forge.service_builder import ServiceBuilder
 
 
 @click.group()
@@ -94,6 +95,72 @@ def create_project(no_dev, no_staging, no_prod, no_docs):
     project_builder.build()
 
 
+AVALABLE_SERVICES = sorted([
+        "sns",
+        "dynamodb",
+        "s3",
+        "layers",
+        "state_machine",
+        "event_bridge",
+        "sqs",
+        "secrets_manager",
+        "cognito",
+        "kms",
+    ]
+)
+
+
+@forge.command()
+@click.argument(
+    "service",
+    type=click.Choice(AVALABLE_SERVICES),
+)
+def service(service):
+    """
+    Forjes the structure of a service.
+
+    """
+    create_service(service)
+
+
+def create_service(service):
+    service_builder = ServiceBuilder.a_service()
+
+    if service not in AVALABLE_SERVICES:
+        raise click.UsageError(f"Service {service} not available")
+
+    if service == "sns":
+        service_builder = service_builder.with_sns()
+
+    if service == "layers":
+        service_builder = service_builder.with_layers()
+
+    if service == "dynamodb":
+        service_builder = service_builder.with_dynamodb()
+
+    if service == "s3":
+        service_builder = service_builder.with_s3()
+
+    if service == "state_machine":
+        service_builder = service_builder.with_state_machine()
+
+    if service == "event_bridge":
+        service_builder = service_builder.with_event_bridge()
+
+    if service == "sqs":
+        service_builder = service_builder.with_sqs()
+
+    if service == "secrets_manager":
+        service_builder = service_builder.with_secrets_manager()
+
+    if service == "cognito":
+        service_builder = service_builder.with_cognito()
+
+    if service == "kms":
+        service_builder = service_builder.with_kms()
+
+    service_builder.build()
+
+
 if __name__ == "__main__":
-    # forge()
-    create_project(False, False, False, False)
+    forge()

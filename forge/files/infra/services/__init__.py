@@ -1,6 +1,5 @@
 from infra.services.api_gateway import APIGateway
 from infra.services.aws_lambda import AWSLambda
-from infra.services.sns import SNS
 
 
 class Services:

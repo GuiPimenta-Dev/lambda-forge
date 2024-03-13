@@ -55,7 +55,6 @@ class AWSLambda:
         )
 
         return function
-    
 
     @staticmethod
     def __top_level_path(src):
