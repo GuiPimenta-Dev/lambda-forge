@@ -213,7 +213,6 @@ class CodeBuildStep:
             input=self.source,
             install_commands=[
                 "pip install -r requirements.txt",
-                "npm install -g redoc-cli",
             ],
             commands=[
                 "python generate_docs.py",
