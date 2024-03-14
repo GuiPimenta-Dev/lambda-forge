@@ -42,12 +42,14 @@ class APIGateway:
 
         self.__create_docs_endpoints(scope, name, stage)
 
-    def create_endpoint(self, method, path, function, authorizer=True, authorizer_name="default"):
-        if authorizer_name not in self.authorizers:
-            raise Exception(f"Authorizer {authorizer_name} not found")
+    def create_endpoint(
+        self, method, path, function, private=True, authorizer="default"
+    ):
+        if authorizer not in self.authorizers:
+            raise Exception(f"Authorizer {authorizer} not found")
 
         resource = self.__create_resource(path)
-        authorizer = self.authorizers[authorizer_name] if authorizer else None
+        authorizer = self.authorizers[authorizer] if private else None
         resource.add_method(
             method,
             apigateway.LambdaIntegration(handler=function, proxy=True),
@@ -57,21 +59,24 @@ class APIGateway:
         function_name = function._physical_name.split("-")[-1]
         self.endpoints[function_name] = {"method": method, "endpoint": path}
 
-    def create_authorizer(self, function, authorizer_name="default"):
-        if self.authorizers.get(authorizer_name) is not None:
-            raise Exception(f"Authorizer {authorizer_name} already set")
-        
-        function.add_environment("API_ARN", f"arn:aws:execute-api:{self.scope.region}:{self.scope.account}:{self.api.rest_api_id}/*")
-        authorizer =  apigateway.RequestAuthorizer(
+    def create_authorizer(self, function, name="default"):
+        if self.authorizers.get(name) is not None:
+            raise Exception(f"Authorizer {name} already set")
+
+        function.add_environment(
+            "API_ARN",
+            f"arn:aws:execute-api:{self.scope.region}:{self.scope.account}:{self.api.rest_api_id}/*",
+        )
+        authorizer = apigateway.RequestAuthorizer(
             self.scope,
-            id=f"{authorizer_name}-Authorizer",
+            id=f"{name}-Authorizer",
             handler=function,
             identity_sources=[apigateway.IdentitySource.context("identity.sourceIp")],
             results_cache_ttl=Duration.seconds(0),
         )
 
-        self.authorizers[authorizer_name] = authorizer
-    
+        self.authorizers[name] = authorizer
+
     def __create_resource(self, endpoint):
         resources = list(filter(None, endpoint.split("/")))
         resource = self.api.root.get_resource(resources[0])

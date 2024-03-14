@@ -1,4 +1,4 @@
-from forge.file_service import FileService
+from lambda_forge.file_service import FileService
 
 
 class ServiceBuilder(FileService):

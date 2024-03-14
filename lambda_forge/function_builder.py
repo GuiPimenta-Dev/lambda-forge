@@ -11,6 +11,7 @@ class FunctionBuilder(FileService):
         self.description = description
         self.endpoint = None
         self.integration = None
+        self.authorizer = False
 
     def with_endpoint(self, endpoint):
         if endpoint.startswith("/"):
@@ -101,6 +102,31 @@ def test_lambda_handler():
 """
         return self
 
+    def with_authorizer_unit(self):
+        self.unit = """import json
+from .main import lambda_handler
+
+def test_lambda_handler():
+
+    response = lambda_handler(None, None)
+
+    assert response is None
+"""
+        return self
+
+    def with_authorizer(self):
+        self.authorizer = True
+        self.main = """
+def lambda_handler(event, context):
+    pass
+    """
+
+        self.config += """        
+        services.api_gateway.create_authorizer(function)
+        """
+
+        return self
+
     def with_lambda_stack(self):
         self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
@@ -121,9 +147,22 @@ def test_lambda_handler():
                 comment_index + 1, f"        {self.pascal_name}(self.services)\n"
             )
         except:
-            self.lambda_stack.append(f"\n")
-            self.lambda_stack.append(f"        # {comment}\n")
-            self.lambda_stack.append(f"        {self.pascal_name}(self.services)\n")
+            if self.authorizer is False:
+                self.lambda_stack.append(f"\n")
+                self.lambda_stack.append(f"        # {comment}\n")
+                self.lambda_stack.append(f"        {self.pascal_name}(self.services)\n")
+            else:
+                services_index = next(
+                    (
+                        i
+                        for i, line in enumerate(self.lambda_stack)
+                        if "Services(self" in line
+                    ),
+                    -1,
+                )
+                self.lambda_stack.insert(services_index + 1, f"\n")
+                self.lambda_stack.insert(services_index + 2, f"        # {comment}\n")
+                self.lambda_stack.insert(services_index + 3, f"        {self.pascal_name}(self.services)\n")
 
         return self
 

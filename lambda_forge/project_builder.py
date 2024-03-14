@@ -1,4 +1,4 @@
-from forge.file_service import FileService
+from lambda_forge.file_service import FileService
 
 
 class ProjectBuilder(FileService):
@@ -231,7 +231,7 @@ class ProdPipelineStack(cdk.Stack):
         return self
 
     def build(self):
-        self.copy_folders("/forge/files", "")
+        self.copy_folders("/lambda_forge/files", "")
         if self.dev:
             self.make_file("infra/stacks", "dev_pipeline_stack.py", self.dev)
 

@@ -19,34 +19,53 @@ def forge():
 @click.option("--belongs", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint URL for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-def function(name, description, method, belongs, endpoint, no_api):
+@click.option("--authorizer", help="Define the function as an authorizer", is_flag=True)
+def function(name, description, method, belongs, endpoint, no_api, authorizer):
     """
     Forjes the function with the required folder structure.
     """
-    create_function(name, description, method.upper(), belongs, endpoint, no_api)
+    method = method.upper() if method else None
+    create_function(name, description, method, belongs, endpoint, no_api, authorizer)
 
 
 def create_function(
-    name, description, http_method=None, belongs=None, endpoint=None, no_api=False
+    name,
+    description,
+    http_method=None,
+    belongs=None,
+    endpoint=None,
+    no_api=False,
+    authorizer=False,
 ):
-    if no_api is False and not http_method:
+    if no_api is False and not http_method and authorizer is False:
         raise click.UsageError(
             "You must provide a method for the API Gateway endpoint or use the flag --no-api"
         )
+
+    if authorizer:
+        belongs = belongs or "authorizer"
 
     function_builder = FunctionBuilder.a_function(name, description).with_config(
         belongs
     )
 
-    if no_api is False:
+    if authorizer:
+        function_builder.with_authorizer().with_authorizer_unit()
+
+    elif no_api is True:
+        function_builder = function_builder.with_unit().with_main()
+
+    elif no_api is False:
         endpoint = endpoint or belongs or name
         function_builder = (
             function_builder.with_endpoint(endpoint)
             .with_api(http_method)
             .with_integration(http_method)
+            .with_unit()
+            .with_main()
         )
 
-    function_builder = function_builder.with_unit().with_main().with_lambda_stack()
+    function_builder = function_builder.with_lambda_stack()
     function_builder.build()
 
 
@@ -95,7 +114,8 @@ def create_project(no_dev, no_staging, no_prod, no_docs):
     project_builder.build()
 
 
-AVALABLE_SERVICES = sorted([
+AVALABLE_SERVICES = sorted(
+    [
         "sns",
         "dynamodb",
         "s3",
@@ -126,35 +146,19 @@ def service(service):
 def create_service(service):
     service_builder = ServiceBuilder.a_service()
 
-    if service == "sns":
-        service_builder = service_builder.with_sns()
-
-    if service == "layers":
-        service_builder = service_builder.with_layers()
-
-    if service == "dynamodb":
-        service_builder = service_builder.with_dynamodb()
-
-    if service == "s3":
-        service_builder = service_builder.with_s3()
-
-    if service == "state_machine":
-        service_builder = service_builder.with_state_machine()
-
-    if service == "event_bridge":
-        service_builder = service_builder.with_event_bridge()
-
-    if service == "sqs":
-        service_builder = service_builder.with_sqs()
-
-    if service == "secrets_manager":
-        service_builder = service_builder.with_secrets_manager()
-
-    if service == "cognito":
-        service_builder = service_builder.with_cognito()
-
-    if service == "kms":
-        service_builder = service_builder.with_kms()
+    services = {
+        "sns": service_builder.with_sns,
+        "layers": service_builder.with_layers,
+        "dynamodb": service_builder.with_dynamodb,
+        "s3": service_builder.with_s3,
+        "state_machine": service_builder.with_state_machine,
+        "event_bridge": service_builder.with_event_bridge,
+        "sqs": service_builder.with_sqs,
+        "secrets_manager": service_builder.with_secrets_manager,
+        "cognito": service_builder.with_cognito,
+        "kms": service_builder.with_kms,
+    }
+    service_builder = services[service]()
 
     service_builder.build()
 
