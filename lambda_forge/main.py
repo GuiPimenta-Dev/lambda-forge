@@ -1,8 +1,8 @@
 import click
 
-from forge.function_builder import FunctionBuilder
-from forge.project_builder import ProjectBuilder
-from forge.service_builder import ServiceBuilder
+from lambda_forge.function_builder import FunctionBuilder
+from lambda_forge.project_builder import ProjectBuilder
+from lambda_forge.service_builder import ServiceBuilder
 
 
 @click.group()

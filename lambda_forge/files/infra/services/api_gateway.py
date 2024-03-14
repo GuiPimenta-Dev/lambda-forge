@@ -11,6 +11,7 @@ class APIGateway:
         self.stage = stage
         self.scope = scope
         self.arns = arns
+        self.authorizers = {"default": None}
         name = scope.node.try_get_context("name")
         self.api = apigateway.RestApi(
             scope,
@@ -39,13 +40,14 @@ class APIGateway:
             },
         )
 
-        self.authorizer = self.__create_authorizer(scope, name, stage)
-
         self.__create_docs_endpoints(scope, name, stage)
 
-    def create_endpoint(self, method, path, function, authorizer=True):
+    def create_endpoint(self, method, path, function, authorizer=True, authorizer_name="default"):
+        if authorizer_name not in self.authorizers:
+            raise Exception(f"Authorizer {authorizer_name} not found")
+
         resource = self.__create_resource(path)
-        authorizer = self.authorizer if authorizer else None
+        authorizer = self.authorizers[authorizer_name] if authorizer else None
         resource.add_method(
             method,
             apigateway.LambdaIntegration(handler=function, proxy=True),
@@ -55,6 +57,21 @@ class APIGateway:
         function_name = function._physical_name.split("-")[-1]
         self.endpoints[function_name] = {"method": method, "endpoint": path}
 
+    def create_authorizer(self, function, authorizer_name="default"):
+        if self.authorizers.get(authorizer_name) is not None:
+            raise Exception(f"Authorizer {authorizer_name} already set")
+        
+        function.add_environment("API_ARN", f"arn:aws:execute-api:{self.scope.region}:{self.scope.account}:{self.api.rest_api_id}/*")
+        authorizer =  apigateway.RequestAuthorizer(
+            self.scope,
+            id=f"{authorizer_name}-Authorizer",
+            handler=function,
+            identity_sources=[apigateway.IdentitySource.context("identity.sourceIp")],
+            results_cache_ttl=Duration.seconds(0),
+        )
+
+        self.authorizers[authorizer_name] = authorizer
+    
     def __create_resource(self, endpoint):
         resources = list(filter(None, endpoint.split("/")))
         resource = self.api.root.get_resource(resources[0])
@@ -65,31 +82,6 @@ class APIGateway:
                 subresource
             )
         return resource
-
-    def __create_authorizer(self, scope, name, stage):
-        region = scope.node.try_get_context("region")
-        account = scope.node.try_get_context("account")
-        authorizer = Function(
-            scope,
-            id="Authorizer",
-            runtime=Runtime.PYTHON_3_9,
-            handler="main.lambda_handler",
-            environment={
-                "API_ARN": f"arn:aws:execute-api:{region}:{account}:{self.api.rest_api_id}/*",
-            },
-            function_name=f"{stage}-{name}-Authorizer",
-            code=Code.from_asset(path="./authorizer"),
-            description="Lambda function that authenticates requests",
-            timeout=Duration.minutes(1),
-        )
-
-        return apigateway.RequestAuthorizer(
-            scope,
-            id="RequestAuthorizer",
-            handler=authorizer,
-            identity_sources=[apigateway.IdentitySource.context("identity.sourceIp")],
-            results_cache_ttl=Duration.seconds(0),
-        )
 
     def __create_docs_endpoints(self, scope, name, stage):
         docs_bucket_arn = self.arns["docs_bucket_arn"]
