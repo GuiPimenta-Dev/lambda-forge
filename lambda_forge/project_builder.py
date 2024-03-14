@@ -231,14 +231,23 @@ class ProdPipelineStack(cdk.Stack):
         return self
 
     def build(self):
-        self.copy_folders("/lambda_forge/files", "")
+        self.copy_folders("lambda_forge", "files", "")
+
         if self.dev:
-            self.make_file("infra/stacks", "dev_pipeline_stack.py", self.dev)
+            self.make_file(
+                f"{self.root_dir}/infra/stacks", "dev_pipeline_stack.py", self.dev
+            )
 
         if self.staging:
-            self.make_file("infra/stacks", "staging_pipeline_stack.py", self.staging)
+            self.make_file(
+                f"{self.root_dir}/infra/stacks",
+                "staging_pipeline_stack.py",
+                self.staging,
+            )
 
         if self.prod:
-            self.make_file("infra/stacks", "prod_pipeline_stack.py", self.prod)
+            self.make_file(
+                f"{self.root_dir}/infra/stacks", "prod_pipeline_stack.py", self.prod
+            )
 
         self.write_lines("app.py", self.app)
