@@ -25,6 +25,8 @@ def function(name, description, method, belongs, endpoint, no_api, authorizer):
     Forjes the function with the required folder structure.
     """
     method = method.upper() if method else None
+    if authorizer:
+        belongs = belongs or "authorizer"
     create_function(name, description, method, belongs, endpoint, no_api, authorizer)
 
 
@@ -41,9 +43,6 @@ def create_function(
         raise click.UsageError(
             "You must provide a method for the API Gateway endpoint or use the flag --no-api"
         )
-
-    if authorizer:
-        belongs = belongs or "authorizer"
 
     function_builder = FunctionBuilder.a_function(name, description).with_config(
         belongs
@@ -70,6 +69,7 @@ def create_function(
 
 
 @forge.command()
+@click.argument("name")
 @click.option(
     "--no-dev", help="Do not create dev environment", is_flag=True, default=False
 )
@@ -88,18 +88,55 @@ def create_function(
     is_flag=True,
     default=False,
 )
-def project(no_dev, no_staging, no_prod, no_docs):
+@click.option(
+    "--public-docs",
+    help="Create public documentation for the api endpoints",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "--bucket",
+    help="Bucket used to store the documentation",
+    default="",
+)
+def project(
+    name,
+    no_dev,
+    no_staging,
+    no_prod,
+    no_docs,
+    public_docs,
+    bucket,
+):
     """
-    Forjes the project structure.
+    Starts the project structure.
     """
-    create_project(no_dev, no_staging, no_prod, no_docs)
+
+    if no_docs is False and not bucket:
+        raise click.UsageError("You must provide a S3 bucket for the docs or use the flag --no-docs")
+
+    create_project(
+        name,
+        no_dev,
+        no_staging,
+        no_prod,
+        no_docs,
+        public_docs,
+        bucket,
+    )
 
 
-def create_project(no_dev, no_staging, no_prod, no_docs):
-    project_builder = ProjectBuilder.a_project()
+def create_project(
+    name,
+    no_dev,
+    no_staging,
+    no_prod,
+    no_docs,
+    public_docs,
+    bucket,
+):
 
-    if no_docs is False:
-        project_builder = project_builder.with_docs()
+    project_builder = ProjectBuilder.a_project(name, not no_docs)
 
     if no_dev is False:
         project_builder = project_builder.with_dev()
@@ -110,8 +147,42 @@ def create_project(no_dev, no_staging, no_prod, no_docs):
     if no_prod is False:
         project_builder = project_builder.with_prod()
 
-    project_builder = project_builder.with_app()
+    project_builder = project_builder.with_app().with_cdk()
     project_builder.build()
+
+    if no_docs is False:
+        if public_docs:
+            config = f"""
+from infra.services import Services
+
+class DocsConfig:
+    def __init__(self, services: Services) -> None:
+
+        services.api_gateway.create_docs(bucket="{bucket}", authorizer=None)
+"""
+            FunctionBuilder.a_function("docs").with_custom_config(config).with_lambda_stack().build()
+
+        else:
+            config = f"""
+from infra.services import Services
+
+class DocsConfig:
+    def __init__(self, services: Services) -> None:
+
+        function = services.aws_lambda.create_function(
+            name="DocsAuthorizer",
+            path="./functions/docs",
+            description="Function used to authorize the docs endpoints",
+
+        )
+
+        services.api_gateway.create_authorizer(function, name="docs-authorizer")
+        services.api_gateway.create_docs(bucket="{bucket}", authorizer="docs-authorizer")
+"""
+
+            FunctionBuilder.a_function("docs").with_custom_config(config).with_authorizer(
+            update_config=False
+        ).with_authorizer_unit().with_lambda_stack().build()
 
 
 AVALABLE_SERVICES = sorted(
@@ -164,4 +235,5 @@ def create_service(service):
 
 
 if __name__ == "__main__":
-    forge()
+    # forge()
+    create_project("lambda", False, False, False, False, False, "bucket")

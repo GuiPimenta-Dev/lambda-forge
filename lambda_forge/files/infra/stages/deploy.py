@@ -5,15 +5,7 @@ from infra.stacks.lambda_stack import LambdaStack
 
 
 class DeployStage(cdk.Stage):
-    def __init__(
-        self,
-        scope: Construct,
-        stage: str,
-        arns,
-        alarms=False,
-        versioning=False,
-        **kwargs
-    ):
+    def __init__(self, scope: Construct, stage: str, arns, **kwargs):
         super().__init__(scope, stage, **kwargs)
 
-        LambdaStack(self, stage, arns, alarms, versioning)
+        LambdaStack(self, stage, arns)

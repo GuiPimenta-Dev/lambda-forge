@@ -30,7 +30,9 @@ class FileService:
         with open(path, "r") as f:
             return f.readlines()
 
-    def copy_folders(self, package_name: str, resource_name: str, destination: str) -> None:
+    def copy_folders(
+        self, package_name: str, resource_name: str, destination: str
+    ) -> None:
         with resources.path(package_name, resource_name) as src:
             dst = Path(self.root_dir + destination)
 

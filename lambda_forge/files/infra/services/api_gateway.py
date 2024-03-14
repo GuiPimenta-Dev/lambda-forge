@@ -6,17 +6,16 @@ from aws_cdk.aws_lambda import Code, Function, Runtime
 
 
 class APIGateway:
-    def __init__(self, scope, stage, arns) -> None:
+    def __init__(self, scope, stage) -> None:
         self.endpoints = {}
         self.stage = stage
         self.scope = scope
-        self.arns = arns
-        self.authorizers = {"default": None}
-        name = scope.node.try_get_context("name")
+        self.authorizers = {"authorizer": None}
+        self.name = scope.node.try_get_context("name")
         self.api = apigateway.RestApi(
             scope,
-            id=f"{stage}-{name}-API",
-            description=f"{stage} {name} CDK API",
+            id=f"{stage}-{self.name}-API",
+            description=f"{stage} {self.name} CDK API",
             deploy_options={"stage_name": stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
             binary_media_types=["multipart/form-data"],
@@ -40,10 +39,8 @@ class APIGateway:
             },
         )
 
-        self.__create_docs_endpoints(scope, name, stage)
-
     def create_endpoint(
-        self, method, path, function, private=True, authorizer="default"
+        self, method, path, function, private=True, authorizer="authorizer"
     ):
         if authorizer not in self.authorizers:
             raise Exception(f"Authorizer {authorizer} not found")
@@ -59,7 +56,7 @@ class APIGateway:
         function_name = function._physical_name.split("-")[-1]
         self.endpoints[function_name] = {"method": method, "endpoint": path}
 
-    def create_authorizer(self, function, name="default"):
+    def create_authorizer(self, function, name="authorizer"):
         if self.authorizers.get(name) is not None:
             raise Exception(f"Authorizer {name} already set")
 
@@ -88,13 +85,12 @@ class APIGateway:
             )
         return resource
 
-    def __create_docs_endpoints(self, scope, name, stage):
-        docs_bucket_arn = self.arns["docs_bucket_arn"]
+    def create_docs(self, bucket, authorizer):
         s3_integration_role = iam.Role(
-            scope,
+            self.scope,
             "api-gateway-s3",
             assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            role_name=f"{stage}-{name}-API-Gateway-S3-Integration-Role",
+            role_name=f"{self.stage}-{self.name}-API-Gateway-S3-Integration-Role",
         )
 
         s3_integration_role.add_to_policy(
@@ -110,14 +106,18 @@ class APIGateway:
         )
 
         docs_resource = self.api.root.add_resource("docs")
-
         swagger_resource = docs_resource.add_resource("swagger")
+
+        if authorizer and authorizer not in self.authorizers:
+            raise Exception(f"Authorizer {authorizer} not found")
+
+        authorizer = self.authorizers[authorizer] if authorizer else None
 
         swagger_resource.add_method(
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{docs_bucket_arn}/{name}/{stage.lower()}-swagger.html",
+                path=f"{bucket}/{self.name}/{self.stage.lower()}-swagger.html",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,
@@ -128,6 +128,7 @@ class APIGateway:
                     ],
                 ),
             ),
+            authorizer=authorizer,
             method_responses=[
                 {
                     "statusCode": "200",

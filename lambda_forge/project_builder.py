@@ -1,20 +1,21 @@
 from lambda_forge.file_service import FileService
+import json
+
+# from file_service import FileService
+# from lambda_forge.function_builder import FunctionBuilder
 
 
 class ProjectBuilder(FileService):
     @staticmethod
-    def a_project():
-        return ProjectBuilder()
+    def a_project(name, docs):
+        return ProjectBuilder(name, docs)
 
-    def __init__(self):
-        self.docs = False
+    def __init__(self, name, docs):
+        self.name = name
+        self.docs = docs
         self.dev = None
         self.staging = None
         self.prod = None
-
-    def with_docs(self):
-        self.docs = True
-        return self
 
     def with_dev(self):
         self.dev = """
@@ -27,11 +28,11 @@ from infra.stages.deploy import DeployStage
 
 class DevPipelineStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
-        name = scope.node.try_get_context("name").capitalize()
+        name = scope.node.try_get_context("name").title()
         super().__init__(scope, f"Dev-{name}-Pipeline-Stack", **kwargs)
 
         repo = self.node.try_get_context("repo")
-        source = CodePipelineSource.git_hub(f"{repo["owner"]}/{repo["name"]}", "dev")
+        source = CodePipelineSource.git_hub(f"{repo['owner']}/{repo['name']}", "dev")
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -47,7 +48,7 @@ class DevPipelineStack(cdk.Stack):
                     "cdk synth",
                 ],
             ),
-            pipeline_name=f"Playground-{name}-Pipeline",
+            pipeline_name=f"Dev-{name}-Pipeline",
         )
 
         context = self.node.try_get_context("dev")
@@ -70,11 +71,11 @@ from infra.steps.code_build_step import CodeBuildStep
 
 class StagingPipelineStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
-        name = scope.node.try_get_context("name").capitalize()
+        name = scope.node.try_get_context("name").title()
         super().__init__(scope, f"Staging-{{name}}-Pipeline-Stack", **kwargs)
 
         repo = self.node.try_get_context("repo")
-        source = CodePipelineSource.git_hub(f"{{repo["owner"]}}/{{repo["name"]}}", "staging")
+        source = CodePipelineSource.git_hub(f"{{repo['owner']}}/{{repo['name']}}", "staging")
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -105,8 +106,7 @@ class StagingPipelineStack(cdk.Stack):
         validate_integration_tests = code_build.validate_integration_tests()
 
         # post
-        bucket = self.node.try_get_context("docs")["bucket"]
-        generate_docs = code_build.generate_docs(name, stage, bucket)
+        generate_docs = code_build.generate_docs(name, stage)
         integration_tests = code_build.run_integration_tests()
 
         pipeline.add_stage(
@@ -135,11 +135,11 @@ from infra.steps.code_build_step import CodeBuildStep
 
 class ProdPipelineStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
-        name = scope.node.try_get_context("name").capitalize()
+        name = scope.node.try_get_context("name").title()
         super().__init__(scope, f"Prod-{{name}}-Pipeline-Stack", **kwargs)
 
         repo = self.node.try_get_context("repo")
-        source = CodePipelineSource.git_hub(f"{{repo["owner"]}}/{{repo["name"]}}", "main")
+        source = CodePipelineSource.git_hub(f"{{repo['owner']}}/{{repo['name']}}", "main")
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -170,8 +170,7 @@ class ProdPipelineStack(cdk.Stack):
         validate_integration_tests = code_build.validate_integration_tests()
 
         # post
-        bucket = self.node.try_get_context("docs")["bucket"]
-        generate_staging_docs = code_build.generate_docs(name, staging_stage, bucket)
+        generate_staging_docs = code_build.generate_docs(name, staging_stage)
         integration_tests = code_build.run_integration_tests()
 
         pipeline.add_stage(
@@ -182,20 +181,70 @@ class ProdPipelineStack(cdk.Stack):
                 validate_integration_tests,
                 validate_docs,
             ],
-            post=[generate_staging_docs, integration_tests],
+            post=[integration_tests{", generate_staging_docs" if self.docs else ""}],
         )
 
         prod_context = self.node.try_get_context("prod")
         prod_stage = "Prod"
 
         # post
-        generate_prod_docs = code_build.generate_docs(name, prod_stage, bucket)
+        generate_prod_docs = code_build.generate_docs(name, prod_stage)
 
         pipeline.add_stage(
             DeployStage(self, prod_stage, prod_context["arns"]),
             post=[{"generate_prod_docs" if self.docs else ""}],
         )
 """
+        return self
+
+    def with_cdk(self):
+        cdk = {
+            "app": "python3 app.py",
+            "watch": {
+                "include": ["**"],
+                "exclude": [
+                    "README.md",
+                    "cdk*.json",
+                    "requirements*.txt",
+                    "source.bat",
+                    "**/__init__.py",
+                    "python/__pycache__",
+                    "tests",
+                ],
+            },
+            "context": {
+                "@aws-cdk/aws-lambda:recognizeLayerVersion": True,
+                "@aws-cdk/core:checkSecretUsage": True,
+                "@aws-cdk/core:target-partitions": ["aws", "aws-cn"],
+                "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": True,
+                "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": True,
+                "@aws-cdk/aws-ecs:arnFormatIncludesClusterName": True,
+                "@aws-cdk/aws-iam:minimizePolicies": True,
+                "@aws-cdk/core:validateSnapshotRemovalPolicy": True,
+                "@aws-cdk/aws-codepipeline:crossAccountKeyAliasStackSafeResourceName": True,
+                "@aws-cdk/aws-s3:createDefaultLoggingPolicy": True,
+                "@aws-cdk/aws-sns-subscriptions:restrictSqsDescryption": True,
+                "@aws-cdk/aws-apigateway:disableCloudWatchRole": True,
+                "@aws-cdk/core:enablePartitionLiterals": True,
+                "@aws-cdk/aws-events:eventsTargetQueueSameAccount": True,
+                "@aws-cdk/aws-iam:standardizedServicePrincipals": True,
+                "@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker": True,
+                "@aws-cdk/aws-iam:importedRoleStackSafeDefaultPolicyName": True,
+                "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": True,
+                "@aws-cdk/aws-route53-patters:useCertificate": True,
+                "@aws-cdk/customresources:installLatestAwsSdkDefault": False,
+                "region": "us-east-2",
+                "account": "",
+                "name": self.name.title(),
+                "repo": {"owner": "", "name": ""},
+                "docs": self.docs,
+                "dev": {"arns": {}},
+                "staging": {"arns": {}},
+                "prod": {"arns": {}},
+            },
+        }
+
+        self.cdk = json.dumps(cdk, indent=2)
         return self
 
     def with_app(self):
@@ -250,4 +299,5 @@ class ProdPipelineStack(cdk.Stack):
                 f"{self.root_dir}/infra/stacks", "prod_pipeline_stack.py", self.prod
             )
 
+        self.make_file("", "cdk.json", self.cdk)
         self.write_lines("app.py", self.app)

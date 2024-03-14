@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambda_forge",
-    version="1.0.12",
+    version="1.0.18",
     packages=find_packages(),
-    license='MIT',
+    license="MIT",
     install_requires=[
         "attrs==22.1.0",
         "aws-cdk-lib==2.29.1",
@@ -18,7 +18,7 @@ setup(
     ],
     include_package_data=True,
     package_data={
-        'lambda_forge': ['files/*', 'files/**/*'],
+        "lambda_forge": ["files/*", "files/**/*"],
     },
     author="Guilherme Alves Pimenta",
     author_email="guialvespimenta27@gmail.com",

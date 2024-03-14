@@ -3,7 +3,7 @@ from lambda_forge.file_service import FileService
 
 class FunctionBuilder(FileService):
     @staticmethod
-    def a_function(function_name, description):
+    def a_function(function_name, description=""):
         return FunctionBuilder(function_name, description)
 
     def __init__(self, function_name, description):
@@ -12,11 +12,21 @@ class FunctionBuilder(FileService):
         self.endpoint = None
         self.integration = None
         self.authorizer = False
+        self.main = None
+        self.unit = None
 
     def with_endpoint(self, endpoint):
         if endpoint.startswith("/"):
             endpoint = endpoint[1:]
         self.endpoint = endpoint
+        return self
+
+    def with_custom_config(self, config, belongs=None):
+        self.config = config
+        self.belongs = belongs
+        self.pascal_name = "".join(
+            word.capitalize() for word in self.function_name.split("_")
+        )
         return self
 
     def with_config(self, belongs):
@@ -114,16 +124,22 @@ def test_lambda_handler():
 """
         return self
 
-    def with_authorizer(self):
+    def with_authorizer(self, name=None, update_config=True):
         self.authorizer = True
         self.main = """
 def lambda_handler(event, context):
     pass
     """
+        if update_config:
+            if name:
+                self.config += f"""
+            services.api_gateway.create_authorizer(function, name="{name}")
+            """
 
-        self.config += """        
-        services.api_gateway.create_authorizer(function)
-        """
+            else:
+                self.config += """        
+            services.api_gateway.create_authorizer(function)
+            """
 
         return self
 
@@ -136,7 +152,9 @@ def lambda_handler(event, context):
             else f"functions.{self.function_name}"
         )
 
-        self.lambda_stack.insert(0, f"from {folder}.config import {self.pascal_name}\n")
+        self.lambda_stack.insert(
+            0, f"from {folder}.config import {self.pascal_name}Config\n"
+        )
 
         directory = self.belongs or self.function_name
         comment = "".join(word.capitalize() for word in directory.split("_"))
@@ -144,13 +162,15 @@ def lambda_handler(event, context):
         try:
             comment_index = self.lambda_stack.index(f"        # {comment}\n")
             self.lambda_stack.insert(
-                comment_index + 1, f"        {self.pascal_name}(self.services)\n"
+                comment_index + 1, f"        {self.pascal_name}Config(self.services)\n"
             )
         except:
             if self.authorizer is False:
                 self.lambda_stack.append(f"\n")
                 self.lambda_stack.append(f"        # {comment}\n")
-                self.lambda_stack.append(f"        {self.pascal_name}(self.services)\n")
+                self.lambda_stack.append(
+                    f"        {self.pascal_name}Config(self.services)\n"
+                )
             else:
                 services_index = next(
                     (
@@ -162,7 +182,10 @@ def lambda_handler(event, context):
                 )
                 self.lambda_stack.insert(services_index + 1, f"\n")
                 self.lambda_stack.insert(services_index + 2, f"        # {comment}\n")
-                self.lambda_stack.insert(services_index + 3, f"        {self.pascal_name}(self.services)\n")
+                self.lambda_stack.insert(
+                    services_index + 3,
+                    f"        {self.pascal_name}Config(self.services)\n",
+                )
 
         return self
 
@@ -179,8 +202,10 @@ def lambda_handler(event, context):
             self.make_file(folder_path, "__init__.py")
 
         self.make_file(folder_path, "config.py", self.config)
-        self.make_file(folder_path, "main.py", self.main)
-        self.make_file(folder_path, "unit.py", self.unit)
+        if self.main:
+            self.make_file(folder_path, "main.py", self.main)
+        if self.unit:
+            self.make_file(folder_path, "unit.py", self.unit)
         self.write_lines("infra/stacks/lambda_stack.py", self.lambda_stack)
         if self.integration:
             self.make_file(folder_path, "integration.py", self.integration)

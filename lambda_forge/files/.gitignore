@@ -1,0 +1,29 @@
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.venv
+*.egg-info
+venv/
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+.env
+.vscode/
+dist/
+# pyenv
+.python-version
+
+env/
+
+sam.out
+
+tested_endpoints.jsonl
+
+htmlcov/
+.coverage
+coverage.xml
+.DS_store
+.fc
+build/
+docs.yaml

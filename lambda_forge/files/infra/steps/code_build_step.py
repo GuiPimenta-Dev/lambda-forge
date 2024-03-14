@@ -207,7 +207,8 @@ class CodeBuildStep:
             ],
         )
 
-    def generate_docs(self, name, stage, bucket):
+    def generate_docs(self, name, stage):
+        bucket = self.scope.node.try_get_context("docs")["bucket"]
         return pipelines.CodeBuildStep(
             f"Generate {stage} Docs",
             input=self.source,
