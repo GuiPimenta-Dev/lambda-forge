@@ -10,7 +10,7 @@ venv/
 cdk.out
 .env
 .vscode/
-
+dist/
 # pyenv
 .python-version
 
