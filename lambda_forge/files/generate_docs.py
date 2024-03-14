@@ -13,7 +13,7 @@ with open("cdk.json", "r") as json_file:
     arns = context["dev"]["arns"]
 
 info = {
-    "title": f"Entri {name} V2 CDK",
+    "title": f"{name.capitalize()} Docs",
     "description": "",
     "version": "1.0.0",
 }
