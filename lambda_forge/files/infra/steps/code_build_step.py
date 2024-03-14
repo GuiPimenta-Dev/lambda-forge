@@ -218,9 +218,7 @@ class CodeBuildStep:
             commands=[
                 "python generate_docs.py",
                 "python swagger_yml_to_ui.py < docs.yaml > swagger.html",
-                "redoc-cli bundle -o redoc.html docs.yaml",
                 f"aws s3 cp swagger.html s3://{bucket}/{name}/{stage.lower()}-swagger.html",
-                f"aws s3 cp redoc.html s3://{bucket}/{name}/{stage.lower()}-redoc.html",
             ],
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
