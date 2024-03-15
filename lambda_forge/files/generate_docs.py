@@ -23,7 +23,6 @@ services = LambdaStack(
     cdk.App(),
     "Dev",
     arns,
-    alarms=False,
 ).services
 
 functions = services.aws_lambda.functions

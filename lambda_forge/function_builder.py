@@ -1,3 +1,5 @@
+import random
+import string
 from lambda_forge.file_service import FileService
 
 
@@ -113,23 +115,92 @@ def test_lambda_handler():
         return self
 
     def with_authorizer_unit(self):
-        self.unit = """import json
-from .main import lambda_handler
+        self.unit = f"""from .main import lambda_handler
 
-def test_lambda_handler():
+def test_authorizer_should_pass_with_correct_secret():
 
-    response = lambda_handler(None, None)
+    secret = "{self.secret}"
+    event = {{
+        "headers": {{
+            "secret": secret
+        }}
+    }}
+    response = lambda_handler(event, None)
 
-    assert response is None
+    assert response == {{
+        "policyDocument": {{
+            "Version": "2012-10-17",
+            "Statement": [
+                {{
+                    "Action": "execute-api:Invoke",
+                    "Effect": "allow",
+                    "Resource": "*"
+                }}
+            ],
+        }},
+    }}
+
+def test_authorizer_should_fail_with_invalid_secret():
+
+    secret = "INVALID-SECRET"
+    event = {{
+        "headers": {{
+            "secret": secret
+        }}
+    }}
+    response = lambda_handler(event, None)
+
+    assert response == {{
+        "policyDocument": {{
+            "Version": "2012-10-17",
+            "Statement": [
+                {{
+                    "Action": "execute-api:Invoke",
+                    "Effect": "deny",
+                    "Resource": "*"
+                }}
+            ],
+        }},
+    }}
 """
         return self
 
     def with_authorizer(self, name=None, update_config=True):
         self.authorizer = True
-        self.main = """
+        self.secret = "".join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=52))
+
+        self.main = f"""
 def lambda_handler(event, context):
-    pass
-    """
+
+    # ATTENTION: The example provided below is strictly for demonstration purposes and should NOT be deployed in a production environment.
+    # It's crucial to develop and integrate your own robust authorization mechanism tailored to your application's security requirements.
+    # To utilize the example authorizer as a temporary placeholder, ensure to include the following header in your requests:
+
+    # Header:
+    # secret: {self.secret}
+
+    # Remember, security is paramount. This placeholder serves as a guide to help you understand the kind of information your custom authorizer should authenticate. 
+    # Please replace it with your secure, proprietary logic before going live. Happy coding!
+
+    secret = event["headers"].get("secret")
+
+    SECRET = "{self.secret}"
+    effect = "allow" if secret == SECRET else "deny"
+
+    policy = {{
+        "policyDocument": {{
+            "Version": "2012-10-17",
+            "Statement": [
+                {{
+                    "Action": "execute-api:Invoke",
+                    "Effect": effect,
+                    "Resource": "*"
+                }}
+            ],
+        }},
+    }}
+    return policy
+"""
         if update_config:
             if name:
                 self.config += f"""
@@ -138,7 +209,7 @@ def lambda_handler(event, context):
 
             else:
                 self.config += """        
-            services.api_gateway.create_authorizer(function)
+        services.api_gateway.create_authorizer(function)
             """
 
         return self

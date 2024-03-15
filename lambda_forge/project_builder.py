@@ -91,7 +91,7 @@ class StagingPipelineStack(cdk.Stack):
                     "cdk synth",
                 ],
             ),
-            pipeline_name=f"Dev-{{name}}-Pipeline",
+            pipeline_name=f"Staging-{{name}}-Pipeline",
         )
 
         context = self.node.try_get_context("staging")
@@ -197,7 +197,7 @@ class ProdPipelineStack(cdk.Stack):
 """
         return self
 
-    def with_cdk(self):
+    def with_cdk(self, repo_owner, repo_name, bucket):
         cdk = {
             "app": "python3 app.py",
             "watch": {
@@ -236,8 +236,8 @@ class ProdPipelineStack(cdk.Stack):
                 "region": "us-east-2",
                 "account": "",
                 "name": self.name.title(),
-                "repo": {"owner": "", "name": ""},
-                "docs": self.docs,
+                "repo": {"owner": repo_owner, "name": repo_name},
+                "bucket": bucket,
                 "dev": {"arns": {}},
                 "staging": {"arns": {}},
                 "prod": {"arns": {}},

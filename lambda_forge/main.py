@@ -71,6 +71,12 @@ def create_function(
 @forge.command()
 @click.argument("name")
 @click.option(
+    "--repo-owner", help="Owner of the repository",  required=True
+)
+@click.option(
+    "--repo-name", help="Repository name", required=True
+)
+@click.option(
     "--no-dev", help="Do not create dev environment", is_flag=True, default=False
 )
 @click.option(
@@ -101,6 +107,8 @@ def create_function(
 )
 def project(
     name,
+    repo_owner,
+    repo_name,
     no_dev,
     no_staging,
     no_prod,
@@ -117,6 +125,8 @@ def project(
 
     create_project(
         name,
+        repo_owner,
+        repo_name,
         no_dev,
         no_staging,
         no_prod,
@@ -128,6 +138,8 @@ def project(
 
 def create_project(
     name,
+    repo_owner,
+    repo_name,
     no_dev,
     no_staging,
     no_prod,
@@ -147,7 +159,7 @@ def create_project(
     if no_prod is False:
         project_builder = project_builder.with_prod()
 
-    project_builder = project_builder.with_app().with_cdk()
+    project_builder = project_builder.with_app().with_cdk(repo_owner, repo_name, bucket)
     project_builder.build()
 
     if no_docs is False:
@@ -235,5 +247,4 @@ def create_service(service):
 
 
 if __name__ == "__main__":
-    # forge()
-    create_project("lambda", False, False, False, False, False, "bucket")
+    forge()
