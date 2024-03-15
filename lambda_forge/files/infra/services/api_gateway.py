@@ -41,9 +41,6 @@ class APIGateway:
         )
 
     def create_endpoint(self, method, path, function, private=True, authorizer=None):
-        if authorizer not in self.authorizers:
-            raise Exception(f"Authorizer {authorizer} not found")
-
         resource = self.__create_resource(path)
         if private:
             authorizer_name = authorizer or self.default_authorizer

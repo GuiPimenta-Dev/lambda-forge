@@ -1,4 +1,5 @@
 import json
+import os
 
 import aws_cdk as cdk
 
@@ -8,9 +9,12 @@ with open("cdk.json", "r") as json_file:
     context = json.load(json_file)["context"]
     arns = context["dev"]["arns"]
 
-with open("tested_endpoints.jsonl", "r") as jl:
-    json_list = list(jl)
-    tested_endpoints = [json.loads(json_str) for json_str in json_list]
+tested_endpoints = []
+
+if os.path.exists("tested_endpoints.jsonl"):
+    with open("tested_endpoints.jsonl", "r") as jl:
+        json_list = list(jl)
+        tested_endpoints = [json.loads(json_str) for json_str in json_list]
 
 services = LambdaStack(
     cdk.App(),

@@ -12,7 +12,7 @@ class LambdaStack(Stack):
         **kwargs,
     ) -> None:
 
-        name = scope.node.try_get_context("name").title()
+        name = scope.node.try_get_context("name")
         super().__init__(scope, f"{name}-CDK", **kwargs)
 
         self.services = Services(self, stage, arns)
