@@ -1,5 +1,6 @@
 import click
 
+from lambda_forge.authorizer_builder import AuthorizerBuilder
 from lambda_forge.function_builder import FunctionBuilder
 from lambda_forge.project_builder import ProjectBuilder
 from lambda_forge.service_builder import ServiceBuilder
@@ -17,17 +18,14 @@ def forge():
     "--method", required=False, help="HTTP method for the endpoint", default=None
 )
 @click.option("--belongs", help="Folder name you want to share code accross lambdas")
-@click.option("--endpoint", help="Endpoint URL for the API Gateway")
+@click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-@click.option("--authorizer", help="Define the function as an authorizer", is_flag=True)
-def function(name, description, method, belongs, endpoint, no_api, authorizer):
+def function(name, description, method, belongs, endpoint, no_api):
     """
-    Forjes the function with the required folder structure.
+    Forjes a function with the required folder structure.
     """
     method = method.upper() if method else None
-    if authorizer:
-        belongs = belongs or "authorizer"
-    create_function(name, description, method, belongs, endpoint, no_api, authorizer)
+    create_function(name, description, method, belongs, endpoint, no_api)
 
 
 def create_function(
@@ -37,7 +35,6 @@ def create_function(
     belongs=None,
     endpoint=None,
     no_api=False,
-    authorizer=False,
 ):
     if no_api is False and not http_method and authorizer is False:
         raise click.UsageError(
@@ -48,10 +45,7 @@ def create_function(
         belongs
     )
 
-    if authorizer:
-        function_builder.with_authorizer().with_authorizer_unit()
-
-    elif no_api is True:
+    if no_api is True:
         function_builder = function_builder.with_unit().with_main()
 
     elif no_api is False:
@@ -70,12 +64,34 @@ def create_function(
 
 @forge.command()
 @click.argument("name")
+@click.option("--description", required=True, help="Description for the endpoint")
 @click.option(
-    "--repo-owner", help="Owner of the repository",  required=True
+    "--default",
+    help="Mark the authorizer as the default for all private endpoints with no authorizer set.",
+    is_flag=True,
+    default=False,
 )
-@click.option(
-    "--repo-name", help="Repository name", required=True
-)
+def authorizer(name, description, belongs, default):
+    """
+    Forjes an authorizer with the required folder structure.
+    """
+    create_authorizer(name, description, belongs, default)
+
+
+def create_authorizer(name, description, default):
+    authorizer_builder = AuthorizerBuilder.an_authorizer(
+        name, description, "authorizer"
+    )
+
+    authorizer_builder.with_config(
+        default
+    ).with_main().with_unit().with_lambda_stack().build()
+
+
+@forge.command()
+@click.argument("name")
+@click.option("--repo-owner", help="Owner of the repository", required=True)
+@click.option("--repo-name", help="Repository name", required=True)
 @click.option(
     "--no-dev", help="Do not create dev environment", is_flag=True, default=False
 )
@@ -121,7 +137,9 @@ def project(
     """
 
     if no_docs is False and not bucket:
-        raise click.UsageError("You must provide a S3 bucket for the docs or use the flag --no-docs")
+        raise click.UsageError(
+            "You must provide a S3 bucket for the docs or use the flag --no-docs"
+        )
 
     create_project(
         name,
@@ -163,38 +181,26 @@ def create_project(
     project_builder.build()
 
     if no_docs is False:
-        if public_docs:
-            config = f"""
+
+        if public_docs is False:
+            AuthorizerBuilder.an_authorizer(
+                "docs_authorizer",
+                "Function used to authorize the docs endpoints",
+                "authorizer",
+            ).with_config().with_main().with_unit().with_lambda_stack().build()
+
+        custom_config = f"""
 from infra.services import Services
 
 class DocsConfig:
     def __init__(self, services: Services) -> None:
 
-        services.api_gateway.create_docs(bucket="{bucket}", authorizer=None)
-"""
-            FunctionBuilder.a_function("docs").with_custom_config(config).with_lambda_stack().build()
-
-        else:
-            config = f"""
-from infra.services import Services
-
-class DocsConfig:
-    def __init__(self, services: Services) -> None:
-
-        function = services.aws_lambda.create_function(
-            name="DocsAuthorizer",
-            path="./functions/docs",
-            description="Function used to authorize the docs endpoints",
-
-        )
-
-        services.api_gateway.create_authorizer(function, name="docs-authorizer")
-        services.api_gateway.create_docs(bucket="{bucket}", authorizer="docs-authorizer")
+        services.api_gateway.create_docs(bucket="{bucket}", authorizer={None if public_docs else '"docs_authorizer"'})
 """
 
-            FunctionBuilder.a_function("docs").with_custom_config(config).with_authorizer(
-            update_config=False
-        ).with_authorizer_unit().with_lambda_stack().build()
+        FunctionBuilder.a_function("docs").with_custom_config(
+            custom_config
+        ).with_lambda_stack().build()
 
 
 AVALABLE_SERVICES = sorted(
@@ -248,3 +254,5 @@ def create_service(service):
 
 if __name__ == "__main__":
     forge()
+    # create_project("project", "repo_owner", "repo_name", False, False, False, False, False, "my-bucket")
+    # create_authorizer("authorizer", "Function used to authorize the docs endpoints", "authorizer", True)

@@ -167,7 +167,11 @@ def test_authorizer_should_fail_with_invalid_secret():
 
     def with_authorizer(self, name=None, update_config=True):
         self.authorizer = True
-        self.secret = "".join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=52))
+        self.secret = "".join(
+            random.choices(
+                string.ascii_lowercase + string.ascii_uppercase + string.digits, k=52
+            )
+        )
 
         self.main = f"""
 def lambda_handler(event, context):
@@ -236,27 +240,11 @@ def lambda_handler(event, context):
                 comment_index + 1, f"        {self.pascal_name}Config(self.services)\n"
             )
         except:
-            if self.authorizer is False:
-                self.lambda_stack.append(f"\n")
-                self.lambda_stack.append(f"        # {comment}\n")
-                self.lambda_stack.append(
-                    f"        {self.pascal_name}Config(self.services)\n"
-                )
-            else:
-                services_index = next(
-                    (
-                        i
-                        for i, line in enumerate(self.lambda_stack)
-                        if "Services(self" in line
-                    ),
-                    -1,
-                )
-                self.lambda_stack.insert(services_index + 1, f"\n")
-                self.lambda_stack.insert(services_index + 2, f"        # {comment}\n")
-                self.lambda_stack.insert(
-                    services_index + 3,
-                    f"        {self.pascal_name}Config(self.services)\n",
-                )
+            self.lambda_stack.append(f"\n")
+            self.lambda_stack.append(f"        # {comment}\n")
+            self.lambda_stack.append(
+                f"        {self.pascal_name}Config(self.services)\n"
+            )
 
         return self
 

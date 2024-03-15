@@ -10,7 +10,8 @@ class APIGateway:
         self.endpoints = {}
         self.stage = stage
         self.scope = scope
-        self.authorizers = {"authorizer": None}
+        self.authorizers = {}
+        self.default_authorizer = None
         self.name = scope.node.try_get_context("name")
         self.api = apigateway.RestApi(
             scope,
@@ -39,14 +40,24 @@ class APIGateway:
             },
         )
 
-    def create_endpoint(
-        self, method, path, function, private=True, authorizer="authorizer"
-    ):
+    def create_endpoint(self, method, path, function, private=True, authorizer=None):
         if authorizer not in self.authorizers:
             raise Exception(f"Authorizer {authorizer} not found")
 
         resource = self.__create_resource(path)
-        authorizer = self.authorizers[authorizer] if private else None
+        if private:
+            authorizer_name = authorizer or self.default_authorizer
+            if not authorizer_name:
+                raise ValueError(
+                    "No default authorizer set and no authorizer provided."
+                )
+
+            authorizer = self.authorizers.get(authorizer_name)
+            if authorizer is None:
+                raise ValueError(f"Authorizer '{authorizer_name}' not found.")
+        else:
+            authorizer = None
+
         resource.add_method(
             method,
             apigateway.LambdaIntegration(handler=function, proxy=True),
@@ -56,9 +67,15 @@ class APIGateway:
         function_name = function._physical_name.split("-")[-1]
         self.endpoints[function_name] = {"method": method, "endpoint": path}
 
-    def create_authorizer(self, function, name="authorizer"):
+    def create_authorizer(self, function, name, default=False):
         if self.authorizers.get(name) is not None:
             raise Exception(f"Authorizer {name} already set")
+
+        if self.default_authorizer is not None and default is True:
+            raise Exception("Default authorizer already set")
+
+        if default:
+            self.default_authorizer = name
 
         function.add_environment(
             "API_ARN",
@@ -76,9 +93,9 @@ class APIGateway:
 
     def __create_resource(self, endpoint):
         resources = list(filter(None, endpoint.split("/")))
-        resource = self.api.root.get_resource(resources[0])
-        if not resource:
-            resource = self.api.root.add_resource(resources[0])
+        resource = self.api.root.get_resource(
+            resources[0]
+        ) or self.api.root.add_resource(resources[0])
         for subresource in resources[1:]:
             resource = resource.get_resource(subresource) or resource.add_resource(
                 subresource
