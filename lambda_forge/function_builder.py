@@ -155,8 +155,10 @@ def test_lambda_handler():
             self.make_file(folder_path, "__init__.py")
 
         self.make_file(folder_path, "config.py", self.config)
-        self.make_file(folder_path, "main.py", self.main)
-        self.make_file(folder_path, "unit.py", self.unit)
-        self.write_lines("infra/stacks/lambda_stack.py", self.lambda_stack)
+        if self.main:
+            self.make_file(folder_path, "main.py", self.main)
+        if self.unit:
+            self.make_file(folder_path, "unit.py", self.unit)
         if self.integration:
             self.make_file(folder_path, "integration.py", self.integration)
+        self.write_lines("infra/stacks/lambda_stack.py", self.lambda_stack)
