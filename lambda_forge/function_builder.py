@@ -1,5 +1,3 @@
-import random
-import string
 from lambda_forge.file_service import FileService
 
 
@@ -13,7 +11,6 @@ class FunctionBuilder(FileService):
         self.description = description
         self.endpoint = None
         self.integration = None
-        self.authorizer = False
         self.main = None
         self.unit = None
 
@@ -114,109 +111,6 @@ def test_lambda_handler():
 """
         return self
 
-    def with_authorizer_unit(self):
-        self.unit = f"""from .main import lambda_handler
-
-def test_authorizer_should_pass_with_correct_secret():
-
-    secret = "{self.secret}"
-    event = {{
-        "headers": {{
-            "secret": secret
-        }}
-    }}
-    response = lambda_handler(event, None)
-
-    assert response == {{
-        "policyDocument": {{
-            "Version": "2012-10-17",
-            "Statement": [
-                {{
-                    "Action": "execute-api:Invoke",
-                    "Effect": "allow",
-                    "Resource": "*"
-                }}
-            ],
-        }},
-    }}
-
-def test_authorizer_should_fail_with_invalid_secret():
-
-    secret = "INVALID-SECRET"
-    event = {{
-        "headers": {{
-            "secret": secret
-        }}
-    }}
-    response = lambda_handler(event, None)
-
-    assert response == {{
-        "policyDocument": {{
-            "Version": "2012-10-17",
-            "Statement": [
-                {{
-                    "Action": "execute-api:Invoke",
-                    "Effect": "deny",
-                    "Resource": "*"
-                }}
-            ],
-        }},
-    }}
-"""
-        return self
-
-    def with_authorizer(self, name=None, update_config=True):
-        self.authorizer = True
-        self.secret = "".join(
-            random.choices(
-                string.ascii_lowercase + string.ascii_uppercase + string.digits, k=52
-            )
-        )
-
-        self.main = f"""
-def lambda_handler(event, context):
-
-    # ATTENTION: The example provided below is strictly for demonstration purposes and should NOT be deployed in a production environment.
-    # It's crucial to develop and integrate your own robust authorization mechanism tailored to your application's security requirements.
-    # To utilize the example authorizer as a temporary placeholder, ensure to include the following header in your requests:
-
-    # Header:
-    # secret: {self.secret}
-
-    # Remember, security is paramount. This placeholder serves as a guide to help you understand the kind of information your custom authorizer should authenticate. 
-    # Please replace it with your secure, proprietary logic before going live. Happy coding!
-
-    secret = event["headers"].get("secret")
-
-    SECRET = "{self.secret}"
-    effect = "allow" if secret == SECRET else "deny"
-
-    policy = {{
-        "policyDocument": {{
-            "Version": "2012-10-17",
-            "Statement": [
-                {{
-                    "Action": "execute-api:Invoke",
-                    "Effect": effect,
-                    "Resource": "*"
-                }}
-            ],
-        }},
-    }}
-    return policy
-"""
-        if update_config:
-            if name:
-                self.config += f"""
-            services.api_gateway.create_authorizer(function, name="{name}")
-            """
-
-            else:
-                self.config += """        
-        services.api_gateway.create_authorizer(function)
-            """
-
-        return self
 
     def with_lambda_stack(self):
         self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
@@ -261,10 +155,8 @@ def lambda_handler(event, context):
             self.make_file(folder_path, "__init__.py")
 
         self.make_file(folder_path, "config.py", self.config)
-        if self.main:
-            self.make_file(folder_path, "main.py", self.main)
-        if self.unit:
-            self.make_file(folder_path, "unit.py", self.unit)
+        self.make_file(folder_path, "main.py", self.main)
+        self.make_file(folder_path, "unit.py", self.unit)
         self.write_lines("infra/stacks/lambda_stack.py", self.lambda_stack)
         if self.integration:
             self.make_file(folder_path, "integration.py", self.integration)

@@ -254,5 +254,3 @@ def create_service(service):
 
 if __name__ == "__main__":
     forge()
-    # create_project("project", "repo_owner", "repo_name", False, False, False, False, False, "my-bucket")
-    # create_authorizer("authorizer", "Function used to authorize the docs endpoints", "authorizer", True)
