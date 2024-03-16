@@ -1,10 +1,6 @@
 from lambda_forge.file_service import FileService
 import json
 
-# from file_service import FileService
-# from lambda_forge.function_builder import FunctionBuilder
-
-
 class ProjectBuilder(FileService):
     @staticmethod
     def a_project(name, docs):
