@@ -141,12 +141,18 @@ class DocsConfig:
 @click.option("--belongs", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-def function(name, description, method, belongs, endpoint, no_api):
+@click.option(
+    "--public",
+    help="Endpoint is public",
+    is_flag=True,
+    default=False,
+)
+def function(name, description, method, belongs, endpoint, no_api, public):
     """
     Forjes a function with the required folder structure.
     """
     method = method.upper() if method else None
-    create_function(name, description, method, belongs, endpoint, no_api)
+    create_function(name, description, method, belongs, endpoint, no_api, public)
 
 
 def create_function(
@@ -156,6 +162,7 @@ def create_function(
     belongs=None,
     endpoint=None,
     no_api=False,
+    public=False,
 ):
     if no_api is False and not http_method:
         raise click.UsageError(
@@ -173,7 +180,7 @@ def create_function(
         endpoint = endpoint or belongs or name
         function_builder = (
             function_builder.with_endpoint(endpoint)
-            .with_api(http_method)
+            .with_api(http_method, public)
             .with_integration(http_method)
             .with_unit()
             .with_main()

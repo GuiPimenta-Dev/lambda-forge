@@ -144,7 +144,7 @@ def test_it_should_configure_the_config_file_correctly_for_a_belongs_and_with_ap
         "",
         '        services.api_gateway.create_endpoint("GET", "/belongs", function)',
         "",
-        "        ",
+        "            ",
     ]
 
 
@@ -177,7 +177,7 @@ def test_it_should_configure_the_config_file_correctly_for_a_api_function():
         '        services.api_gateway.create_endpoint("GET", "/function_name", '
         "function)",
         "",
-        "        ",
+        "            ",
     ]
 
 

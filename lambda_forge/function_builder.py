@@ -48,12 +48,18 @@ class {self.pascal_name}Config:
 """
         return self
 
-    def with_api(self, http_method):
+    def with_api(self, http_method, public):
         self.http_method = http_method
-        self.config += f"""
+        if public:
+            self.config += f"""
+        services.api_gateway.create_endpoint("{http_method}", "/{self.endpoint}", function, private={not public})
+
+            """
+        else:
+            self.config += f"""
         services.api_gateway.create_endpoint("{http_method}", "/{self.endpoint}", function)
 
-        """
+            """
         return self
 
     def with_integration(self, http_method):
