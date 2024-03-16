@@ -1,6 +1,7 @@
 from lambda_forge.file_service import FileService
 import json
 
+
 class ProjectBuilder(FileService):
     @staticmethod
     def a_project(name, docs):
@@ -22,7 +23,7 @@ from constructs import Construct
 from infra.stages.deploy import DeployStage
 
 
-class DevPipelineStack(cdk.Stack):
+class DevStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
         name = scope.node.try_get_context("name").title()
         super().__init__(scope, f"Dev-{name}-Pipeline-Stack", **kwargs)
@@ -65,7 +66,7 @@ from infra.stages.deploy import DeployStage
 from infra.steps.code_build_step import CodeBuildStep
 
 
-class StagingPipelineStack(cdk.Stack):
+class StagingStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
         name = scope.node.try_get_context("name").title()
         super().__init__(scope, f"Staging-{{name}}-Pipeline-Stack", **kwargs)
@@ -129,7 +130,7 @@ from infra.stages.deploy import DeployStage
 from infra.steps.code_build_step import CodeBuildStep
 
 
-class ProdPipelineStack(cdk.Stack):
+class ProdStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
         name = scope.node.try_get_context("name").title()
         super().__init__(scope, f"Prod-{{name}}-Pipeline-Stack", **kwargs)
@@ -192,7 +193,7 @@ class ProdPipelineStack(cdk.Stack):
         )
 """
         return self
-    
+
     def with_gitignore(self):
         self.gitignore = """
 # Compiled source #
@@ -354,7 +355,7 @@ tested_endpoints.jsonl
 # Coverage reports #
 ####################
 coverage.xml
-"""     
+"""
         return self
 
     def with_pre_commit(self):
@@ -408,7 +409,7 @@ repos:
         stages: [commit]
 """
         return self
-    
+
     def with_coverage(self):
         self.coverage = """
 [run]
@@ -420,7 +421,7 @@ include =
 omit=
 """
         return self
-    
+
     def with_cdk(self, repo_owner, repo_name, bucket):
         cdk = {
             "app": "python3 app.py",
@@ -475,30 +476,24 @@ omit=
         self.app = ["import aws_cdk as cdk\n"]
 
         if self.dev:
-            self.app.append(
-                "from infra.stacks.dev_pipeline_stack import DevPipelineStack\n"
-            )
+            self.app.append("from infra.stacks.dev_stack import DevStack\n")
 
         if self.staging:
-            self.app.append(
-                "from infra.stacks.staging_pipeline_stack import StagingPipelineStack\n"
-            )
+            self.app.append("from infra.stacks.staging_stack import StagingStack\n")
 
         if self.prod:
-            self.app.append(
-                "from infra.stacks.prod_pipeline_stack import ProdPipelineStack\n"
-            )
+            self.app.append("from infra.stacks.prod_stack import ProdStack\n")
 
         self.app.append("\napp = cdk.App()\n\n")
 
         if self.dev:
-            self.app.append("DevPipelineStack = DevPipelineStack(app)\n")
+            self.app.append("DevStack = DevStack(app)\n")
 
         if self.staging:
-            self.app.append("StagingStack = StagingPipelineStack(app)\n")
+            self.app.append("StagingStack = StagingStack(app)\n")
 
         if self.prod:
-            self.app.append("ProdStack = ProdPipelineStack(app)\n")
+            self.app.append("ProdStack = ProdStack(app)\n")
 
         self.app.append("\napp.synth()")
         return self
@@ -510,21 +505,17 @@ omit=
         self.make_file("", ".coveragerc", self.coverage)
 
         if self.dev:
-            self.make_file(
-                f"{self.root_dir}/infra/stacks", "dev_pipeline_stack.py", self.dev
-            )
+            self.make_file(f"{self.root_dir}/infra/stacks", "dev_stack.py", self.dev)
 
         if self.staging:
             self.make_file(
                 f"{self.root_dir}/infra/stacks",
-                "staging_pipeline_stack.py",
+                "staging_stack.py",
                 self.staging,
             )
 
         if self.prod:
-            self.make_file(
-                f"{self.root_dir}/infra/stacks", "prod_pipeline_stack.py", self.prod
-            )
+            self.make_file(f"{self.root_dir}/infra/stacks", "prod_stack.py", self.prod)
 
         self.make_file("", "cdk.json", self.cdk)
         self.write_lines("app.py", self.app)

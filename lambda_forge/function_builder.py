@@ -111,7 +111,6 @@ def test_lambda_handler():
 """
         return self
 
-
     def with_lambda_stack(self):
         self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 

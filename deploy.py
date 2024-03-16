@@ -3,6 +3,7 @@ import subprocess
 import shutil
 import os
 
+
 def read_version():
     """Reads the version from setup.py."""
     with open("setup.py", "r") as file:
@@ -12,18 +13,23 @@ def read_version():
             return version_match[1]
     return None
 
+
 def increment_version(version):
     """Increments the patch number in the version."""
-    major, minor, patch = map(int, version.split('.'))
+    major, minor, patch = map(int, version.split("."))
     return f"{major}.{minor}.{patch + 1}"
+
 
 def update_setup_py(new_version):
     """Updates the setup.py file with the new version."""
     with open("setup.py", "r") as file:
         content = file.read()
-    content = re.sub(r"(version=['\"])([^'\"]+)(['\"])", fr"\g<1>{new_version}\3", content)
+    content = re.sub(
+        r"(version=['\"])([^'\"]+)(['\"])", rf"\g<1>{new_version}\3", content
+    )
     with open("setup.py", "w") as file:
         file.write(content)
+
 
 def build_and_upload():
     # Check if the dist directory exists and remove it
@@ -34,7 +40,10 @@ def build_and_upload():
 
     """Builds the package and uploads it to TestPyPI."""
     subprocess.run(["python", "setup.py", "sdist", "bdist_wheel"], check=True)
-    subprocess.run(["twine", "upload", "--repository", "testpypi", "dist/*"], check=True)
+    subprocess.run(
+        ["twine", "upload", "--repository", "testpypi", "dist/*"], check=True
+    )
+
 
 def main():
     current_version = read_version()
@@ -46,6 +55,7 @@ def main():
     print("Building and uploading the package to TestPyPI...")
     build_and_upload()
     print("Done.")
+
 
 if __name__ == "__main__":
     main()

@@ -177,7 +177,13 @@ def create_project(
     if no_prod is False:
         project_builder = project_builder.with_prod()
 
-    project_builder = project_builder.with_app().with_cdk(repo_owner, repo_name, bucket).with_gitignore().with_pre_commit().with_coverage()
+    project_builder = (
+        project_builder.with_app()
+        .with_cdk(repo_owner, repo_name, bucket)
+        .with_gitignore()
+        .with_pre_commit()
+        .with_coverage()
+    )
     project_builder.build()
 
     if no_docs is False:

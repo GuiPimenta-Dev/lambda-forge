@@ -1,2 +1,2 @@
-from .stacks.staging_pipeline_stack import StagingPipelineStack
-from .stacks.prod_pipeline_stack import ProdPipelineStack
+from .stacks.staging_stack import StagingStack
+from .stacks.prod_stack import ProdStack
