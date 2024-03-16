@@ -71,11 +71,11 @@ def create_function(
     is_flag=True,
     default=False,
 )
-def authorizer(name, description, belongs, default):
+def authorizer(name, description, default):
     """
     Forjes an authorizer with the required folder structure.
     """
-    create_authorizer(name, description, belongs, default)
+    create_authorizer(name, description, default)
 
 
 def create_authorizer(name, description, default):
