@@ -460,7 +460,7 @@ omit=
                 "@aws-cdk/customresources:installLatestAwsSdkDefault": False,
                 "region": "us-east-2",
                 "account": "",
-                "name": self.name.title(),
+                "name": self.name.title().replace("_", "-").replace(" ", "-"),
                 "repo": {"owner": repo_owner, "name": repo_name},
                 "bucket": bucket,
                 "dev": {"arns": {}},

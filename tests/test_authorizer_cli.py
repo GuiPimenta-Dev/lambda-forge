@@ -117,7 +117,8 @@ def test_it_should_update_lambda_stack_when_creating_an_authorizer():
         "from functions.authorizers.authorizer_name.config import "
         "AuthorizerNameConfig",
         "from functions.docs.config import DocsConfig",
-        "from functions.authorizer.docs_authorizer.config import DocsAuthorizerConfig",
+        "from functions.authorizers.docs_authorizer.config import "
+        "DocsAuthorizerConfig",
         "from aws_cdk import Stack",
         "from constructs import Construct",
         "from infra.services import Services",
@@ -139,8 +140,6 @@ def test_it_should_update_lambda_stack_when_creating_an_authorizer():
         "",
         "        # Authorizers",
         "        AuthorizerNameConfig(self.services)",
-        "",
-        "        # Authorizer",
         "        DocsAuthorizerConfig(self.services)",
         "",
         "        # Docs",

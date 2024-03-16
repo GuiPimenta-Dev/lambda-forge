@@ -246,7 +246,8 @@ def test_it_should_update_lambda_stack_with_no_belongs():
     assert lambda_stack == [
         "from functions.function_name.config import FunctionNameConfig",
         "from functions.docs.config import DocsConfig",
-        "from functions.authorizer.docs_authorizer.config import DocsAuthorizerConfig",
+        "from functions.authorizers.docs_authorizer.config import "
+        "DocsAuthorizerConfig",
         "from aws_cdk import Stack",
         "from constructs import Construct",
         "from infra.services import Services",
@@ -266,7 +267,7 @@ def test_it_should_update_lambda_stack_with_no_belongs():
         "",
         "        self.services = Services(self, stage, arns)",
         "",
-        "        # Authorizer",
+        "        # Authorizers",
         "        DocsAuthorizerConfig(self.services)",
         "",
         "        # Docs",
@@ -295,7 +296,8 @@ def test_it_should_update_lambda_stack_with_belongs():
     assert lambda_stack == [
         "from functions.belongs.function_name.config import FunctionNameConfig",
         "from functions.docs.config import DocsConfig",
-        "from functions.authorizer.docs_authorizer.config import DocsAuthorizerConfig",
+        "from functions.authorizers.docs_authorizer.config import "
+        "DocsAuthorizerConfig",
         "from aws_cdk import Stack",
         "from constructs import Construct",
         "from infra.services import Services",
@@ -315,7 +317,7 @@ def test_it_should_update_lambda_stack_with_belongs():
         "",
         "        self.services = Services(self, stage, arns)",
         "",
-        "        # Authorizer",
+        "        # Authorizers",
         "        DocsAuthorizerConfig(self.services)",
         "",
         "        # Docs",
