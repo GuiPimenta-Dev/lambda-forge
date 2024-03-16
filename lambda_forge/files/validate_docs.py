@@ -31,8 +31,10 @@ def extract_path_parameters(endpoint):
     matches = re.findall(pattern, endpoint)
     return matches
 
+def default_module_loader(file_path):
+    return importlib.import_module(file_path)
 
-def validate_docs(endpoints):
+def validate_docs(endpoints, loader):
     paths = {endpoint["endpoint"]: {} for endpoint in endpoints}
     for endpoint in endpoints:
         print(endpoint)
@@ -42,7 +44,7 @@ def validate_docs(endpoints):
             .replace("/", ".")
             .replace(".lambda_handler", "")
         )
-        function_file = importlib.import_module(file_path)
+        function_file = loader(file_path)
 
         if "{" in endpoint["endpoint"] and "}" in endpoint["endpoint"]:
             try:
@@ -93,4 +95,4 @@ if __name__ == "__main__":
     functions = services.aws_lambda.functions
     api_endpoints = services.api_gateway.endpoints
     endpoints = get_endpoints(functions, api_endpoints)
-    validate_docs(endpoints)
+    validate_docs(endpoints, default_module_loader)
