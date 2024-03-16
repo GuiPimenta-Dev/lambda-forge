@@ -1,5 +1,7 @@
 import re
 import subprocess
+import shutil
+import os
 
 def read_version():
     """Reads the version from setup.py."""
@@ -7,7 +9,7 @@ def read_version():
         content = file.read()
         version_match = re.search(r"version=['\"]([^'\"]+)['\"]", content)
         if version_match:
-            return version_match.group(1)
+            return version_match[1]
     return None
 
 def increment_version(version):
@@ -24,6 +26,12 @@ def update_setup_py(new_version):
         file.write(content)
 
 def build_and_upload():
+    # Check if the dist directory exists and remove it
+    dist_path = "dist"
+    if os.path.exists(dist_path) and os.path.isdir(dist_path):
+        shutil.rmtree(dist_path)
+        print(f"Removed existing {dist_path} directory.")
+
     """Builds the package and uploads it to TestPyPI."""
     subprocess.run(["python", "setup.py", "sdist", "bdist_wheel"], check=True)
     subprocess.run(["twine", "upload", "--repository", "testpypi", "dist/*"], check=True)
