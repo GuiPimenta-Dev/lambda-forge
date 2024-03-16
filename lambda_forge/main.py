@@ -13,83 +13,6 @@ def forge():
 
 @forge.command()
 @click.argument("name")
-@click.option("--description", required=True, help="Description for the endpoint")
-@click.option(
-    "--method", required=False, help="HTTP method for the endpoint", default=None
-)
-@click.option("--belongs", help="Folder name you want to share code accross lambdas")
-@click.option("--endpoint", help="Endpoint for the API Gateway")
-@click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-def function(name, description, method, belongs, endpoint, no_api):
-    """
-    Forjes a function with the required folder structure.
-    """
-    method = method.upper() if method else None
-    create_function(name, description, method, belongs, endpoint, no_api)
-
-
-def create_function(
-    name,
-    description,
-    http_method=None,
-    belongs=None,
-    endpoint=None,
-    no_api=False,
-):
-    if no_api is False and not http_method and authorizer is False:
-        raise click.UsageError(
-            "You must provide a method for the API Gateway endpoint or use the flag --no-api"
-        )
-
-    function_builder = FunctionBuilder.a_function(name, description).with_config(
-        belongs
-    )
-
-    if no_api is True:
-        function_builder = function_builder.with_unit().with_main()
-
-    elif no_api is False:
-        endpoint = endpoint or belongs or name
-        function_builder = (
-            function_builder.with_endpoint(endpoint)
-            .with_api(http_method)
-            .with_integration(http_method)
-            .with_unit()
-            .with_main()
-        )
-
-    function_builder = function_builder.with_lambda_stack()
-    function_builder.build()
-
-
-@forge.command()
-@click.argument("name")
-@click.option("--description", required=True, help="Description for the endpoint")
-@click.option(
-    "--default",
-    help="Mark the authorizer as the default for all private endpoints with no authorizer set.",
-    is_flag=True,
-    default=False,
-)
-def authorizer(name, description, default):
-    """
-    Forjes an authorizer with the required folder structure.
-    """
-    create_authorizer(name, description, default)
-
-
-def create_authorizer(name, description, default):
-    authorizer_builder = AuthorizerBuilder.an_authorizer(
-        name, description, "authorizer"
-    )
-
-    authorizer_builder.with_config(
-        default
-    ).with_main().with_unit().with_lambda_stack().build()
-
-
-@forge.command()
-@click.argument("name")
 @click.option("--repo-owner", help="Owner of the repository", required=True)
 @click.option("--repo-name", help="Repository name", required=True)
 @click.option(
@@ -133,7 +56,7 @@ def project(
     bucket,
 ):
     """
-    Starts the project structure.
+    Forges the initial project structure.
     """
 
     if no_docs is False and not bucket:
@@ -192,7 +115,7 @@ def create_project(
             AuthorizerBuilder.an_authorizer(
                 "docs_authorizer",
                 "Function used to authorize the docs endpoints",
-                "authorizer",
+                "authorizers",
             ).with_config().with_main().with_unit().with_lambda_stack().build()
 
         custom_config = f"""
@@ -207,6 +130,83 @@ class DocsConfig:
         FunctionBuilder.a_function("docs").with_custom_config(
             custom_config
         ).with_lambda_stack().build()
+
+
+@forge.command()
+@click.argument("name")
+@click.option("--description", required=True, help="Description for the endpoint")
+@click.option(
+    "--method", required=False, help="HTTP method for the endpoint", default=None
+)
+@click.option("--belongs", help="Folder name you want to share code accross lambdas")
+@click.option("--endpoint", help="Endpoint for the API Gateway")
+@click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
+def function(name, description, method, belongs, endpoint, no_api):
+    """
+    Forjes a function with the required folder structure.
+    """
+    method = method.upper() if method else None
+    create_function(name, description, method, belongs, endpoint, no_api)
+
+
+def create_function(
+    name,
+    description,
+    http_method=None,
+    belongs=None,
+    endpoint=None,
+    no_api=False,
+):
+    if no_api is False and not http_method:
+        raise click.UsageError(
+            "You must provide a method for the API Gateway endpoint or use the flag --no-api"
+        )
+
+    function_builder = FunctionBuilder.a_function(name, description).with_config(
+        belongs
+    )
+
+    if no_api is True:
+        function_builder = function_builder.with_unit().with_main()
+
+    elif no_api is False:
+        endpoint = endpoint or belongs or name
+        function_builder = (
+            function_builder.with_endpoint(endpoint)
+            .with_api(http_method)
+            .with_integration(http_method)
+            .with_unit()
+            .with_main()
+        )
+
+    function_builder = function_builder.with_lambda_stack()
+    function_builder.build()
+
+
+@forge.command()
+@click.argument("name")
+@click.option("--description", required=True, help="Description for the endpoint")
+@click.option(
+    "--default",
+    help="Mark the authorizer as the default for all private endpoints with no authorizer set.",
+    is_flag=True,
+    default=False,
+)
+def authorizer(name, description, default):
+    """
+    Forjes an authorizer with the required folder structure.
+    """
+    create_authorizer(name, description, default)
+
+
+def create_authorizer(name, description, default):
+    authorizer_builder = AuthorizerBuilder.an_authorizer(
+        name, description, "authorizers"
+    )
+
+    authorizer_builder.with_config(
+        default
+    ).with_main().with_unit().with_lambda_stack().build()
 
 
 AVALABLE_SERVICES = sorted(

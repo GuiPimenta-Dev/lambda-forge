@@ -2,6 +2,7 @@ import contextlib
 import pytest
 import shutil
 import os
+from click.testing import CliRunner
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -33,11 +34,17 @@ def clean_project_structure():
             os.remove(file)
 
 
+@pytest.fixture(scope="function")
+def initial_files():
+    files = list_files(".")
+    return files
+
+
 def file_exists(file_path):
     return os.path.exists(file_path)
 
 
-def read_lines(file_path):
+def read_file_lines(file_path):
     try:
         with open(file_path, "r") as file:
             return file.read().splitlines()
@@ -49,7 +56,7 @@ def read_lines(file_path):
         return []
 
 
-def created_files(root_dir):
+def list_files(root_dir="."):
     ignore_dirs = [
         ".venv",
         "venv",
@@ -58,7 +65,9 @@ def created_files(root_dir):
         ".git",
         ".vscode",
         "lambda_forge",
+        "lambda_forge.egg-info",
         "tests",
+        "build",
     ]
     ignore_files = ["LICENSE", "README.md", "setup.py", ".env", "clean.py", "deploy.py"]
     all_files = []
@@ -69,3 +78,11 @@ def created_files(root_dir):
             if file not in ignore_files:
                 all_files.append(os.path.join(root, file))
     return all_files
+
+
+def list_files_related_to(*args):
+    my_list = list_files(".")
+    filtered_list = [
+        item for item in my_list if any(substring in item for substring in args)
+    ]
+    return filtered_list

@@ -13,8 +13,9 @@ setup(
         "click==8.1.3",
         "pre-commit==2.20.0",
         "PyYAML==6.0",
-        "pytest==7.2.0",
+        "pytest==8.1.1",
         "coverage==7.2.3",
+        "",
     ],
     include_package_data=True,
     package_data={
