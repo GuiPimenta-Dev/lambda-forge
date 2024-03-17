@@ -78,6 +78,7 @@ def list_files(root_dir="."):
         "clean.py",
         "deploy.py",
         ".tested_endpoints.jsonl",
+        "todo.txt",
     ]
     all_files = []
     for root, dirs, files in os.walk(root_dir, topdown=True):
