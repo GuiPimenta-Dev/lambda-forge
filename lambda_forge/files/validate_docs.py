@@ -23,13 +23,19 @@ def extract_path_parameters(endpoint):
 
 
 def default_module_loader(file_path):
-    return importlib.import_module(file_path)
+    return importlib.import_module(transform_file_path(file_path))
 
 
 def transform_file_path(file_path):
-    return (
-        file_path.replace(".", "/", 2).replace("//", "/").replace("/lambda_handler", "")
-    )
+    if file_path.startswith("./"):
+        file_path = file_path[2:]
+
+    # Replace '/' with '.' and remove the last part if it contains '.'
+    parts = file_path.split("/")
+    if "." in parts[-1]:
+        parts[-1] = parts[-1].split(".")[0]
+
+    return ".".join(parts)
 
 
 def validate_dataclass(file_path, attribute_name, attribute):
@@ -61,7 +67,7 @@ def validate_paths(endpoint, function_file):
 
 def validate_docs(endpoints, loader=default_module_loader):
     for endpoint in endpoints:
-        function_file = loader(transform_file_path(endpoint["file_path"]))
+        function_file = loader(endpoint["file_path"])
 
         validate_paths(endpoint, function_file)
 
