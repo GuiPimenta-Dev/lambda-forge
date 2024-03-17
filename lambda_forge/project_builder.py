@@ -350,7 +350,7 @@ docs.yaml
 ###############
 .fc
 sam.out
-tested_endpoints.jsonl
+.tested_endpoints.jsonl
 
 # Coverage reports #
 ####################
@@ -403,7 +403,7 @@ repos:
         stages: [commit]
       - id: cleaning
         name: cleaning
-        entry: rm -rf .fc coverage.xml .coverage tested_endpoints.jsonl htmlcov .DS_Store build/ gaia.egg-info/ docs.yaml
+        entry: rm -rf .fc coverage.xml .coverage .tested_endpoints.jsonl htmlcov .DS_Store build/ gaia.egg-info/ docs.yaml
         language: system
         pass_filenames: false
         stages: [commit]

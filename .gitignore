@@ -153,7 +153,7 @@ docs.yaml
 ###############
 .fc
 sam.out
-tested_endpoints.jsonl
+.tested_endpoints.jsonl
 
 # Coverage reports #
 ####################
