@@ -31,8 +31,10 @@ def extract_path_parameters(endpoint):
     matches = re.findall(pattern, endpoint)
     return matches
 
+
 def default_module_loader(file_path):
     return importlib.import_module(file_path)
+
 
 def validate_docs(endpoints, loader):
     paths = {endpoint["endpoint"]: {} for endpoint in endpoints}
