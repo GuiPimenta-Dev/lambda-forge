@@ -5,7 +5,7 @@ import os
 
 def clean_project_structure():
 
-    folders_to_delete = ["functions", "infra"]
+    folders_to_delete = ["functions", "infra", ".fc"]
     files_to_delete = [
         ".coveragerc",
         ".pre-commit-config.yaml",
@@ -20,6 +20,7 @@ def clean_project_structure():
         "swagger_yml_to_ui.py",
         "validate_docs.py",
         "validate_integration_tests.py",
+        ".tested_endpoints.jsonl",
     ]
 
     for folder in folders_to_delete:
