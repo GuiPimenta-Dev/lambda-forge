@@ -1,6 +1,7 @@
 import json
 import os
 
+
 def get_endpoints(functions, api_endpoints):
     endpoints = []
 
