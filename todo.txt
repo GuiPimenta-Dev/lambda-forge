@@ -1,5 +1,3 @@
-2 - Trocar private=True para public=False
-
 3 - Readicionar suporte para o redoc 
 
 4 - Adicionar flags --no-swagger and --no-redoc

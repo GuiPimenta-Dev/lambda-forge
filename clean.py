@@ -21,6 +21,7 @@ def clean_project_structure():
         "validate_docs.py",
         "validate_integration_tests.py",
         ".tested_endpoints.jsonl",
+        "docs.yaml",
     ]
 
     for folder in folders_to_delete:
