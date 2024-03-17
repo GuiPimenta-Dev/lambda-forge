@@ -4,7 +4,6 @@ from lambda_forge.files.validate_docs import get_endpoints, validate_docs
 from dataclasses import dataclass
 
 
-
 class NotDataclass:
     pass
 
@@ -18,7 +17,6 @@ class Mock:
     def __init__(self) -> None:
         self.Input = ADataClass()
         self.Output = ADataClass()
-
 
 
 def module_loader(content):
@@ -193,8 +191,8 @@ def test_it_should_throw_an_error_if_path_id_parameter_is_missing_case_the_endpo
         == "Path parameter id is missing in Path on /functions/function_name/main"
     )
 
-def test_it_should_not_throw_an_error_if_path_id_parameter_is_on_the_dataclass():
 
+def test_it_should_not_throw_an_error_if_path_id_parameter_is_on_the_dataclass():
     @dataclass
     class Path:
         id: str
@@ -215,7 +213,6 @@ def test_it_should_not_throw_an_error_if_path_id_parameter_is_on_the_dataclass()
         validate_docs(endpoints, module_loader(mock))
     except:
         pytest.fail("It should not throw an error")
-
 
 
 def test_it_should_throw_an_error_if_path_class_is_missing_case_the_endpoint_has_the_path():
@@ -257,5 +254,6 @@ def test_it_should_throw_an_error_if_path_class_is_not_a_dataclass_case_the_endp
         validate_docs(endpoints, module_loader(mock))
 
     assert (
-        str(exc_info.value) == "Path is not a dataclass on /functions/function_name/main"
+        str(exc_info.value)
+        == "Path is not a dataclass on /functions/function_name/main"
     )

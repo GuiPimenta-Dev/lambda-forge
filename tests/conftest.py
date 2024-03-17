@@ -68,9 +68,17 @@ def list_files(root_dir="."):
         "lambda_forge.egg-info",
         "tests",
         "build",
-        ".fc"
+        ".fc",
     ]
-    ignore_files = ["LICENSE", "README.md", "setup.py", ".env", "clean.py", "deploy.py", ".tested_endpoints.jsonl"]
+    ignore_files = [
+        "LICENSE",
+        "README.md",
+        "setup.py",
+        ".env",
+        "clean.py",
+        "deploy.py",
+        ".tested_endpoints.jsonl",
+    ]
     all_files = []
     for root, dirs, files in os.walk(root_dir, topdown=True):
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
