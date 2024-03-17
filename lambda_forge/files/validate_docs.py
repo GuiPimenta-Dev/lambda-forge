@@ -79,7 +79,7 @@ if __name__ == "__main__":
         context = json.load(json_file)["context"]
         arns = context["dev"]["arns"]
 
-    from aws_cdk import core as cdk
+    import aws_cdk as cdk
     from infra.stacks.lambda_stack import LambdaStack
 
     app = cdk.App()

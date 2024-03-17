@@ -488,13 +488,13 @@ omit=
         self.app.append("\napp = cdk.App()\n\n")
 
         if self.dev:
-            self.app.append("DevStack = DevStack(app)\n")
+            self.app.append("DevStack(app)\n")
 
         if self.staging:
-            self.app.append("StagingStack = StagingStack(app)\n")
+            self.app.append("StagingStack(app)\n")
 
         if self.prod:
-            self.app.append("ProdStack = ProdStack(app)\n")
+            self.app.append("ProdStack(app)\n")
 
         self.app.append("\napp.synth()")
         return self
