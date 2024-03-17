@@ -3,98 +3,70 @@ import importlib
 import json
 import re
 
-import aws_cdk as cdk
-
-from infra.stacks.lambda_stack import LambdaStack
-
-
 def get_endpoints(functions, api_endpoints):
-    endpoints = []
-    for function in functions:
-        function_name = function["name"]
-        if function_name in api_endpoints:
-            endpoint = api_endpoints[function_name]["endpoint"]
-            method = api_endpoints[function_name]["method"]
-            merged_obj = {
-                "file_path": function["file_path"],
-                "name": function_name,
-                "description": function["description"],
-                "endpoint": endpoint,
-                "method": method,
-            }
-            endpoints.append(merged_obj)
-    return endpoints
-
+    return [
+        {
+            "file_path": function["file_path"],
+            "name": function_name,
+            "description": function["description"],
+            "endpoint": api_endpoints[function_name]["endpoint"],
+            "method": api_endpoints[function_name]["method"],
+        }
+        for function in functions
+        if (function_name := function["name"]) in api_endpoints
+    ]
 
 def extract_path_parameters(endpoint):
-    pattern = r"\{(.*?)\}"
-    matches = re.findall(pattern, endpoint)
-    return matches
-
+    return re.findall(r"\{(.*?)\}", endpoint)
 
 def default_module_loader(file_path):
     return importlib.import_module(file_path)
 
+def transform_file_path(file_path):
+    return file_path.replace(".", "/", 2).replace("//", "/").replace("/lambda_handler", "")
 
-def validate_docs(endpoints, loader):
-    paths = {endpoint["endpoint"]: {} for endpoint in endpoints}
+def validate_dataclass(file_path, attribute_name, attribute):
+    if not dataclasses.is_dataclass(attribute):
+        raise Exception(f"{attribute_name} is not a dataclass on {transform_file_path(file_path)}")
+
+def validate_paths(endpoint, function_file):
+    if "{" not in endpoint["endpoint"] and "}" not in endpoint["endpoint"]:
+        return
+    path = getattr(function_file, 'Path', None)
+    if path is None:
+        raise Exception(f"Path is missing on {transform_file_path(endpoint['file_path'])}")
+
+    validate_dataclass(endpoint['file_path'], 'Path', path)
+
+    path_parameters = extract_path_parameters(endpoint["endpoint"])
+    typed_args = list(path.__dataclass_fields__.keys())
+    for parameter in path_parameters:
+        if parameter not in typed_args:
+            raise Exception(f"Path parameter {parameter} is missing in Path on {transform_file_path(endpoint['file_path'])}")
+
+def validate_docs(endpoints, loader=default_module_loader):
     for endpoint in endpoints:
-        print(endpoint)
-        file_path = (
-            endpoint["file_path"]
-            .replace(".", "/")[2:]
-            .replace("/", ".")
-            .replace(".lambda_handler", "")
-        )
-        function_file = loader(file_path)
+        function_file = loader(transform_file_path(endpoint["file_path"]))
+        
+        validate_paths(endpoint, function_file)
 
-        if "{" in endpoint["endpoint"] and "}" in endpoint["endpoint"]:
-            try:
-                path = function_file.Path
-            except AttributeError:
-                raise Exception(f"Path is missing on {file_path.replace('.', '/')}")
-
-            if not dataclasses.is_dataclass(path):
-                raise Exception(
-                    f"Path is not a dataclass on {file_path.replace('.', '/')}"
-                )
-
-            paths = extract_path_parameters(endpoint["endpoint"])
-            typed_args = list(path.__dataclass_fields__.keys())
-            for path in paths:
-                if path not in typed_args:
-                    raise Exception(
-                        f"Path parameter {path} is missing in Path on {file_path.replace('.', '/')}"
-                    )
-
-        try:
-            input_ = function_file.Input
-        except AttributeError:
-            raise Exception(f"Input is missing on {file_path.replace('.', '/')}")
-
-        try:
-            output = function_file.Output
-        except AttributeError:
-            raise Exception(f"Output is missing on {file_path.replace('.', '/')}")
-
-        if not dataclasses.is_dataclass(input_):
-            raise Exception(
-                f"Input is not a dataclass on {file_path.replace('.', '/')}"
-            )
-
-        if not dataclasses.is_dataclass(output):
-            raise Exception(
-                f"Output is not a dataclass on {file_path.replace('.', '/')}"
-            )
-
+        for attr_name in ["Input", "Output"]:
+            attribute = getattr(function_file, attr_name, None)
+            if attribute is None:
+                raise Exception(f"{attr_name} is missing on {transform_file_path(endpoint['file_path'])}")
+            validate_dataclass(endpoint['file_path'], attr_name, attribute)
 
 if __name__ == "__main__":
     with open("cdk.json", "r") as json_file:
         context = json.load(json_file)["context"]
         arns = context["dev"]["arns"]
 
-    services = LambdaStack(cdk.App(), "Dev", arns).services
+    from aws_cdk import core as cdk
+    from infra.stacks.lambda_stack import LambdaStack
+
+    app = cdk.App()
+    services = LambdaStack(app, "Dev", arns).services
     functions = services.aws_lambda.functions
     api_endpoints = services.api_gateway.endpoints
     endpoints = get_endpoints(functions, api_endpoints)
-    validate_docs(endpoints, default_module_loader)
+    validate_docs(endpoints)
