@@ -52,7 +52,7 @@ class {self.pascal_name}Config:
         self.http_method = http_method
         if public:
             self.config += f"""
-        services.api_gateway.create_endpoint("{http_method}", "/{self.endpoint}", function, private={not public})
+        services.api_gateway.create_endpoint("{http_method}", "/{self.endpoint}", function, public=True)
 
             """
         else:

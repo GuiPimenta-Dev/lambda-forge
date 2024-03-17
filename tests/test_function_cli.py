@@ -84,6 +84,41 @@ def test_it_should_configure_the_config_file_correctly_for_a_no_api_function():
     ]
 
 
+def test_it_should_configure_the_config_file_correctly_for_a_public_function():
+
+    runner.invoke(
+        function,
+        [
+            "function_name",
+            "--description",
+            "description",
+            "--method",
+            "GET",
+            "--public",
+        ],
+    )
+
+    config = read_file_lines("functions/function_name/config.py")
+    assert config == [
+        "from infra.services import Services",
+        "",
+        "class FunctionNameConfig:",
+        "    def __init__(self, services: Services) -> None:",
+        "",
+        "        function = services.aws_lambda.create_function(",
+        '            name="FunctionName",',
+        '            path="./functions/function_name",',
+        '            description="description",',
+        "            ",
+        "        )",
+        "",
+        '        services.api_gateway.create_endpoint("GET", "/function_name", '
+        "function, public=True)",
+        "",
+        "            ",
+    ]
+
+
 def test_it_should_configure_the_config_file_correctly_for_a_belongs_and_no_api_function():
 
     runner.invoke(

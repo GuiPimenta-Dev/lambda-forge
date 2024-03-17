@@ -69,6 +69,7 @@ def list_files(root_dir="."):
         "tests",
         "build",
         ".fc",
+        "dist",
     ]
     ignore_files = [
         "LICENSE",
@@ -78,6 +79,7 @@ def list_files(root_dir="."):
         "clean.py",
         "deploy.py",
         ".tested_endpoints.jsonl",
+        "docs.yaml",
         "todo.txt",
     ]
     all_files = []

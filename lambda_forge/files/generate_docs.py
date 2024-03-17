@@ -53,15 +53,15 @@ def normalize_file_path(file_path):
     Converts the file path from the endpoint format to the loader format.
     """
     # Strip leading './' if it exists
-    if file_path.startswith('./'):
+    if file_path.startswith("./"):
         file_path = file_path[2:]
-    
-    # Replace '/' with '.' and remove the last part if it contains '.'
-    parts = file_path.split('/')
-    if '.' in parts[-1]:
-        parts[-1] = parts[-1].split('.')[0]
 
-    return '.'.join(parts)
+    # Replace '/' with '.' and remove the last part if it contains '.'
+    parts = file_path.split("/")
+    if "." in parts[-1]:
+        parts[-1] = parts[-1].split(".")[0]
+
+    return ".".join(parts)
 
 
 def get_schemas_from_endpoint(endpoint, loader):
