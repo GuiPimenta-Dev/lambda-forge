@@ -143,7 +143,7 @@ def test_it_should_update_lambda_stack_when_creating_an_authorizer():
         "        DocsAuthorizerConfig(self.services)",
         "",
         "        # Docs",
-        "        DocsConfig(self.services)",
+        "        DocsConfig(scope, self.services)",
     ]
 
 

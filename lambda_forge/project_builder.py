@@ -26,7 +26,7 @@ from infra.stages.deploy import DeployStage
 class DevStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
         name = scope.node.try_get_context("name").title()
-        super().__init__(scope, f"Dev-{name}-Pipeline-Stack", **kwargs)
+        super().__init__(scope, f"Dev-{name}-Stack", **kwargs)
 
         repo = self.node.try_get_context("repo")
         source = CodePipelineSource.git_hub(f"{repo['owner']}/{repo['name']}", "dev")
@@ -69,7 +69,7 @@ from infra.steps.code_build_step import CodeBuildStep
 class StagingStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
         name = scope.node.try_get_context("name").title()
-        super().__init__(scope, f"Staging-{{name}}-Pipeline-Stack", **kwargs)
+        super().__init__(scope, f"Staging-{{name}}-Stack", **kwargs)
 
         repo = self.node.try_get_context("repo")
         source = CodePipelineSource.git_hub(f"{{repo['owner']}}/{{repo['name']}}", "staging")
@@ -133,7 +133,7 @@ from infra.steps.code_build_step import CodeBuildStep
 class ProdStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
         name = scope.node.try_get_context("name").title()
-        super().__init__(scope, f"Prod-{{name}}-Pipeline-Stack", **kwargs)
+        super().__init__(scope, f"Prod-{{name}}-Stack", **kwargs)
 
         repo = self.node.try_get_context("repo")
         source = CodePipelineSource.git_hub(f"{{repo['owner']}}/{{repo['name']}}", "main")

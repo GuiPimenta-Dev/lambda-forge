@@ -175,6 +175,7 @@ def test_it_should_add_the_cdk_json_file():
         '      "name": "repo"',
         "    },",
         '    "bucket": "bucket",',
+        '    "coverage": 80,',
         '    "dev": {',
         '      "arns": {}',
         "    },",
@@ -413,7 +414,7 @@ def test_it_should_update_lambda_stack_with_public_docs():
         "        self.services = Services(self, stage, arns)",
         "",
         "        # Docs",
-        "        DocsConfig(self.services)",
+        "        DocsConfig(scope, self.services)",
     ]
 
 
@@ -459,5 +460,5 @@ def test_it_should_always_update_lambda_stack_with_private_docs():
         "        DocsAuthorizerConfig(self.services)",
         "",
         "        # Docs",
-        "        DocsConfig(self.services)",
+        "        DocsConfig(scope, self.services)",
     ]
