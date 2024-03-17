@@ -62,7 +62,7 @@ class CodeBuildStep:
             "CoverageGroup",
             type=codebuild.ReportGroupType.CODE_COVERAGE,
         )
-
+        coverage = self.scope.node.try_get_context("coverage") or 80
         return pipelines.CodeBuildStep(
             "Coverage",
             input=self.source,
@@ -71,7 +71,7 @@ class CodeBuildStep:
             ],
             commands=[
                 'coverage run -m pytest -k "unit.py"',
-                "coverage xml --fail-under=80",
+                f"coverage xml --fail-under={coverage}",
                 "touch coverage.xml",
             ],
             build_environment=codebuild.BuildEnvironment(

@@ -44,6 +44,11 @@ def forge():
     help="Bucket used to store the documentation",
     default="",
 )
+@click.option(
+    "--coverage",
+    help="Minimum coverage percentage",
+    default=80,
+)
 def project(
     name,
     repo_owner,
@@ -54,6 +59,7 @@ def project(
     no_docs,
     public_docs,
     bucket,
+    coverage
 ):
     """
     Forges the initial project structure.
@@ -74,6 +80,7 @@ def project(
         no_docs,
         public_docs,
         bucket,
+        coverage
     )
 
 
@@ -87,6 +94,7 @@ def create_project(
     no_docs,
     public_docs,
     bucket,
+    coverage,
 ):
 
     project_builder = ProjectBuilder.a_project(name, not no_docs)
@@ -102,7 +110,7 @@ def create_project(
 
     project_builder = (
         project_builder.with_app()
-        .with_cdk(repo_owner, repo_name, bucket)
+        .with_cdk(repo_owner, repo_name, bucket, coverage)
         .with_gitignore()
         .with_pre_commit()
         .with_coverage()
@@ -122,14 +130,15 @@ def create_project(
 from infra.services import Services
 
 class DocsConfig:
-    def __init__(self, services: Services) -> None:
 
-        services.api_gateway.create_docs(bucket="{bucket}", authorizer={None if public_docs else '"docs_authorizer"'})
+    def __init__(self, scope, services: Services) -> None:
+        bucket = scope.node.try_get_context("bucket")
+        services.api_gateway.create_docs(bucket=bucket, authorizer={None if public_docs else '"docs_authorizer"'})
 """
 
         FunctionBuilder.a_function("docs").with_custom_config(
             custom_config
-        ).with_lambda_stack().build()
+        ).with_lambda_stack(docs=True).build()
 
 
 @forge.command()

@@ -117,7 +117,7 @@ def test_lambda_handler():
 """
         return self
 
-    def with_lambda_stack(self):
+    def with_lambda_stack(self, docs=False):
         self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
         folder = (
@@ -132,18 +132,17 @@ def test_lambda_handler():
 
         directory = self.belongs or self.function_name
         comment = "".join(word.capitalize() for word in directory.split("_"))
-
+        if docs:
+            class_instance = f"        {self.pascal_name}Config(scope, self.services)\n"
+        else:
+            class_instance = f"        {self.pascal_name}Config(self.services)\n"
         try:
             comment_index = self.lambda_stack.index(f"        # {comment}\n")
-            self.lambda_stack.insert(
-                comment_index + 1, f"        {self.pascal_name}Config(self.services)\n"
-            )
+            self.lambda_stack.insert(comment_index + 1, class_instance)
         except:
             self.lambda_stack.append(f"\n")
             self.lambda_stack.append(f"        # {comment}\n")
-            self.lambda_stack.append(
-                f"        {self.pascal_name}Config(self.services)\n"
-            )
+            self.lambda_stack.append(class_instance)
 
         return self
 

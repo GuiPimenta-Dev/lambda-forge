@@ -1,7 +1,3 @@
-3 - Readicionar suporte para o redoc 
-
-4 - Adicionar flags --no-swagger and --no-redoc
-
 5 - Adiconar coverage no cdk.json e Ler a porcentagem de lá no code_build_step.py
 
 6 - Buscar o bucket do cdk.json no ProjectBuilder

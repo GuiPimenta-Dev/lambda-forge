@@ -120,14 +120,13 @@ class APIGateway:
         )
 
         docs_resource = self.api.root.add_resource("docs")
-        swagger_resource = docs_resource.add_resource("swagger")
 
         if authorizer and authorizer not in self.authorizers:
             raise Exception(f"Authorizer {authorizer} not found")
 
         authorizer = self.authorizers[authorizer] if authorizer else None
 
-        swagger_resource.add_method(
+        docs_resource.add_method(
             "GET",
             apigateway.AwsIntegration(
                 service="s3",

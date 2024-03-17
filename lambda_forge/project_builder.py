@@ -422,7 +422,7 @@ omit=
 """
         return self
 
-    def with_cdk(self, repo_owner, repo_name, bucket):
+    def with_cdk(self, repo_owner, repo_name, bucket, coverage):
         cdk = {
             "app": "python3 app.py",
             "watch": {
@@ -463,6 +463,7 @@ omit=
                 "name": self.name.title().replace("_", "-").replace(" ", "-"),
                 "repo": {"owner": repo_owner, "name": repo_name},
                 "bucket": bucket,
+                "coverage": coverage,
                 "dev": {"arns": {}},
                 "staging": {"arns": {}},
                 "prod": {"arns": {}},
