@@ -213,6 +213,9 @@ class Steps:
         )
 
     def generate_docs(self, name, stage):
+        generate_docs = pkg_resources.resource_string(__name__, 'generate_docs.py')
+        swagger_yml_to_ui = pkg_resources.resource_string(__name__, 'swagger_yml_to_ui.py')
+
         bucket = self.scope.node.try_get_context("bucket")
         return pipelines.CodeBuildStep(
             f"Generate {stage} Docs",
@@ -221,7 +224,9 @@ class Steps:
                 "pip install -r requirements.txt",
             ],
             commands=[
+                f"echo '{generate_docs.decode()}' > generate_docs.py",
                 "python generate_docs.py",
+                f"echo '{swagger_yml_to_ui.decode()}' > swagger_yml_to_ui.py",
                 "python swagger_yml_to_ui.py < docs.yaml > swagger.html",
                 f"aws s3 cp swagger.html s3://{bucket}/{name}/{stage.lower()}-swagger.html",
             ],
