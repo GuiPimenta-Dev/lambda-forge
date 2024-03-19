@@ -40,7 +40,7 @@ class DevStack(cdk.Stack):
         # context = {"arns": ""}
         stage = "Dev"
 
-        steps = Steps(scope, stage, source)
+        steps = Steps(self, stage, source)
         coverage = steps.run_coverage()
         validate_integration_tests = steps.validate_integration_tests()
         generate_docs = steps.generate_docs(name, stage)
