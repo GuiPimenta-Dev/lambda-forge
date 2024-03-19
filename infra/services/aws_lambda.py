@@ -4,7 +4,7 @@ from aws_cdk import Duration, RemovalPolicy
 from aws_cdk.aws_cloudwatch import Alarm, ComparisonOperator
 from aws_cdk.aws_cloudwatch_actions import SnsAction
 from aws_cdk.aws_lambda import Code, Function, Runtime
-
+from lambda_forge import track
 
 class AWSLambda:
     def __init__(self, scope, stage) -> None:
@@ -12,6 +12,7 @@ class AWSLambda:
         self.stage = stage
         self.functions = []
 
+    @track
     def create_function(
         self,
         name,

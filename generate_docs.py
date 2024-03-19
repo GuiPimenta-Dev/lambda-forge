@@ -53,11 +53,11 @@ def normalize_file_path(file_path):
     """
     Converts the file path from the endpoint format to the loader format.
     """
-    # Strip leading './' if it exists
+    # Strip leading ./ if it exists
     if file_path.startswith("./"):
         file_path = file_path[2:]
 
-    # Replace '/' with '.' and remove the last part if it contains '.'
+    # Replace / with . and remove the last part if it contains .
     parts = file_path.split("/")
     if "." in parts[-1]:
         parts[-1] = parts[-1].split(".")[0]
@@ -101,8 +101,8 @@ def parse_schema(data):
     """
     Parses a list of data representing schemas and converts them into a structured dictionary.
 
-    Each item in the input data is expected to have 'data' (the class definition)
-    and 'name' (the schema name) as keys.
+    Each item in the input data is expected to have data (the class definition)
+    and name (the schema name) as keys.
     """
     schemas = {}
     for item in data:
@@ -363,3 +363,4 @@ if __name__ == "__main__":
     spec = generate_docs(endpoints, name)
     with open(r"docs.yaml", "w") as f:
         yaml.dump(spec, f, sort_keys=True)
+

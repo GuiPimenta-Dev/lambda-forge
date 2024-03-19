@@ -1,0 +1,14 @@
+[
+    {
+        "name": "DocsAuthorizer",
+        "file_path": "./functions/authorizers/docs_authorizer/main.lambda_handler",
+        "description": "Function used to authorize the docs endpoints"
+    },
+    {
+        "name": "HelloWorld",
+        "file_path": "./functions/hello_world/main.lambda_handler",
+        "description": "A simple hello word",
+        "method": "GET",
+        "endpoint": "/hello_world"
+    }
+]

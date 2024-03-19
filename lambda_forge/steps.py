@@ -1,3 +1,4 @@
+import os
 from aws_cdk import aws_codebuild as codebuild
 from aws_cdk import aws_iam as iam
 from aws_cdk import pipelines as pipelines
@@ -215,7 +216,8 @@ class Steps:
     def generate_docs(self, name, stage):
         generate_docs = pkg_resources.resource_string(__name__, 'generate_docs.py')
         swagger_yml_to_ui = pkg_resources.resource_string(__name__, 'swagger_yml_to_ui.py')
-
+        os.system(f"echo '{generate_docs.decode()}' > generate_docs.py")
+        os.system("python generate_docs.py")
         bucket = self.scope.node.try_get_context("bucket")
         return pipelines.CodeBuildStep(
             f"Generate {stage} Docs",
