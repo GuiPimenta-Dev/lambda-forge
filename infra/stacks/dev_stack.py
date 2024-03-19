@@ -9,15 +9,15 @@ from lambda_forge import Steps
 
 class DevStack(cdk.Stack):
     def __init__(self, scope: Construct, **kwargs) -> None:
-        # name = scope.node.try_get_context("name").title()
-        name = ""
+        name = scope.node.try_get_context("name").title()
+        # name = ""
         super().__init__(scope, f"Dev-{name}-Stack", **kwargs)
 
-        # repo = self.node.try_get_context("repo")
-        repo = {
-            "owner": "asd",
-            "name": "das",
-        }
+        repo = self.node.try_get_context("repo")
+        # repo = {
+            # "owner": "asd",
+            # "name": "das",
+        # }
         source = CodePipelineSource.git_hub(f"{repo['owner']}/{repo['name']}", "dev")
 
         pipeline = pipelines.CodePipeline(
