@@ -37,8 +37,8 @@ class DevStack(cdk.Stack):
             pipeline_name=f"Dev-{name}-Pipeline",
         )
 
-        # context = self.node.try_get_context("dev")
-        context = {"arns": ""}
+        context = self.node.try_get_context("dev")
+        # context = {"arns": ""}
         stage = "Dev"
 
         steps= Steps(scope, stage, source)
