@@ -1,3 +1,4 @@
+from functions.hello_world.config import HelloWorldConfig
 from functions.docs.config import DocsConfig
 from functions.authorizers.docs_authorizer.config import DocsAuthorizerConfig
 from aws_cdk import Stack
@@ -24,3 +25,6 @@ class LambdaStack(Stack):
 
         # Docs
         DocsConfig(scope, self.services)
+
+        # HelloWorld
+        HelloWorldConfig(self.services)
