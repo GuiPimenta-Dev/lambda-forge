@@ -2,11 +2,9 @@ from aws_cdk import aws_codebuild as codebuild
 from aws_cdk import aws_iam as iam
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
-import pkg_resources
 
 
-
-class Steps:
+class CodeBuildStep:
     def __init__(self, scope, stage, source: CodePipelineSource):
         self.scope = scope
         self.stage = stage
@@ -108,8 +106,6 @@ class Steps:
         )
 
     def validate_integration_tests(self):
-        validate_integration_tests = pkg_resources.resource_string(__name__, 'validate_integration_tests.py')
-
         return pipelines.CodeBuildStep(
             "Validate Integration Tests",
             input=self.source,
@@ -117,7 +113,6 @@ class Steps:
                 "pip install -r requirements.txt",
             ],
             commands=[
-                f"echo '{validate_integration_tests.decode()}' > validate_integration_tests.py",
                 "pytest -m integration --collect-only . -q || echo 'No integration tests found, continuing...'",
                 "python validate_integration_tests.py",
             ],

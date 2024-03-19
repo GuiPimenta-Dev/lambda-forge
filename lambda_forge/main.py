@@ -16,16 +16,16 @@ def forge():
 @click.option("--repo-owner", help="Owner of the repository", required=True)
 @click.option("--repo-name", help="Repository name", required=True)
 @click.option(
-    "--no-dev", help="Do not create dev environment", is_flag=True, default=False
+    "--no-dev", help="Do not create a dev environment", is_flag=True, default=False
 )
 @click.option(
     "--no-staging",
-    help="Do not create staging environment",
+    help="Do not create a staging environment"
     is_flag=True,
     default=False,
 )
 @click.option(
-    "--no-prod", help="Do not create prod environment", is_flag=True, default=False
+    "--no-prod", help="Do not create a prod environment", is_flag=True, default=False
 )
 @click.option(
     "--no-docs",
