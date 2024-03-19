@@ -1,4 +1,3 @@
-
 import aws_cdk as cdk
 from aws_cdk import pipelines
 from aws_cdk.pipelines import CodePipelineSource

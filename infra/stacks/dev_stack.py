@@ -1,4 +1,3 @@
-
 import aws_cdk as cdk
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
@@ -15,8 +14,8 @@ class DevStack(cdk.Stack):
 
         repo = self.node.try_get_context("repo")
         # repo = {
-            # "owner": "asd",
-            # "name": "das",
+        # "owner": "asd",
+        # "name": "das",
         # }
         source = CodePipelineSource.git_hub(f"{repo['owner']}/{repo['name']}", "dev")
 
@@ -41,9 +40,16 @@ class DevStack(cdk.Stack):
         # context = {"arns": ""}
         stage = "Dev"
 
-        steps= Steps(scope, stage, source)
+        steps = Steps(scope, stage, source)
+        coverage = steps.run_coverage()
         validate_integration_tests = steps.validate_integration_tests()
         generate_docs = steps.generate_docs(name, stage)
+        validate_docs = steps.validate_docs()
+        run_integration_tests = steps.run_integration_tests()
+        run_unit_tests = steps.run_unit_tests()
 
-
-        pipeline.add_stage(DeployStage(self, stage, context["arns"]), pre=[validate_integration_tests, generate_docs])
+        pipeline.add_stage(
+            DeployStage(self, stage, context["arns"]),
+            pre=[run_unit_tests, validate_docs, coverage, validate_integration_tests],
+            post=[run_integration_tests, generate_docs],
+        )

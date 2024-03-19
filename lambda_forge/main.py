@@ -20,7 +20,7 @@ def forge():
 )
 @click.option(
     "--no-staging",
-    help="Do not create a staging environment"
+    help="Do not create a staging environment",
     is_flag=True,
     default=False,
 )
@@ -59,7 +59,7 @@ def project(
     no_docs,
     public_docs,
     bucket,
-    coverage
+    coverage,
 ):
     """
     Forges the initial project structure.
@@ -80,7 +80,7 @@ def project(
         no_docs,
         public_docs,
         bucket,
-        coverage
+        coverage,
     )
 
 

@@ -1,5 +1,6 @@
 from infra.services import Services
 
+
 class HelloWorldConfig:
     def __init__(self, services: Services) -> None:
 
@@ -7,9 +8,8 @@ class HelloWorldConfig:
             name="HelloWorld",
             path="./functions/hello_world",
             description="A simple hello word",
-            
         )
 
-        services.api_gateway.create_endpoint("GET", "/hello_world", function, public=True)
-
-            
+        services.api_gateway.create_endpoint(
+            "GET", "/hello_world", function, public=True
+        )

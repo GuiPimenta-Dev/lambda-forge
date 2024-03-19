@@ -6,6 +6,7 @@ from constructs import Construct
 from infra.services import Services
 from lambda_forge import release
 
+
 @release
 class LambdaStack(Stack):
     def __init__(

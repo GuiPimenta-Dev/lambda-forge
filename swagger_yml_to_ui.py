@@ -74,4 +74,3 @@ window.onload = function() {
 
 spec = yaml.load(sys.stdin, Loader=yaml.FullLoader)
 sys.stdout.write(TEMPLATE % json.dumps(spec))
-

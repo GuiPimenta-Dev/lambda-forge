@@ -6,7 +6,6 @@ from aws_cdk.pipelines import CodePipelineSource
 import pkg_resources
 
 
-
 class Steps:
     def __init__(self, scope, stage, source: CodePipelineSource):
         self.scope = scope
@@ -109,7 +108,9 @@ class Steps:
         )
 
     def validate_integration_tests(self):
-        validate_integration_tests = pkg_resources.resource_string(__name__, 'validate_integration_tests.py')
+        validate_integration_tests = pkg_resources.resource_string(
+            __name__, "validate_integration_tests.py"
+        )
 
         return pipelines.CodeBuildStep(
             "Validate Integration Tests",
@@ -214,8 +215,10 @@ class Steps:
         )
 
     def generate_docs(self, name, stage):
-        generate_docs = pkg_resources.resource_string(__name__, 'generate_docs.py')
-        swagger_yml_to_ui = pkg_resources.resource_string(__name__, 'swagger_yml_to_ui.py')
+        generate_docs = pkg_resources.resource_string(__name__, "generate_docs.py")
+        swagger_yml_to_ui = pkg_resources.resource_string(
+            __name__, "swagger_yml_to_ui.py"
+        )
         bucket = self.scope.node.try_get_context("bucket")
         return pipelines.CodeBuildStep(
             f"Generate {stage} Docs",

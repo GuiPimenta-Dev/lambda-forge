@@ -16,7 +16,7 @@ setup(
         "PyYAML==6.0",
         "pytest==8.1.1",
         "coverage==7.2.3",
-        "moto==4.1.7"
+        "moto==4.1.7",
     ],
     include_package_data=True,
     package_data={
@@ -27,7 +27,7 @@ setup(
     author_email="guialvespimenta27@gmail.com",
     url="https://github.com/GuiPimenta-Dev/lambda-forge",
     project_urls={
-        'Documentation': "https://github.com/GuiPimenta-Dev/lambda-forge",
+        "Documentation": "https://github.com/GuiPimenta-Dev/lambda-forge",
     },
     description="Lambda Forge is a framework to help you create lambda functions following a pre-defined structure.",
     entry_points={"console_scripts": ["forge=lambda_forge.main:forge"]},

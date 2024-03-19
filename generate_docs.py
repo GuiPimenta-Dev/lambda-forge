@@ -363,4 +363,3 @@ if __name__ == "__main__":
     spec = generate_docs(endpoints, name)
     with open(r"docs.yaml", "w") as f:
         yaml.dump(spec, f, sort_keys=True)
-

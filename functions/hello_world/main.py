@@ -1,9 +1,11 @@
 import json
 from dataclasses import dataclass
 
+
 @dataclass
 class Input:
     pass
+
 
 @dataclass
 class Output:
@@ -12,7 +14,4 @@ class Output:
 
 def lambda_handler(event, context):
 
-    return {
-        "statusCode": 200,
-        "body": json.dumps({"message": "Hello World!"})
-    }
+    return {"statusCode": 200, "body": json.dumps({"message": "Hello World!"})}
