@@ -131,6 +131,7 @@ class Steps:
         )
 
     def validate_docs(self):
+        validate_docs = pkg_resources.resource_string(            __name__, "validate_docs.py"        )
         return pipelines.CodeBuildStep(
             "Validate Docs",
             input=self.source,
@@ -138,6 +139,7 @@ class Steps:
                 "pip install -r requirements.txt",
             ],
             commands=[
+                f"echo '{validate_docs.decode()}' > validate_integration_tests.py",
                 "python validate_docs.py",
             ],
             build_environment=codebuild.BuildEnvironment(
