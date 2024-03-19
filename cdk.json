@@ -40,10 +40,10 @@
     "@aws-cdk/customresources:installLatestAwsSdkDefault": false,
     "region": "us-east-2",
     "account": "",
-    "name": "Crowdform",
+    "name": "Lambda-Forge",
     "repo": {
       "owner": "GuiPimenta-Dev",
-      "name": "crowdform"
+      "name": "lambda-forge"
     },
     "bucket": "gui-docs",
     "coverage": 80,
