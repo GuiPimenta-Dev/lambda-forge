@@ -1,18 +1,14 @@
 import json
 from functools import wraps
 import os
+import pkg_resources
 
 
 def track(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        file_path = os.path.join("lambda_forge", "functions.json")
-        try:
-            with open(file_path, "r") as file:
-                data = json.load(file)
-        except:
-            data = []
-
+        cdk = json.load(open("cdk.json"))
+        data = cdk["context"].get("functions", [])
         function_name = func.__name__
 
         if function_name == "create_function":
@@ -24,15 +20,13 @@ def track(func):
                 else f"{path}/main.lambda_handler"
             )
             name = kwargs["name"]
-            existent_function = next((i for i in data if i["name"] == name), None)
-            if not existent_function:
-                data.append(
-                    {
-                        "name": name,
-                        "file_path": full_path,
-                        "description": kwargs["description"],
-                    }
-                )
+            data.append(
+                {
+                    "name": name,
+                    "file_path": full_path,
+                    "description": kwargs["description"],
+                }
+            )
 
         elif function_name == "create_endpoint":
             name = args[3]._physical_name.split("-")[-1]
@@ -41,8 +35,9 @@ def track(func):
                     i.update({"method": args[1], "endpoint": args[2]})
                     break
 
-        with open(file_path, "w") as file:
-            json.dump(data, file, indent=4)
+        cdk["context"]["functions"] = data
+        with open("cdk.json", "w") as file:
+            json.dump(cdk, file, indent=4)
 
         return func(*args, **kwargs)
 
@@ -52,9 +47,10 @@ def track(func):
 def release(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        file_path = os.path.join("lambda_forge", "functions.json")
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        cdk = json.load(open("cdk.json"))
+        cdk["context"]["functions"] = []
+        with open("cdk.json", "w") as file:
+            json.dump(cdk, file, indent=4)
 
         return func(*args, **kwargs)
 

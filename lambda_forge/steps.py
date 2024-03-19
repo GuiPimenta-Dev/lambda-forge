@@ -132,6 +132,7 @@ class Steps:
 
     def validate_docs(self):
         validate_docs = pkg_resources.resource_string(__name__, "validate_docs.py")
+
         return pipelines.CodeBuildStep(
             "Validate Docs",
             input=self.source,

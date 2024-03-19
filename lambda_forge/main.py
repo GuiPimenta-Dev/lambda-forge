@@ -59,7 +59,7 @@ def project(
     no_docs,
     public_docs,
     bucket,
-    coverage
+    coverage,
 ):
     """
     Forges the initial project structure.
@@ -80,7 +80,7 @@ def project(
         no_docs,
         public_docs,
         bucket,
-        coverage
+        coverage,
     )
 
 

@@ -42,8 +42,10 @@ class APIGateway:
         )
 
     @track
-    def create_endpoint(self, method, path, function, public=False, authorizer=None):
-        resource = self.__create_resource(path)
+    def create_endpoint(
+        self, method, endpoint, function, public=False, authorizer=None
+    ):
+        resource = self.__create_resource(endpoint)
         if public:
             authorizer = None
         else:
@@ -64,7 +66,7 @@ class APIGateway:
         )
 
         function_name = function._physical_name.split("-")[-1]
-        self.endpoints[function_name] = {"method": method, "endpoint": path}
+        self.endpoints[function_name] = {"method": method, "endpoint": endpoint}
 
     def create_authorizer(self, function, name, default=False):
         if self.authorizers.get(name) is not None:

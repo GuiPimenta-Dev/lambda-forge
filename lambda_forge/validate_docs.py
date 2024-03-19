@@ -4,20 +4,6 @@ import json
 import re
 
 
-def get_endpoints(functions, api_endpoints):
-    return [
-        {
-            "file_path": function["file_path"],
-            "name": function_name,
-            "description": function["description"],
-            "endpoint": api_endpoints[function_name]["endpoint"],
-            "method": api_endpoints[function_name]["method"],
-        }
-        for function in functions
-        if (function_name := function["name"]) in api_endpoints
-    ]
-
-
 def extract_path_parameters(endpoint):
     return re.findall(r"\{(.*?)\}", endpoint)
 
@@ -81,16 +67,8 @@ def validate_docs(endpoints, loader=default_module_loader):
 
 
 if __name__ == "__main__":
-    with open("cdk.json", "r") as json_file:
+    with open("functions.json", "r") as json_file:
         context = json.load(json_file)["context"]
-        arns = context["dev"]["arns"]
-
-    import aws_cdk as cdk
-    from infra.stacks.lambda_stack import LambdaStack
-
-    app = cdk.App()
-    services = LambdaStack(app, "Dev", arns).services
-    functions = services.aws_lambda.functions
-    api_endpoints = services.api_gateway.endpoints
-    endpoints = get_endpoints(functions, api_endpoints)
+        functions = context["functions"]
+    endpoints = [endpoint for endpoint in functions if "method" in endpoint]
     validate_docs(endpoints)

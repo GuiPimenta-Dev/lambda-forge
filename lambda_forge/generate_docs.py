@@ -1,36 +1,7 @@
 import importlib
 import json
 from copy import deepcopy
-import os
-
 import yaml
-
-
-def merge_function_with_endpoint(function, api_endpoint_info):
-    """
-    Merges function details with corresponding API endpoint information.
-    """
-    return {
-        "file_path": function["file_path"],
-        "name": function["name"],
-        "description": function["description"],
-        "endpoint": api_endpoint_info["endpoint"],
-        "method": api_endpoint_info["method"],
-    }
-
-
-def get_endpoints(functions, api_endpoints):
-    """
-    Generates a list of merged endpoint objects for functions that have corresponding API endpoints.
-    """
-    # Filter functions with corresponding API endpoints and merge their details.
-    endpoints = [
-        merge_function_with_endpoint(function, api_endpoints[function["name"]])
-        for function in functions
-        if function["name"] in api_endpoints
-    ]
-
-    return endpoints
 
 
 def get_paths(endpoints):
@@ -350,16 +321,13 @@ def generate_docs(endpoints, name, loader=default_module_loader):
 
 if __name__ == "__main__":
 
-    file_path = os.path.join("lambda_forge", "functions.json")
-
     with open("cdk.json", "r") as json_file:
         context = json.load(json_file)["context"]
         name = context["name"]
+        functions = context["functions"]
 
-    with open(file_path, "r") as file:
-        data = json.load(file)
+    endpoints = [endpoint for endpoint in functions if "method" in endpoint]
 
-    endpoints = [endpoint for endpoint in data if "endpoint" in endpoint]
     spec = generate_docs(endpoints, name)
     with open(r"docs.yaml", "w") as f:
         yaml.dump(spec, f, sort_keys=True)
