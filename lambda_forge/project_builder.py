@@ -48,7 +48,7 @@ class DevStack(cdk.Stack):
         )
 
 
-        pipeline.add_stage(DeployStage(self, context.stage, context))
+        pipeline.add_stage(DeployStage(self, context))
 """
         return self
 

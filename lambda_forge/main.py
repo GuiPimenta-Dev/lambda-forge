@@ -133,8 +133,7 @@ from infra.services import Services
 class DocsConfig:
 
     def __init__(self, scope, services: Services) -> None:
-        bucket = scope.node.try_get_context("bucket")
-        services.api_gateway.create_docs(bucket=bucket, authorizer={None if public_docs else '"docs_authorizer"'})
+        services.api_gateway.create_docs(authorizer={None if public_docs else '"docs_authorizer"'})
 """
 
         FunctionBuilder.a_function("docs").with_custom_config(

@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass, asdict
-from dataclasses import dataclass, field, make_dataclass
+from dataclasses import dataclass, make_dataclass
 
 
 @dataclass(frozen=True)
