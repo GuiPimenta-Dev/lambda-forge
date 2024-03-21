@@ -149,12 +149,6 @@ cdk.out
 #######################
 docs.yaml
 
-# Lambda Forge Stuff #
-###############
-.fc
-sam.out
-.tested_endpoints.jsonl
-
 # Coverage reports #
 ####################
 coverage.xml

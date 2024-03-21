@@ -59,6 +59,9 @@ class APIGateway:
             authorizer=authorizer,
         )
 
+        function_name = function._physical_name.split("-")[-1]
+        self.endpoints[function_name] = {"method": method, "endpoint": path}
+
     def create_authorizer(self, function, name, default=False):
         if self.authorizers.get(name) is not None:
             raise Exception(f"Authorizer {name} already set")

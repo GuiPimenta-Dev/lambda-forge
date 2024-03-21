@@ -4,13 +4,12 @@ from aws_cdk import aws_iam as iam
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
 import pkg_resources
-from lambda_forge.context import Context
 
 
 class Steps:
     # TODO inherit from cdk.Stack to avoid poassing self from the stack
 
-    def __init__(self, scope, context: Context, source: CodePipelineSource):
+    def __init__(self, scope, context, source: CodePipelineSource):
         self.scope = scope
         self.context = context
         self.source = source
