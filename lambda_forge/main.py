@@ -114,7 +114,7 @@ def create_project(
         .with_gitignore()
         .with_pytest_ini()
         .with_pre_commit()
-        .with_coverage()
+        .with_coveragerc()
     )
     authorizer = None
     if no_docs is False:

@@ -37,6 +37,7 @@ class DevStack(cdk.Stack):
                 "Synth",
                 input=source,
                 install_commands=[
+                    "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                     "pip install aws-cdk-lib",
                     "npm install -g aws-cdk",
                 ],
@@ -75,6 +76,7 @@ class StagingStack(cdk.Stack):
                 "Synth",
                 input=source,
                 install_commands=[
+                    "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                     "pip install aws-cdk-lib",
                     "npm install -g aws-cdk",
                 ],
@@ -133,6 +135,7 @@ class ProdStack(cdk.Stack):
                 "Synth",
                 input=source,
                 install_commands=[
+                    "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                     "pip install aws-cdk-lib",
                     "npm install -g aws-cdk",
                 ],
@@ -420,7 +423,7 @@ repos:
 """
         return self
 
-    def with_coverage(self):
+    def with_coveragerc(self):
         self.coverage = """
 [run]
 branch = True
