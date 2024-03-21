@@ -4,12 +4,15 @@ from aws_cdk import aws_iam as iam
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
 import pkg_resources
+from lambda_forge.context import Context
 
 
 class Steps:
-    def __init__(self, scope, stage, source: CodePipelineSource):
+    # TODO inherit from cdk.Stack to avoid poassing self from the stack
+
+    def __init__(self, scope, context: Context, source: CodePipelineSource):
         self.scope = scope
-        self.stage = stage
+        self.context = context
         self.source = source
 
     def run_unit_tests(self):
@@ -64,7 +67,6 @@ class Steps:
             "CoverageGroup",
             type=codebuild.ReportGroupType.CODE_COVERAGE,
         )
-        coverage = self.scope.node.try_get_context("coverage") or 80
         return pipelines.CodeBuildStep(
             "Coverage",
             input=self.source,
@@ -73,7 +75,7 @@ class Steps:
             ],
             commands=[
                 'coverage run -m pytest -k "unit.py"',
-                f"coverage xml --fail-under={coverage}",
+                f"coverage xml --fail-under={self.context.coverage}",
                 "touch coverage.xml",
             ],
             build_environment=codebuild.BuildEnvironment(
@@ -116,7 +118,7 @@ def pytest_generate_tests(metafunc):
     for mark in metafunc.definition.iter_markers(name="integration"):
         with open("tested_endpoints.txt", "a") as f:
             f.write(f"{json.dumps(mark.kwargs)}|")"""
-        
+
         return pipelines.CodeBuildStep(
             "Validate Integration Tests",
             input=self.source,
@@ -225,14 +227,14 @@ def pytest_generate_tests(metafunc):
             ],
         )
 
-    def generate_docs(self, name, stage):
+    def generate_docs(self):
         generate_docs = pkg_resources.resource_string(__name__, "generate_docs.py")
         swagger_yml_to_ui = pkg_resources.resource_string(
             __name__, "swagger_yml_to_ui.py"
         )
         bucket = self.scope.node.try_get_context("bucket")
         return pipelines.CodeBuildStep(
-            f"Generate {stage} Docs",
+            f"Generate {self.context.stage} Docs",
             input=self.source,
             install_commands=[
                 "pip install -r requirements.txt",
@@ -242,7 +244,7 @@ def pytest_generate_tests(metafunc):
                 "python generate_docs.py",
                 f"echo '{swagger_yml_to_ui.decode()}' > swagger_yml_to_ui.py",
                 "python swagger_yml_to_ui.py < docs.yaml > swagger.html",
-                f"aws s3 cp swagger.html s3://{bucket}/{name}/{stage.lower()}-swagger.html",
+                f"aws s3 cp swagger.html s3://{bucket}/{self.context.name}/{self.context.stage.lower()}-swagger.html",
             ],
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,

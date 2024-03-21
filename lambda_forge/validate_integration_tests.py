@@ -7,7 +7,11 @@ def validate_tests(endpoints, tested_endpoints):
         new_endpoint = {"endpoint": endpoint["endpoint"], "method": endpoint["method"]}
         if new_endpoint not in tested_endpoints:
             raise Exception(
-                "Endpoint "+ endpoint["endpoint"] +  " with method " + endpoint["method"] + " should have at least 1 integration test."
+                "Endpoint "
+                + endpoint["endpoint"]
+                + " with method "
+                + endpoint["method"]
+                + " should have at least 1 integration test."
             )
 
 
