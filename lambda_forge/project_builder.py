@@ -346,12 +346,6 @@ cdk.out
 #######################
 docs.yaml
 
-# Lambda Forge Stuff #
-###############
-.fc
-sam.out
-.tested_endpoints.jsonl
-
 # Coverage reports #
 ####################
 coverage.xml
@@ -419,6 +413,14 @@ include =
     functions/**/utils.py
 
 omit=
+"""
+        return self
+    
+    def with_pytest_ini(self):
+        self.pytest_ini = """[pytest]
+python_files = unit.py integration.py
+markers =
+    integration(method, endpoint): mark a test as an integration test.
 """
         return self
 
@@ -504,6 +506,7 @@ omit=
         self.make_file("", ".gitignore", self.gitignore)
         self.make_file("", ".pre-commit-config.yaml", self.pre_commit)
         self.make_file("", ".coveragerc", self.coverage)
+        self.make_file("", "pytest.ini", self.pytest_ini)
 
         if self.dev:
             self.make_file(f"{self.root_dir}/infra/stacks", "dev_stack.py", self.dev)

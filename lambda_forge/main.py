@@ -112,6 +112,7 @@ def create_project(
         project_builder.with_app()
         .with_cdk(repo_owner, repo_name, bucket, coverage)
         .with_gitignore()
+        .with_pytest_ini()
         .with_pre_commit()
         .with_coverage()
     )
