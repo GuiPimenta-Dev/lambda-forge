@@ -25,6 +25,6 @@ class Path:
         os.makedirs(os.path.dirname(destination_path), exist_ok=True)
 
         # Copy the source directory to the destination
-        shutil.copytree(src, destination_path, dirs_exist_ok=True)
+        shutil.copytree(src, f"{destination_path}/src", dirs_exist_ok=True)
 
         return destination_path
