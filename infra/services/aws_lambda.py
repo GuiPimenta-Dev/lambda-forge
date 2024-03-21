@@ -2,7 +2,7 @@ import shutil
 
 from aws_cdk import Duration
 from aws_cdk.aws_lambda import Code, Function, Runtime
-
+from lambda_forge import Path
 
 class AWSLambda:
     def __init__(self, scope, stage) -> None:
@@ -34,15 +34,11 @@ class AWSLambda:
             runtime=Runtime.PYTHON_3_9,
             handler=handler,
             environment=environment,
-            code=Code.from_asset(path=self.__top_level_path(path)),
+            code=Code.from_asset(path=Path.file(path)),
             layers=layers,
             timeout=timeout,
         )
 
         return function
 
-    @staticmethod
-    def __top_level_path(src):
-        path = f"./.fc/{src.split('functions/')[1]}"
-        shutil.copytree(src, f"{path}/src", dirs_exist_ok=True)
-        return path
+
