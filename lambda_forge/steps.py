@@ -7,14 +7,13 @@ import pkg_resources
 
 
 class Steps:
-    # TODO inherit from cdk.Stack to avoid poassing self from the stack
 
     def __init__(self, scope, context, source: CodePipelineSource):
         self.scope = scope
         self.context = context
         self.source = source
 
-    def run_unit_tests(self):
+    def run_unit_tests(self, env=None):
         report_group = codebuild.ReportGroup(
             self.scope,
             "UnitReportGroup",
@@ -33,6 +32,7 @@ class Steps:
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
+                environment_variables=env
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
@@ -60,7 +60,7 @@ class Steps:
             ],
         )
 
-    def run_coverage(self):
+    def run_coverage(self, env=None):
         report_group = codebuild.ReportGroup(
             self.scope,
             "CoverageGroup",
@@ -81,6 +81,7 @@ class Steps:
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
+                environment_variables=env
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
@@ -159,7 +160,7 @@ def pytest_generate_tests(metafunc):
             ),
         )
 
-    def run_integration_tests(self):
+    def run_integration_tests(self, env=None):
         report_group = codebuild.ReportGroup(
             self.scope,
             "IntegrationReportGroup",
@@ -178,6 +179,7 @@ def pytest_generate_tests(metafunc):
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
+                environment_variables=env
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {

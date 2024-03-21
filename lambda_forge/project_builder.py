@@ -53,23 +53,21 @@ class DevStack(cdk.Stack):
         return self
 
     def with_staging(self):
-        self.staging = f"""
-import aws_cdk as cdk
+        self.staging = f"""import aws_cdk as cdk
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 
 from infra.stages.deploy import DeployStage
-from infra.steps.code_build_step import CodeBuildStep
+from lambda_forge import context
+from lambda_forge import Steps
 
-
+@context(stage="Staging", resources="staging")
 class StagingStack(cdk.Stack):
-    def __init__(self, scope: Construct, **kwargs) -> None:
-        name = scope.node.try_get_context("name").title()
-        super().__init__(scope, f"Staging-{{name}}-Stack", **kwargs)
-
-        repo = self.node.try_get_context("repo")
-        source = CodePipelineSource.git_hub(f"{{repo['owner']}}/{{repo['name']}}", "staging")
+    def __init__(self, scope: Construct, context, **kwargs) -> None:
+        super().__init__(scope, f"{{context.stage}}-{{context.name}}-Stack", **kwargs)
+        
+        source = CodePipelineSource.git_hub(f"{{context.repo['owner']}}/{{context.repo['name']}}", "staging")
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -85,26 +83,23 @@ class StagingStack(cdk.Stack):
                     "cdk synth",
                 ],
             ),
-            pipeline_name=f"Staging-{{name}}-Pipeline",
+            pipeline_name=f"{{context.stage}}-{{context.name}}-Pipeline",
         )
 
-        context = self.node.try_get_context("staging")
-        stage = "Staging"
-
-        code_build = CodeBuildStep(self, stage, source)
+        steps = Steps(self, context, source)
 
         # pre
-        unit_tests = code_build.run_unit_tests()
-        coverage = code_build.run_coverage()
-        validate_docs = code_build.validate_docs()
-        validate_integration_tests = code_build.validate_integration_tests()
+        unit_tests = steps.run_unit_tests()
+        coverage = steps.run_coverage()
+        validate_docs = steps.validate_docs()
+        validate_integration_tests = steps.validate_integration_tests()
 
         # post
-        generate_docs = code_build.generate_docs(name, stage)
-        integration_tests = code_build.run_integration_tests()
+        generate_docs = steps.generate_docs()
+        integration_tests = steps.run_integration_tests()
 
         pipeline.add_stage(
-            DeployStage(self, stage, context["arns"]),
+            DeployStage(self, context),
             pre=[
                 unit_tests,
                 coverage,
@@ -117,23 +112,20 @@ class StagingStack(cdk.Stack):
         return self
 
     def with_prod(self):
-        self.prod = f"""
-import aws_cdk as cdk
+        self.prod = f"""import aws_cdk as cdk
 from aws_cdk import pipelines
 from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 
 from infra.stages.deploy import DeployStage
-from infra.steps.code_build_step import CodeBuildStep
+from lambda_forge import context, create_context, Steps
 
-
+@context(stage="Prod", resources="prod", staging=create_context(stage="Staging", resources="staging"))
 class ProdStack(cdk.Stack):
-    def __init__(self, scope: Construct, **kwargs) -> None:
-        name = scope.node.try_get_context("name").title()
-        super().__init__(scope, f"Prod-{{name}}-Stack", **kwargs)
+    def __init__(self, scope: Construct, context, **kwargs) -> None:
+        super().__init__(scope, f"{{context.stage}}-{{context.name}}-Stack", **kwargs)
 
-        repo = self.node.try_get_context("repo")
-        source = CodePipelineSource.git_hub(f"{{repo['owner']}}/{{repo['name']}}", "main")
+        source = CodePipelineSource.git_hub(f"{{context.repo['owner']}}/{{context.repo['name']}}", "main")
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -149,43 +141,36 @@ class ProdStack(cdk.Stack):
                     "cdk synth",
                 ],
             ),
-            pipeline_name=f"Prod-{{name}}-Pipeline",
+            pipeline_name=f"{{context.stage}}-{{context.name}}-Pipeline",
         )
 
-        staging_context = self.node.try_get_context("staging")
-        staging_stage = "Staging"
-
-        code_build = CodeBuildStep(self, staging_stage, source)
+        steps = Steps(self, context, source)
 
         # pre
-        unit_tests = code_build.run_unit_tests()
-        coverage = code_build.run_coverage()
-        validate_docs = code_build.validate_docs()
-        validate_integration_tests = code_build.validate_integration_tests()
+        unit_tests = steps.run_unit_tests()
+        coverage = steps.run_coverage()
+        validate_docs = steps.validate_docs()
+        validate_integration_tests = steps.validate_integration_tests()
 
         # post
-        generate_staging_docs = code_build.generate_docs(name, staging_stage)
-        integration_tests = code_build.run_integration_tests()
+        integration_tests = steps.run_integration_tests()
 
         pipeline.add_stage(
-            DeployStage(self, staging_stage, staging_context["arns"]),
+            DeployStage(self, context.staging),
             pre=[
                 unit_tests,
                 coverage,
                 validate_integration_tests,
                 validate_docs,
             ],
-            post=[integration_tests{", generate_staging_docs" if self.docs else ""}],
+            post=[integration_tests],
         )
 
-        prod_context = self.node.try_get_context("prod")
-        prod_stage = "Prod"
-
         # post
-        generate_prod_docs = code_build.generate_docs(name, prod_stage)
+        generate_docs = steps.generate_docs()
 
         pipeline.add_stage(
-            DeployStage(self, prod_stage, prod_context["arns"]),
+            DeployStage(self, context),
             post=[{"generate_prod_docs" if self.docs else ""}],
         )
 """

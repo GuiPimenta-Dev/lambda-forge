@@ -1,3 +1,1 @@
-5 - Adiconar coverage no cdk.json e Ler a porcentagem de lá no code_build_step.py
-
-6 - Buscar o bucket do cdk.json no ProjectBuilder
+ inherit from cdk.Stack to avoid poassing self from the stack, add support for env variables, changing builds, etc.  This class has to be more customizable
