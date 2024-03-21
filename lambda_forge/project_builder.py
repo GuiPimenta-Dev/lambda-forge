@@ -500,7 +500,7 @@ omit=
         return self
 
     def build(self):
-        self.copy_folders("lambda_forge", "files", "")
+        self.copy_folders("lambda_forge", "scaffold", "")
         self.make_file("", ".gitignore", self.gitignore)
         self.make_file("", ".pre-commit-config.yaml", self.pre_commit)
         self.make_file("", ".coveragerc", self.coverage)

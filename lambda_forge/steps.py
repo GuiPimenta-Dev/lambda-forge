@@ -111,7 +111,12 @@ class Steps:
         validate_integration_tests = pkg_resources.resource_string(
             __name__, "validate_integration_tests.py"
         )
-
+        conftest = """import json 
+def pytest_generate_tests(metafunc):
+    for mark in metafunc.definition.iter_markers(name="integration"):
+        with open("tested_endpoints.txt", "a") as f:
+            f.write(f"{json.dumps(mark.kwargs)}|")"""
+        
         return pipelines.CodeBuildStep(
             "Validate Integration Tests",
             input=self.source,
@@ -119,7 +124,10 @@ class Steps:
                 "pip install -r requirements.txt",
             ],
             commands=[
+                f"echo '{conftest}' > conftest.py",
+                "cat conftest.py",
                 f"echo '{validate_integration_tests.decode()}' > validate_integration_tests.py",
+                "cat validate_integration_tests.py",
                 "pytest -m integration --collect-only . -q || echo 'No integration tests found, continuing...'",
                 "python validate_integration_tests.py",
             ],

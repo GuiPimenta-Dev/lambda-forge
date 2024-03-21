@@ -67,7 +67,7 @@ def validate_docs(endpoints, loader=default_module_loader):
 
 
 if __name__ == "__main__":
-    with open("functions.json", "r") as json_file:
+    with open("cdk.json", "r") as json_file:
         context = json.load(json_file)["context"]
         functions = context["functions"]
     endpoints = [endpoint for endpoint in functions if "method" in endpoint]
