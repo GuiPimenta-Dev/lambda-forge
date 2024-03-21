@@ -176,7 +176,7 @@ class ProdStack(cdk.Stack):
         return self
 
     def with_deploy(self, docs, docs_authorizer):
-        imports = ["import aws_cdk as cdk\n", "from constructs import Construct\n", "from infra.services import Services\n","from lambda_forge.lambda_stack import release, LambdaStack\n"]
+        imports = ["import aws_cdk as cdk\n", "from constructs import Construct\n", "from infra.services import Services\n","from lambda_forge import release, LambdaStack\n"]
         if docs and docs_authorizer:
             imports.append("from functions.docs.config import DocsConfig\n")
 
