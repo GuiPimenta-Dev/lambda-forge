@@ -116,30 +116,23 @@ def create_project(
         .with_pre_commit()
         .with_coverage()
     )
-    project_builder.build()
-
+    authorizer = None
     if no_docs is False:
-
         if public_docs is False:
-            AuthorizerBuilder.an_authorizer(
-                "docs_authorizer",
+            authorizer = AuthorizerBuilder.an_authorizer(
+                "docs",
                 "Function used to authorize the docs endpoints",
                 "authorizers",
-            ).with_config().with_main().with_unit().with_lambda_stack().build()
-
-        custom_config = f"""
-from infra.services import Services
-
-class DocsConfig:
-
-    def __init__(self, scope, services: Services) -> None:
-        services.api_gateway.create_docs(authorizer={None if public_docs else '"docs_authorizer"'})
-"""
-
-        FunctionBuilder.a_function("docs").with_custom_config(
-            custom_config
-        ).with_lambda_stack(docs=True).build()
-
+            ).with_config().with_main().with_unit()
+            project_builder = project_builder.with_deploy(True, "docs")
+        else:
+            project_builder = project_builder.with_deploy(True, None)
+    else:
+        project_builder = project_builder.with_deploy(False, None)
+        
+    project_builder.build()
+    if authorizer:
+        authorizer.with_deploy_stage().build()
 
 @forge.command()
 @click.argument("name")
@@ -195,7 +188,7 @@ def create_function(
             .with_main()
         )
 
-    function_builder = function_builder.with_lambda_stack()
+    function_builder = function_builder.deploy_stage()
     function_builder.build()
 
 
@@ -222,7 +215,7 @@ def create_authorizer(name, description, default):
 
     authorizer_builder.with_config(
         default
-    ).with_main().with_unit().with_lambda_stack().build()
+    ).with_main().with_unit().with_deploy_stage().build()
 
 
 AVALABLE_SERVICES = sorted(

@@ -58,7 +58,6 @@ class APIGateway:
             authorizer=authorizer,
         )
 
-
     def create_authorizer(self, function, name, default=False):
         if self.authorizers.get(name) is not None:
             raise Exception(f"Authorizer {name} already set")

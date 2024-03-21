@@ -170,9 +170,44 @@ class ProdStack(cdk.Stack):
 
         pipeline.add_stage(
             DeployStage(self, context),
-            post=[{"generate_prod_docs" if self.docs else ""}],
+            post=[{"generate_docs" if self.docs else ""}],
         )
 """
+        return self
+
+    def with_deploy(self, docs, docs_authorizer):
+        imports = ["import aws_cdk as cdk\n", "from constructs import Construct\n", "from infra.services import Services\n","from lambda_forge.lambda_stack import release, LambdaStack\n"]
+        if docs and docs_authorizer:
+            imports.append("from functions.docs.config import DocsConfig\n")
+
+        deploy_stage = f"""
+
+@release
+class DeployStage(cdk.Stage):
+    def __init__(self, scope: Construct, context, **kwargs):
+        super().__init__(scope, context.stage, **kwargs)
+
+        services = Services(scope, context)
+
+        authorizers = [
+            # Add The config class for your authorizers here
+        ]
+
+        functions = [
+            # Add The config class for your functions here
+        ]
+
+        LambdaStack(
+            self,
+            context=context,
+            services=services,
+            authorizers=authorizers,
+            functions=functions,
+            docs={docs},
+            docs_authorizer={f"'{docs_authorizer}'" if docs and docs_authorizer else None},
+        )
+"""
+        self.deploy_stage = imports + [deploy_stage]
         return self
 
     def with_gitignore(self):
@@ -396,7 +431,7 @@ include =
 omit=
 """
         return self
-    
+
     def with_pytest_ini(self):
         self.pytest_ini = """[pytest]
 python_files = unit.py integration.py
@@ -503,4 +538,5 @@ markers =
             self.make_file(f"{self.root_dir}/infra/stacks", "prod_stack.py", self.prod)
 
         self.make_file("", "cdk.json", self.cdk)
+        self.write_lines(f"{self.root_dir}/infra/stages/deploy.py", self.deploy_stage)
         self.write_lines("app.py", self.app)

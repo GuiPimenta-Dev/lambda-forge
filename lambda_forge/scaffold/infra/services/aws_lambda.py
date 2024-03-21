@@ -2,6 +2,7 @@ from aws_cdk import Duration
 from aws_cdk.aws_lambda import Code, Function, Runtime
 from lambda_forge import Path
 
+
 class AWSLambda:
     def __init__(self, scope, context) -> None:
         self.scope = scope

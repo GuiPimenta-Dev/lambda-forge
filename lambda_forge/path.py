@@ -2,6 +2,7 @@ import shutil
 import tempfile
 import os
 
+
 class Path:
     _instance = None
     _temp_dir = None
@@ -18,7 +19,7 @@ class Path:
             Path()
 
         # Adjust the path to be relative to the temporary directory
-        relative_path = src.split('functions/')[1] if 'functions/' in src else src
+        relative_path = src.split("functions/")[1] if "functions/" in src else src
         destination_path = os.path.join(Path._temp_dir, relative_path)
 
         # Ensure the destination directory exists

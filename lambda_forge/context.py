@@ -15,7 +15,6 @@ class StageContext:
     resources: dict
 
 
-
 def dict_to_dataclass(class_name, data_dict):
     keys = data_dict.keys()
     fields = [(key, data_dict[key]) for key in keys]
@@ -48,7 +47,7 @@ def create_context(stage, resources):
         coverage=coverage,
         resources=cdk["context"][resources],
     )
-   
+
     return context
 
 
@@ -61,5 +60,7 @@ def context(stage, resources, **decorator_kwargs):
             context = dict_to_dataclass("Context", input_dict)
             context = context(**input_dict)
             return func(context=context, *func_args, **func_kwargs)
+
         return wrapper
+
     return decorator

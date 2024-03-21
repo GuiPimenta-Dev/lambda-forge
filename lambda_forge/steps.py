@@ -7,7 +7,6 @@ import pkg_resources
 
 
 class Steps:
-
     def __init__(self, scope, context, source: CodePipelineSource):
         self.scope = scope
         self.context = context
@@ -32,7 +31,7 @@ class Steps:
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
-                environment_variables=env
+                environment_variables=env,
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
@@ -81,7 +80,7 @@ class Steps:
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
-                environment_variables=env
+                environment_variables=env,
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
@@ -179,7 +178,7 @@ def pytest_generate_tests(metafunc):
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
-                environment_variables=env
+                environment_variables=env,
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
