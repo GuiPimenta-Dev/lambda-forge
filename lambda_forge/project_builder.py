@@ -486,8 +486,7 @@ markers =
         return self
 
     def with_deploy_stage(self, enabled, authorizer):
-        if not enabled:
-            authorizer = None
+        authorizer = authorizer if enabled else None
         authorizer = f'"{authorizer}"' if authorizer else None
         self.deploy_stage = f"""import aws_cdk as cdk
 from constructs import Construct
