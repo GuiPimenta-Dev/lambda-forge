@@ -24,14 +24,13 @@ class AuthorizerBuilder(FileService):
     def with_config(self, default=False):
         self.config = f"""from infra.services import Services
 
-class {self.pascal_name}Config:
+class {self.pascal_name}AuthorizerConfig:
     def __init__(self, services: Services) -> None:
 
         function = services.aws_lambda.create_function(
-            name="{self.pascal_name}",
-            path="./functions/{self.belongs}",
-            description="{self.description}",
-            directory="{self.authorizer_name}"
+            name="{self.pascal_name}Authorizer",
+            path="./authorizers/{self.authorizer_name}",
+            description="{self.description}"
         )
 
         services.api_gateway.create_authorizer(function, name="{self.authorizer_name}", default={default})
@@ -126,10 +125,10 @@ def test_authorizer_should_fail_with_invalid_secret():
     def with_lambda_stack(self):
         self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
-        folder = f"functions.{self.belongs}.{self.authorizer_name}"
+        folder = f"authorizers.{self.authorizer_name}"
 
         self.lambda_stack.insert(
-            0, f"from {folder}.config import {self.pascal_name}Config\n"
+            0, f"from {folder}.config import {self.pascal_name}AuthorizerConfig\n"
         )
 
         comment = "".join(word.capitalize() for word in self.belongs.split("_"))
@@ -137,7 +136,7 @@ def test_authorizer_should_fail_with_invalid_secret():
         try:
             comment_index = self.lambda_stack.index(f"        # {comment}\n")
             self.lambda_stack.insert(
-                comment_index + 1, f"        {self.pascal_name}Config(self.services)\n"
+                comment_index + 1, f"        {self.pascal_name}AuthorizerConfig(self.services)\n"
             )
         except:
             services_index = next(
@@ -152,18 +151,18 @@ def test_authorizer_should_fail_with_invalid_secret():
             self.lambda_stack.insert(services_index + 2, f"        # {comment}\n")
             self.lambda_stack.insert(
                 services_index + 3,
-                f"        {self.pascal_name}Config(self.services)\n",
+                f"        {self.pascal_name}AuthorizerConfig(self.services)\n",
             )
 
         return self
 
     def build(self):
-        folder_path = self.join("functions", self.belongs, self.authorizer_name)
+        folder_path = self.join("authorizers", self.authorizer_name)
         self.make_dir(folder_path)
-        self.make_dir(f"functions/{self.belongs}/utils")
-        self.make_file(self.join("functions", self.belongs), "__init__.py")
+        self.make_dir("authorizers/utils")
+        self.make_file(self.join("authorizers"), "__init__.py")
         self.make_file(folder_path, "__init__.py")
-        self.make_file(f"functions/{self.belongs}/utils", "__init__.py")
+        self.make_file("authorizers/utils", "__init__.py")
         self.make_file(folder_path, "config.py", self.config)
         self.make_file(folder_path, "main.py", self.main)
         self.make_file(folder_path, "unit.py", self.unit)

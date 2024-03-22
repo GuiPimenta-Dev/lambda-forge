@@ -178,32 +178,6 @@ class ProdStack(cdk.Stack):
 """
         return self
 
-    def with_lambda_stack(self):
-        self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
-
-        folder = (
-            f"functions.{self.belongs}.{self.function_name}"
-            if self.belongs
-            else f"functions.{self.function_name}"
-        )
-
-        self.lambda_stack.insert(
-            0, f"from {folder}.config import {self.pascal_name}Config\n"
-        )
-
-        directory = self.belongs or self.function_name
-        comment = "".join(word.capitalize() for word in directory.split("_"))
-        class_instance = f"        {self.pascal_name}Config(self.services)\n"
-        try:
-            comment_index = self.lambda_stack.index(f"        # {comment}\n")
-            self.lambda_stack.insert(comment_index + 1, class_instance)
-        except:
-            self.lambda_stack.append(f"\n")
-            self.lambda_stack.append(f"        # {comment}\n")
-            self.lambda_stack.append(class_instance)
-
-        return self
-
     def with_requirements(self):
         self.requirements = """
 attrs==22.1.0

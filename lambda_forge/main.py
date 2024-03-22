@@ -207,7 +207,7 @@ def create_authorizer(name, description, default):
 
     authorizer_builder.with_config(
         default
-    ).with_main().with_unit().with_deploy_stage().build()
+    ).with_main().with_unit().with_lambda_stack().build()
 
 
 AVALABLE_SERVICES = sorted(
