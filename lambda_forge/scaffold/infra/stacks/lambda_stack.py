@@ -4,12 +4,7 @@ from infra.services import Services
 
 
 class LambdaStack(Stack):
-    def __init__(
-        self,
-        scope: Construct,
-        context,
-        **kwargs,
-    ) -> None:
+    def __init__(self, scope: Construct, context, **kwargs) -> None:
 
         super().__init__(scope, f"{context.name}-CDK", **kwargs)
 

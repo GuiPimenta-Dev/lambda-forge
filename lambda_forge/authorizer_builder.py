@@ -123,24 +123,37 @@ def test_authorizer_should_fail_with_invalid_secret():
 """
         return self
 
-    def with_deploy_stage(self):
-        self.deploy_stage = self.read_lines("infra/stages/deploy.py")
+    def with_lambda_stack(self):
+        self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
         folder = f"functions.{self.belongs}.{self.authorizer_name}"
 
-        IMPORT_LINE = 0
-        
-        self.deploy_stage.insert(
-            IMPORT_LINE, f"from {folder}.config import {self.pascal_name}Config\n"
+        self.lambda_stack.insert(
+            0, f"from {folder}.config import {self.pascal_name}Config\n"
         )
 
-        authorizer_array_index = self.deploy_stage.index('        authorizers = [\n')
-        index = authorizer_array_index + 1
-        value = f"            {self.pascal_name}Config(self.services),\n"
-        if "#" in self.deploy_stage[index]:
-            self.deploy_stage[index] = value
-        else:
-            self.deploy_stage.insert(index, value)
+        comment = "".join(word.capitalize() for word in self.belongs.split("_"))
+
+        try:
+            comment_index = self.lambda_stack.index(f"        # {comment}\n")
+            self.lambda_stack.insert(
+                comment_index + 1, f"        {self.pascal_name}Config(self.services)\n"
+            )
+        except:
+            services_index = next(
+                (
+                    i
+                    for i, line in enumerate(self.lambda_stack)
+                    if "Services(self" in line
+                ),
+                -1,
+            )
+            self.lambda_stack.insert(services_index + 1, f"\n")
+            self.lambda_stack.insert(services_index + 2, f"        # {comment}\n")
+            self.lambda_stack.insert(
+                services_index + 3,
+                f"        {self.pascal_name}Config(self.services)\n",
+            )
 
         return self
 
@@ -154,4 +167,4 @@ def test_authorizer_should_fail_with_invalid_secret():
         self.make_file(folder_path, "config.py", self.config)
         self.make_file(folder_path, "main.py", self.main)
         self.make_file(folder_path, "unit.py", self.unit)
-        self.write_lines("infra/stages/deploy.py", self.deploy_stage)
+        self.write_lines("infra/stacks/lambda_stack.py", self.lambda_stack)

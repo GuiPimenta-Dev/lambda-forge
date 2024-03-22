@@ -178,39 +178,30 @@ class ProdStack(cdk.Stack):
 """
         return self
 
-    def with_deploy(self, docs, docs_authorizer):
-        imports = ["import aws_cdk as cdk\n", "from constructs import Construct\n", "from infra.services import Services\n","from lambda_forge import release, LambdaStack\n"]
-        if docs and docs_authorizer:
-            imports.append("from functions.docs.config import DocsConfig\n")
+    def with_lambda_stack(self):
+        self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
-        deploy_stage = f"""
-
-@release
-class DeployStage(cdk.Stage):
-    def __init__(self, scope: Construct, context, **kwargs):
-        super().__init__(scope, context.stage, **kwargs)
-
-        services = Services(scope, context)
-
-        authorizers = [
-            # Add The config class for your authorizers here
-        ]
-
-        functions = [
-            # Add The config class for your functions here
-        ]
-
-        LambdaStack(
-            self,
-            context=context,
-            services=services,
-            authorizers=authorizers,
-            functions=functions,
-            docs={docs},
-            docs_authorizer={f"'{docs_authorizer}'" if docs and docs_authorizer else None},
+        folder = (
+            f"functions.{self.belongs}.{self.function_name}"
+            if self.belongs
+            else f"functions.{self.function_name}"
         )
-"""
-        self.deploy_stage = imports + [deploy_stage]
+
+        self.lambda_stack.insert(
+            0, f"from {folder}.config import {self.pascal_name}Config\n"
+        )
+
+        directory = self.belongs or self.function_name
+        comment = "".join(word.capitalize() for word in directory.split("_"))
+        class_instance = f"        {self.pascal_name}Config(self.services)\n"
+        try:
+            comment_index = self.lambda_stack.index(f"        # {comment}\n")
+            self.lambda_stack.insert(comment_index + 1, class_instance)
+        except:
+            self.lambda_stack.append(f"\n")
+            self.lambda_stack.append(f"        # {comment}\n")
+            self.lambda_stack.append(class_instance)
+
         return self
 
     def with_gitignore(self):
@@ -494,6 +485,25 @@ markers =
         self.cdk = json.dumps(cdk, indent=2)
         return self
 
+    def with_deploy_stage(self, enabled, authorizer):
+        if not enabled:
+            authorizer = None
+        authorizer = f'"{authorizer}"' if authorizer else None
+        self.deploy_stage = f"""import aws_cdk as cdk
+from constructs import Construct
+
+from infra.stacks.lambda_stack import LambdaStack
+
+
+class DeployStage(cdk.Stage):
+    def __init__(self, scope: Construct, context, **kwargs):
+        super().__init__(scope, context.stage, **kwargs)
+
+        lambda_stack = LambdaStack(self, context)
+        lambda_stack.services.api_gateway.create_docs(enabled={enabled}, authorizer={authorizer})
+"""
+        return self
+
     def with_app(self):
         self.app = ["import aws_cdk as cdk\n"]
 
@@ -540,6 +550,7 @@ markers =
         if self.prod:
             self.make_file(f"{self.root_dir}/infra/stacks", "prod_stack.py", self.prod)
 
+        self.make_file(f"{self.root_dir}/infra/stages", "deploy.py", self.deploy_stage)
+
         self.make_file("", "cdk.json", self.cdk)
-        self.write_lines(f"{self.root_dir}/infra/stages/deploy.py", self.deploy_stage)
         self.write_lines("app.py", self.app)

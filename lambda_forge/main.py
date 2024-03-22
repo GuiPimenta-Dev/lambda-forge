@@ -115,24 +115,16 @@ def create_project(
         .with_pytest_ini()
         .with_pre_commit()
         .with_coveragerc()
+        .with_deploy_stage(not no_docs, None if public_docs else "docs")
+        .build()
     )
-    authorizer = None
-    if no_docs is False:
-        if public_docs is False:
-            authorizer = AuthorizerBuilder.an_authorizer(
-                "docs",
-                "Function used to authorize the docs endpoints",
-                "authorizers",
-            ).with_config().with_main().with_unit()
-            project_builder = project_builder.with_deploy(True, "docs")
-        else:
-            project_builder = project_builder.with_deploy(True, None)
-    else:
-        project_builder = project_builder.with_deploy(False, None)
-        
-    project_builder.build()
-    if authorizer:
-        authorizer.with_deploy_stage().build()
+    if no_docs is False and public_docs is False:
+        AuthorizerBuilder.an_authorizer(
+            "docs",
+            "Function used to authorize the docs endpoints",
+            "authorizers",
+        ).with_config().with_main().with_lambda_stack().with_unit().build()
+
 
 @forge.command()
 @click.argument("name")
@@ -188,8 +180,7 @@ def create_function(
             .with_main()
         )
 
-    function_builder = function_builder.deploy_stage()
-    function_builder.build()
+    function_builder.with_lambda_stack().build()
 
 
 @forge.command()
@@ -268,4 +259,5 @@ def create_service(service):
 
 
 if __name__ == "__main__":
-    forge()
+    # forge()
+    create_project("test", "test", "test", False, False, False, False, False, "", 80)

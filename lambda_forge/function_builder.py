@@ -39,7 +39,6 @@ class {self.pascal_name}Config:
         )
 """
         return self
-        
 
     def with_api(self, http_method, public):
         self.http_method = http_method
@@ -110,8 +109,8 @@ def test_lambda_handler():
 """
         return self
 
-    def deploy_stage(self):
-        self.deploy_stage = self.read_lines("infra/stages/deploy.py")
+    def with_lambda_stack(self, docs=False):
+        self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
         folder = (
             f"functions.{self.belongs}.{self.function_name}"
@@ -119,21 +118,23 @@ def test_lambda_handler():
             else f"functions.{self.function_name}"
         )
 
-        IMPORT_LINE = 0
-
-        self.deploy_stage.insert(
-            IMPORT_LINE, f"from {folder}.config import {self.pascal_name}Config\n"
+        self.lambda_stack.insert(
+            0, f"from {folder}.config import {self.pascal_name}Config\n"
         )
 
-        functions_array_index = self.deploy_stage.index('        functions = [\n')
-        index = functions_array_index + 1
-        value = f"            {self.pascal_name}Config(services),\n"
-        if "#" in self.deploy_stage[index]:
-            self.deploy_stage[index] = value
+        directory = self.belongs or self.function_name
+        comment = "".join(word.capitalize() for word in directory.split("_"))
+        if docs:
+            class_instance = f"        {self.pascal_name}Config(scope, self.services)\n"
         else:
-            self.deploy_stage.insert(index, value)
-
-
+            class_instance = f"        {self.pascal_name}Config(self.services)\n"
+        try:
+            comment_index = self.lambda_stack.index(f"        # {comment}\n")
+            self.lambda_stack.insert(comment_index + 1, class_instance)
+        except:
+            self.lambda_stack.append(f"\n")
+            self.lambda_stack.append(f"        # {comment}\n")
+            self.lambda_stack.append(class_instance)
 
         return self
 
@@ -156,4 +157,4 @@ def test_lambda_handler():
             self.make_file(folder_path, "unit.py", self.unit)
         if self.integration:
             self.make_file(folder_path, "integration.py", self.integration)
-        self.write_lines("infra/stages/deploy.py", self.deploy_stage)
+        self.write_lines("infra/stacks/lambda_stack.py", self.lambda_stack)
