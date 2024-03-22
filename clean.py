@@ -5,7 +5,15 @@ import os
 
 def clean_project_structure():
 
-    folders_to_delete = ["functions", "infra", "authorizers", "build", "cdk.out", "lambda_forge.egg-info",".fc"]
+    folders_to_delete = [
+        "functions",
+        "infra",
+        "authorizers",
+        "build",
+        "cdk.out",
+        "lambda_forge.egg-info",
+        ".fc",
+    ]
     files_to_delete = [
         ".coveragerc",
         ".pre-commit-config.yaml",

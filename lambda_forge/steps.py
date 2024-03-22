@@ -22,6 +22,7 @@ class Steps:
             "Unit Test",
             input=self.source,
             install_commands=[
+                "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
             commands=[
@@ -35,13 +36,18 @@ class Steps:
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
+                    "cache": {
+                        "paths": [
+                            "/root/.cache/pip/**/*",
+                        ]
+                    },
                     "reports": {
                         report_group.report_group_arn: {
                             "files": "test-results.xml",
                             "base-directory": "pytest-report",
                             "file-format": "JUNITXML",
                         }
-                    }
+                    },
                 }
             ),
             role_policy_statements=[
@@ -69,6 +75,7 @@ class Steps:
             "Coverage",
             input=self.source,
             install_commands=[
+                "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
             commands=[
@@ -84,13 +91,18 @@ class Steps:
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
+                    "cache": {
+                        "paths": [
+                            "/root/.cache/pip/**/*",
+                        ]
+                    },
                     "reports": {
                         report_group.report_group_arn: {
                             "files": "coverage.xml",
                             "base-directory": ".",
                             "file-format": "COBERTURAXML",
                         }
-                    }
+                    },
                 }
             ),
             role_policy_statements=[
@@ -137,6 +149,15 @@ def pytest_generate_tests(metafunc):
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
             ),
+            partial_build_spec=codebuild.BuildSpec.from_object(
+                {
+                    "cache": {
+                        "paths": [
+                            "/root/.cache/pip/**/*",
+                        ]
+                    },
+                }
+            ),
         )
 
     def validate_docs(self):
@@ -157,6 +178,15 @@ def pytest_generate_tests(metafunc):
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
             ),
+            partial_build_spec=codebuild.BuildSpec.from_object(
+                {
+                    "cache": {
+                        "paths": [
+                            "/root/.cache/pip/**/*",
+                        ]
+                    },
+                }
+            ),
         )
 
     def run_integration_tests(self, env=None):
@@ -169,6 +199,7 @@ def pytest_generate_tests(metafunc):
             "Integration Test",
             input=self.source,
             install_commands=[
+                "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
             commands=[
@@ -182,13 +213,19 @@ def pytest_generate_tests(metafunc):
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
+                    "cache": {
+                        "paths": [
+                            "/root/.cache/pip/**/*",  # Cache directory for pip
+                            # Add any other directories you want to cache
+                        ]
+                    },
                     "reports": {
                         report_group.report_group_arn: {
                             "files": "test-results.xml",
                             "base-directory": "pytest-report",
                             "file-format": "JUNITXML",
                         }
-                    }
+                    },
                 }
             ),
             role_policy_statements=[
@@ -261,4 +298,13 @@ def pytest_generate_tests(metafunc):
                     resources=["*"],
                 )
             ],
+            partial_build_spec=codebuild.BuildSpec.from_object(
+                {
+                    "cache": {
+                        "paths": [
+                            "/root/.cache/pip/**/*",
+                        ]
+                    }                    
+                }
+            ),
         )

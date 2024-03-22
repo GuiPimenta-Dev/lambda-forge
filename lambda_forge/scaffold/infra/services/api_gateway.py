@@ -96,7 +96,7 @@ class APIGateway:
     def create_docs(self, enabled, authorizer):
         if not enabled:
             return
-        
+
         s3_integration_role = iam.Role(
             self.scope,
             "api-gateway-s3",

@@ -136,7 +136,8 @@ def test_authorizer_should_fail_with_invalid_secret():
         try:
             comment_index = self.lambda_stack.index(f"        # {comment}\n")
             self.lambda_stack.insert(
-                comment_index + 1, f"        {self.pascal_name}AuthorizerConfig(self.services)\n"
+                comment_index + 1,
+                f"        {self.pascal_name}AuthorizerConfig(self.services)\n",
             )
         except:
             services_index = next(
