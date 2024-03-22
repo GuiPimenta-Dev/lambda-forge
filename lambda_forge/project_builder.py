@@ -204,6 +204,24 @@ class ProdStack(cdk.Stack):
 
         return self
 
+    def with_requirements(self):
+        self.requirements = """
+attrs==22.1.0
+aws-cdk-lib==2.29.1
+constructs>=10.0.0,<11.0.0
+black==22.10.0
+boto3==1.26.25
+click==8.1.3
+pre-commit==2.20.0
+PyYAML==6.0
+requests==2.28.1
+pytest==7.2.0
+pytest-dotenv==0.5.2
+moto==4.1.7
+requests==2.28.1
+coverage==7.2.3"""
+        return self
+
     def with_gitignore(self):
         self.gitignore = """
 # Compiled source #
@@ -536,6 +554,7 @@ class DeployStage(cdk.Stage):
         self.make_file("", ".pre-commit-config.yaml", self.pre_commit)
         self.make_file("", ".coveragerc", self.coverage)
         self.make_file("", "pytest.ini", self.pytest_ini)
+        self.make_file("", "requirements.txt", self.requirements)
 
         if self.dev:
             self.make_file(f"{self.root_dir}/infra/stacks", "dev_stack.py", self.dev)
