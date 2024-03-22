@@ -57,11 +57,12 @@ class {self.pascal_name}Config:
     def with_integration(self, http_method):
         self.integration = f"""import pytest
 import requests
+from lambda_forge.constants import BASE_URL
 
 @pytest.mark.integration(method="{http_method}", endpoint="/{self.endpoint}")
 def test_{self.function_name}_status_code_is_200():
 
-    response = requests.{http_method.lower()}(url="")
+    response = requests.{http_method.lower()}(url=f"{{BASE_URL}}/{self.endpoint}")
 
     assert response.status_code == 200 
 """

@@ -476,6 +476,7 @@ markers =
                 "repo": {"owner": repo_owner, "name": repo_name},
                 "bucket": bucket,
                 "coverage": coverage,
+                "base_url": "",
                 "dev": {"arns": {}},
                 "staging": {"arns": {}},
                 "prod": {"arns": {}},
