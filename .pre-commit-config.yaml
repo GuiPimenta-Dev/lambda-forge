@@ -1,0 +1,48 @@
+
+fail_fast: true
+
+repos:
+  - repo: local
+    hooks:
+      - id: cdk
+        name: remove cdk.out
+        entry: rm -rf cdk.out
+        language: system
+        pass_filenames: false
+        stages: [commit]
+      - id: unit_test
+        name: unit tests
+        entry: coverage run -m pytest -k 'unit.py'
+        language: system
+        pass_filenames: false
+        stages: [commit]
+      - id: coverage
+        name: coverage
+        entry: coverage report --fail-under=80
+        language: system
+        pass_filenames: false
+        stages: [commit]
+      - id: validate_docs
+        name: validate docs
+        entry: python validate_docs.py
+        language: system
+        pass_filenames: false
+        stages: [commit]
+      - id: generate_docs
+        name: generate docs
+        entry: python generate_docs.py
+        language: system
+        pass_filenames: false
+        stages: [commit]
+      - id: validate_integration
+        name: validate integration tests
+        entry: python validate_integration_tests.py
+        language: system
+        pass_filenames: false
+        stages: [commit]
+      - id: cleaning
+        name: cleaning
+        entry: rm -rf .fc coverage.xml .coverage .tested_endpoints.jsonl htmlcov .DS_Store build/ gaia.egg-info/ docs.yaml
+        language: system
+        pass_filenames: false
+        stages: [commit]

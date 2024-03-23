@@ -1,9 +1,9 @@
 import click
 
-from lambda_forge.authorizer_builder import AuthorizerBuilder
-from lambda_forge.function_builder import FunctionBuilder
-from lambda_forge.project_builder import ProjectBuilder
-from lambda_forge.service_builder import ServiceBuilder
+from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
+from lambda_forge.builders.function_builder import FunctionBuilder
+from lambda_forge.builders.project_builder import ProjectBuilder
+from lambda_forge.builders.service_builder import ServiceBuilder
 
 
 @click.group()

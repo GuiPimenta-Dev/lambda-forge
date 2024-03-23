@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambda_forge",
-    version="1.0.195",
+    version="1.0.196",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -25,5 +25,5 @@ setup(
     author="Guilherme Alves Pimenta",
     author_email="guialvespimenta27@gmail.com",
     description="Lambda Forge is a framework to help you create lambda functions following a pre-defined structure.",
-    entry_points={"console_scripts": ["forge=lambda_forge.main:forge"]},
+    entry_points={"console_scripts": ["forge=lambda_forge.cli:forge"]},
 )

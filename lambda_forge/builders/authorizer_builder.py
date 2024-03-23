@@ -1,6 +1,6 @@
 import random
 import string
-from lambda_forge.file_service import FileService
+from lambda_forge.builders.file_service import FileService
 
 
 class AuthorizerBuilder(FileService):
