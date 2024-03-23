@@ -12,7 +12,7 @@ class Steps:
         self.context = context
         self.source = source
 
-    def run_unit_tests(self, env=None):
+    def run_unit_tests(self, env=None, role_policy_statements=[]):
         report_group = codebuild.ReportGroup(
             self.scope,
             "UnitReportGroup",
@@ -31,6 +31,7 @@ class Steps:
             cache=codebuild.Cache.local(
                 codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
             ),
+            env=env,
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
@@ -60,10 +61,10 @@ class Steps:
                     ],
                     resources=[report_group.report_group_arn],
                 )
-            ],
+            ] + role_policy_statements,
         )
 
-    def run_coverage(self, env=None):
+    def run_coverage(self, env=None, role_policy_statements=[]):
         report_group = codebuild.ReportGroup(
             self.scope,
             "CoverageGroup",
@@ -76,6 +77,7 @@ class Steps:
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
+            env=env,
             commands=[
                 'coverage run -m pytest -k "unit.py"',
                 f"coverage xml --fail-under={self.context.coverage}",
@@ -118,10 +120,10 @@ class Steps:
                     ],
                     resources=[report_group.report_group_arn],
                 )
-            ],
+            ] + role_policy_statements,
         )
 
-    def validate_integration_tests(self):
+    def validate_integration_tests(self, env=None, role_policy_statements=[]):
         validate_integration_tests = pkg_resources.resource_string(
             __name__, "validate_integration_tests.py"
         )
@@ -138,6 +140,7 @@ def pytest_generate_tests(metafunc):
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
+            env=env,
             commands=[
                 f"echo '{conftest}' > conftest.py",
                 f"echo '{validate_integration_tests.decode()}' > validate_integration_tests.py",
@@ -161,9 +164,10 @@ def pytest_generate_tests(metafunc):
                     },
                 }
             ),
+            role_policy_statements=role_policy_statements
         )
 
-    def validate_docs(self):
+    def validate_docs(self, env=None, role_policy_statements=[]):
         validate_docs = pkg_resources.resource_string(__name__, "validate_docs.py")
 
         return pipelines.CodeBuildStep(
@@ -176,6 +180,7 @@ def pytest_generate_tests(metafunc):
                 f"echo '{validate_docs.decode()}' > validate_docs.py",
                 "python validate_docs.py",
             ],
+            env=env,
              cache=codebuild.Cache.local(
                 codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
             ),
@@ -193,9 +198,10 @@ def pytest_generate_tests(metafunc):
                     },
                 }
             ),
+            role_policy_statements=role_policy_statements
         )
 
-    def run_integration_tests(self, env=None):
+    def run_integration_tests(self, env=None, role_policy_statements=[]):
         report_group = codebuild.ReportGroup(
             self.scope,
             "IntegrationReportGroup",
@@ -208,6 +214,7 @@ def pytest_generate_tests(metafunc):
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
+            env=env,
             commands=[
                 'pytest --junitxml=pytest-report/test-results.xml -k "integration.py"'
             ],
@@ -222,12 +229,6 @@ def pytest_generate_tests(metafunc):
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
-                    "cache": {
-                        "paths": [
-                            "/root/.cache/pip/**/*",  # Cache directory for pip
-                            # Add any other directories you want to cache
-                        ]
-                    },
                     "reports": {
                         report_group.report_group_arn: {
                             "files": "test-results.xml",
@@ -237,43 +238,10 @@ def pytest_generate_tests(metafunc):
                     },
                 }
             ),
-            role_policy_statements=[
-                iam.PolicyStatement(
-                    effect=iam.Effect.ALLOW,
-                    actions=[
-                        "dynamodb:PutItem",
-                        "dynamodb:GetItem",
-                        "dynamodb:Query",
-                        "dynamodb:Scan",
-                        "dynamodb:DeleteItem",
-                    ],
-                    resources=["*"],
-                ),
-                iam.PolicyStatement(
-                    effect=iam.Effect.ALLOW,
-                    actions=["secretsmanager:GetSecretValue"],
-                    resources=["*"],
-                ),
-                iam.PolicyStatement(
-                    effect=iam.Effect.ALLOW,
-                    actions=["kms:Decrypt"],
-                    resources=["*"],
-                ),
-                iam.PolicyStatement(
-                    effect=iam.Effect.ALLOW,
-                    actions=[
-                        "codebuild:CreateReportGroup",
-                        "codebuild:CreateReport",
-                        "codebuild:UpdateReport",
-                        "codebuild:BatchPutTestCases",
-                        "codebuild:BatchPutCodeCoverages",
-                    ],
-                    resources=[report_group.report_group_arn],
-                ),
-            ],
+            role_policy_statements=role_policy_statements
         )
 
-    def generate_docs(self):
+    def generate_docs(self, env=None, role_policy_statements=[]):
         generate_docs = pkg_resources.resource_string(__name__, "generate_docs.py")
         swagger_yml_to_ui = pkg_resources.resource_string(
             __name__, "swagger_yml_to_ui.py"
@@ -288,6 +256,7 @@ def pytest_generate_tests(metafunc):
              cache=codebuild.Cache.local(
                 codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
             ),
+            env=env,
             commands=[
                 f"echo '{generate_docs.decode()}' > generate_docs.py",
                 "python generate_docs.py",
@@ -309,14 +278,5 @@ def pytest_generate_tests(metafunc):
                     ],
                     resources=["*"],
                 )
-            ],
-            partial_build_spec=codebuild.BuildSpec.from_object(
-                {
-                    "cache": {
-                        "paths": [
-                            "/root/.cache/pip/**/*",
-                        ]
-                    }
-                }
-            ),
+            ] + role_policy_statements
         )

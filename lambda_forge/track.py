@@ -6,11 +6,16 @@ import os
 
 load_dotenv()
 
+def check_track_env_variable():
+    track = os.getenv("TRACK", "false")
+    return track.lower() == "true"
+
+
 def track(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        track = eval(os.getenv("TRACK", False))
-        if not track:
+        should_track = check_track_env_variable()
+        if not should_track:
             return func(*args, **kwargs)
 
         cdk = json.load(open("cdk.json"))
@@ -20,16 +25,12 @@ def track(func):
         if function_name == "create_function":
             path = kwargs["path"]
             directory = kwargs.get("directory")
-            full_path = (
-                f"{path}/{directory}/main.lambda_handler"
-                if directory
-                else f"{path}/main.lambda_handler"
-            )
+            path = f"{path}/{directory}" if directory else path
             name = kwargs["name"]
             data.append(
                 {
                     "name": name,
-                    "file_path": full_path,
+                    "path": path,
                     "description": kwargs["description"],
                 }
             )
@@ -53,8 +54,8 @@ def track(func):
 def release(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        track = eval(os.getenv("TRACK", False))
-        if not track:
+        should_track = check_track_env_variable()
+        if not should_track:
             return func(*args, **kwargs)
 
         cdk = json.load(open("cdk.json"))
