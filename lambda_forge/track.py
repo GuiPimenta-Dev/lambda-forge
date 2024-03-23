@@ -6,6 +6,7 @@ import os
 
 load_dotenv()
 
+
 def check_track_env_variable():
     track = os.getenv("TRACK", "false")
     return track.lower() == "true"

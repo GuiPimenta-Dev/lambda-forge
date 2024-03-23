@@ -9,9 +9,7 @@ def extract_path_parameters(endpoint):
 
 
 def default_module_loader(path):
-    return importlib.import_module(
-        transform_file_path(f"{path}/main.lambda_handler")
-    )
+    return importlib.import_module(transform_file_path(f"{path}/main.lambda_handler"))
 
 
 def transform_file_path(path):

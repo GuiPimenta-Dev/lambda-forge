@@ -112,26 +112,27 @@ def test_it_should_update_lambda_stack_when_creating_an_authorizer():
 
     lambda_stack = read_file_lines("infra/stacks/lambda_stack.py")
     assert lambda_stack == [
-'from authorizers.authorizer_name.config import '
- 'AuthorizerNameAuthorizerConfig',
- 'from authorizers.docs.config import DocsAuthorizerConfig',
- 'from aws_cdk import Stack',
- 'from constructs import Construct',
- 'from infra.services import Services',
- 'from lambda_forge import release',
- '',
- '',
- '@release',
- 'class LambdaStack(Stack):',
- '    def __init__(self, scope: Construct, context, **kwargs) -> None:',
- '',
- '        super().__init__(scope, f"{context.name}-CDK", **kwargs)',
- '',
- '        self.services = Services(self, context)',
- '',
- '        # Authorizers',
- '        AuthorizerNameAuthorizerConfig(self.services)',
- '        DocsAuthorizerConfig(self.services)']
+        "from authorizers.authorizer_name.config import "
+        "AuthorizerNameAuthorizerConfig",
+        "from authorizers.docs.config import DocsAuthorizerConfig",
+        "from aws_cdk import Stack",
+        "from constructs import Construct",
+        "from infra.services import Services",
+        "from lambda_forge import release",
+        "",
+        "",
+        "@release",
+        "class LambdaStack(Stack):",
+        "    def __init__(self, scope: Construct, context, **kwargs) -> None:",
+        "",
+        '        super().__init__(scope, f"{context.name}-CDK", **kwargs)',
+        "",
+        "        self.services = Services(self, context)",
+        "",
+        "        # Authorizers",
+        "        AuthorizerNameAuthorizerConfig(self.services)",
+        "        DocsAuthorizerConfig(self.services)",
+    ]
 
 
 def test_it_should_add_the_authorizer_at_the_beggining_of_lambda_stack():

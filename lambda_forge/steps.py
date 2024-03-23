@@ -12,7 +12,7 @@ class Steps:
         self.context = context
         self.source = source
 
-    def run_unit_tests(self, env=None, role_policy_statements=[]):
+    def run_unit_tests(self, env={}, role_policy_statements=[]):
         report_group = codebuild.ReportGroup(
             self.scope,
             "UnitReportGroup",
@@ -61,10 +61,11 @@ class Steps:
                     ],
                     resources=[report_group.report_group_arn],
                 )
-            ] + role_policy_statements,
+            ]
+            + role_policy_statements,
         )
 
-    def run_coverage(self, env=None, role_policy_statements=[]):
+    def run_coverage(self, env={}, role_policy_statements=[]):
         report_group = codebuild.ReportGroup(
             self.scope,
             "CoverageGroup",
@@ -120,10 +121,11 @@ class Steps:
                     ],
                     resources=[report_group.report_group_arn],
                 )
-            ] + role_policy_statements,
+            ]
+            + role_policy_statements,
         )
 
-    def validate_integration_tests(self, env=None, role_policy_statements=[]):
+    def validate_integration_tests(self, env={}, role_policy_statements=[]):
         validate_integration_tests = pkg_resources.resource_string(
             __name__, "validate_integration_tests.py"
         )
@@ -132,22 +134,25 @@ def pytest_generate_tests(metafunc):
     for mark in metafunc.definition.iter_markers(name="integration"):
         with open("tested_endpoints.txt", "a") as f:
             f.write(f"{json.dumps(mark.kwargs)}|")"""
-
+        env = {"TRACK": "true"} | env
         return pipelines.CodeBuildStep(
             "Validate Integration Tests",
             input=self.source,
             install_commands=[
+                "npm install -g aws-cdk",
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
             env=env,
             commands=[
+                "cdk synth",
+                "rm -rf cdk.out",
                 f"echo '{conftest}' > conftest.py",
                 f"echo '{validate_integration_tests.decode()}' > validate_integration_tests.py",
                 "pytest -m integration --collect-only . -q",
                 "python validate_integration_tests.py",
             ],
-             cache=codebuild.Cache.local(
+            cache=codebuild.Cache.local(
                 codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
             ),
             build_environment=codebuild.BuildEnvironment(
@@ -164,24 +169,29 @@ def pytest_generate_tests(metafunc):
                     },
                 }
             ),
-            role_policy_statements=role_policy_statements
+            role_policy_statements=role_policy_statements,
         )
 
-    def validate_docs(self, env=None, role_policy_statements=[]):
+    def validate_docs(self, env={}, role_policy_statements=[]):
         validate_docs = pkg_resources.resource_string(__name__, "validate_docs.py")
+        env = {"TRACK": "true"} | env
 
         return pipelines.CodeBuildStep(
             "Validate Docs",
             input=self.source,
             install_commands=[
+                "npm install -g aws-cdk",
+                "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
             commands=[
+                "cdk synth",
+                "rm -rf cdk.out",
                 f"echo '{validate_docs.decode()}' > validate_docs.py",
                 "python validate_docs.py",
             ],
             env=env,
-             cache=codebuild.Cache.local(
+            cache=codebuild.Cache.local(
                 codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
             ),
             build_environment=codebuild.BuildEnvironment(
@@ -189,24 +199,27 @@ def pytest_generate_tests(metafunc):
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
             ),
-            partial_build_spec=codebuild.BuildSpec.from_object(
-                {
-                    "cache": {
-                        "paths": [
-                            "/root/.cache/pip/**/*",
-                        ]
-                    },
-                }
-            ),
-            role_policy_statements=role_policy_statements
+            role_policy_statements=role_policy_statements,
         )
 
-    def run_integration_tests(self, env=None, role_policy_statements=[]):
+    def run_integration_tests(self, env={}, role_policy_statements=[]):
         report_group = codebuild.ReportGroup(
             self.scope,
             "IntegrationReportGroup",
         )
-
+        role_policy_statements = [
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "codebuild:CreateReportGroup",
+                    "codebuild:CreateReport",
+                    "codebuild:UpdateReport",
+                    "codebuild:BatchPutTestCases",
+                    "codebuild:BatchPutCodeCoverages",
+                ],
+                resources=[report_group.report_group_arn],
+            ),
+        ] + role_policy_statements
         return pipelines.CodeBuildStep(
             "Integration Test",
             input=self.source,
@@ -224,7 +237,7 @@ def pytest_generate_tests(metafunc):
                 compute_type=codebuild.ComputeType.SMALL,
                 environment_variables=env,
             ),
-             cache=codebuild.Cache.local(
+            cache=codebuild.Cache.local(
                 codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
@@ -238,26 +251,32 @@ def pytest_generate_tests(metafunc):
                     },
                 }
             ),
-            role_policy_statements=role_policy_statements
+            role_policy_statements=role_policy_statements,
         )
 
-    def generate_docs(self, env=None, role_policy_statements=[]):
+    def generate_docs(self, env={}, role_policy_statements=[]):
         generate_docs = pkg_resources.resource_string(__name__, "generate_docs.py")
         swagger_yml_to_ui = pkg_resources.resource_string(
             __name__, "swagger_yml_to_ui.py"
         )
         bucket = self.scope.node.try_get_context("bucket")
+
+        env = {"TRACK": "true"} | env
         return pipelines.CodeBuildStep(
             f"Generate {self.context.stage} Docs",
             input=self.source,
             install_commands=[
+                "npm install -g aws-cdk",
+                "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
-             cache=codebuild.Cache.local(
+            cache=codebuild.Cache.local(
                 codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
             ),
             env=env,
             commands=[
+                "cdk synth",
+                "rm -rf cdk.out",
                 f"echo '{generate_docs.decode()}' > generate_docs.py",
                 "python generate_docs.py",
                 f"echo '{swagger_yml_to_ui.decode()}' > swagger_yml_to_ui.py",
@@ -278,5 +297,6 @@ def pytest_generate_tests(metafunc):
                     ],
                     resources=["*"],
                 )
-            ] + role_policy_statements
+            ]
+            + role_policy_statements,
         )
