@@ -293,7 +293,7 @@ def parse_path_properties(schema):
 
 
 def default_module_loader(file_path):
-    file_path = f"{file_path}/main"
+    file_path = f"{file_path}.main"
     return importlib.import_module(file_path)
 
 
