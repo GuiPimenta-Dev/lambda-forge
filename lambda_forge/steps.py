@@ -134,14 +134,13 @@ def pytest_generate_tests(metafunc):
             "Validate Integration Tests",
             input=self.source,
             install_commands=[
+                "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
             ],
             commands=[
                 f"echo '{conftest}' > conftest.py",
-                "cat conftest.py",
                 f"echo '{validate_integration_tests.decode()}' > validate_integration_tests.py",
-                "cat validate_integration_tests.py",
-                "pytest -m integration --collect-only . -q || echo 'No integration tests found, continuing...'",
+                "pytest -m integration --collect-only . -q",
                 "python validate_integration_tests.py",
             ],
             build_environment=codebuild.BuildEnvironment(
