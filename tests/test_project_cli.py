@@ -362,7 +362,7 @@ def test_it_should_always_update_lambda_stack_with_the_authorizer_for_docs():
         "from aws_cdk import Stack",
         "from constructs import Construct",
         "from infra.services import Services",
-        "from lambda_forge.builders import release",
+        "from lambda_forge import release",
         "",
         "",
         "@release",

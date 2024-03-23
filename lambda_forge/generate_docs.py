@@ -41,7 +41,7 @@ def get_schemas_from_endpoint(endpoint, loader):
     Generates schema definitions for a given endpoint.
     """
     repo_name = endpoint["name"]
-    file_path = normalize_file_path(endpoint["file_path"])
+    file_path = normalize_file_path(endpoint["path"])
     function_module = loader(file_path)
 
     schemas = [
@@ -293,7 +293,7 @@ def parse_path_properties(schema):
 
 
 def default_module_loader(file_path):
-    return importlib.import_module(file_path)
+    return f"{importlib.import_module(file_path)}/main.lambda_handler"
 
 
 def generate_docs(endpoints, name, loader=default_module_loader):

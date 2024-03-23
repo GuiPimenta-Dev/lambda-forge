@@ -51,7 +51,7 @@ def test_it_should_generate_the_refactored_docs():
 
     endpoints = [
         {
-            "file_path": "./functions/function_name/main.lambda_handler",
+            "path": "./functions/function_name",
             "name": "FunctionName",
             "description": "description",
             "method": "GET",
