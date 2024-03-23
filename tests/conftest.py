@@ -2,7 +2,6 @@ import contextlib
 import pytest
 import shutil
 import os
-from click.testing import CliRunner
 
 
 @pytest.fixture(scope="function", autouse=True)
