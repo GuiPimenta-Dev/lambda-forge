@@ -1,6 +1,6 @@
 import pytest
 
-from lambda_forge.files.validate_docs import get_endpoints, validate_docs
+from lambda_forge.validate_docs import validate_docs
 from dataclasses import dataclass
 
 
@@ -25,57 +25,6 @@ def module_loader(content):
 
     return loader
 
-
-def test_it_should_retrieve_the_endpoints():
-
-    functions = [
-        {
-            "file_path": "./functions/authorizers/docs_authorizer/main.lambda_handler",
-            "name": "DocsAuthorizer",
-            "description": "Function used to authorize the docs endpoints",
-        },
-        {
-            "file_path": "./functions/function_name/main.lambda_handler",
-            "name": "FunctionName",
-            "description": "description",
-        },
-    ]
-    api_endpoints = {"FunctionName": {"method": "GET", "endpoint": "/function_name"}}
-
-    endpoints = get_endpoints(functions, api_endpoints)
-
-    assert endpoints == [
-        {
-            "file_path": "./functions/function_name/main.lambda_handler",
-            "name": "FunctionName",
-            "description": "description",
-            "endpoint": "/function_name",
-            "method": "GET",
-        }
-    ]
-
-
-def test_it_should_not_throw_an_error_if_docs_are_set():
-
-    functions = [
-        {
-            "file_path": "./functions/authorizers/docs_authorizer/main.lambda_handler",
-            "name": "DocsAuthorizer",
-            "description": "Function used to authorize the docs endpoints",
-        },
-        {
-            "file_path": "./functions/function_name/main.lambda_handler",
-            "name": "FunctionName",
-            "description": "description",
-        },
-    ]
-    api_endpoints = {"FunctionName": {"method": "GET", "endpoint": "/function_name"}}
-
-    endpoints = get_endpoints(functions, api_endpoints)
-    try:
-        validate_docs(endpoints, module_loader(Mock()))
-    except:
-        pytest.fail("It should not throw an error")
 
 
 def test_it_should_throw_an_error_if_input_is_not_a_dataclass():

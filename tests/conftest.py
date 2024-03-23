@@ -9,13 +9,12 @@ from click.testing import CliRunner
 def clean_project_structure():
     yield
 
-    folders_to_delete = ["functions", "infra"]
+    folders_to_delete = ["functions", "authorizers","infra"]
     files_to_delete = [
         ".coveragerc",
         ".pre-commit-config.yaml",
         "cdk.context.json",
         "cdk.json",
-        "conftest.py",
         "generate_docs.py",
         "pytest.ini",
         "app.py",

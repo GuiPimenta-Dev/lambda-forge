@@ -2,7 +2,7 @@ import pytest
 from click.testing import CliRunner
 from pprint import pprint
 
-from lambda_forge.main import project, authorizer
+from lambda_forge.cli import project, authorizer
 from tests.conftest import read_file_lines, list_files_related_to
 
 runner = CliRunner()
