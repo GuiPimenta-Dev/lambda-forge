@@ -1,10 +1,18 @@
 import json
 from functools import wraps
+from dotenv import load_dotenv
+import os
 
+
+load_dotenv()
 
 def track(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        track = eval(os.getenv("TRACK", False))
+        if not track:
+            return func(*args, **kwargs)
+
         cdk = json.load(open("cdk.json"))
         data = cdk["context"].get("functions", [])
         function_name = func.__name__
@@ -45,6 +53,10 @@ def track(func):
 def release(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        track = eval(os.getenv("TRACK", False))
+        if not track:
+            return func(*args, **kwargs)
+
         cdk = json.load(open("cdk.json"))
         cdk["context"]["functions"] = []
         with open("cdk.json", "w") as file:

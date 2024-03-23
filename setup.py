@@ -17,6 +17,7 @@ setup(
         "pytest==8.1.1",
         "coverage==7.2.3",
         "moto==4.1.7",
+        "python-dotenv==1.0.1"
     ],
     include_package_data=True,
     package_data={
