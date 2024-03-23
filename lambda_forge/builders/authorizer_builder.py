@@ -15,6 +15,8 @@ class AuthorizerBuilder(FileService):
         self.pascal_name = "".join(
             word.capitalize() for word in self.authorizer_name.split("_")
         )
+        if not self.pascal_name.endswith("Authorizer"):
+            self.pascal_name += "Authorizer"
         self.secret = "".join(
             random.choices(
                 string.ascii_lowercase + string.ascii_uppercase + string.digits, k=52
@@ -24,11 +26,11 @@ class AuthorizerBuilder(FileService):
     def with_config(self, default=False):
         self.config = f"""from infra.services import Services
 
-class {self.pascal_name}AuthorizerConfig:
+class {self.pascal_name}Config:
     def __init__(self, services: Services) -> None:
 
         function = services.aws_lambda.create_function(
-            name="{self.pascal_name}Authorizer",
+            name="{self.pascal_name}",
             path="./authorizers/{self.authorizer_name}",
             description="{self.description}"
         )
@@ -128,7 +130,7 @@ def test_authorizer_should_fail_with_invalid_secret():
         folder = f"authorizers.{self.authorizer_name}"
 
         self.lambda_stack.insert(
-            0, f"from {folder}.config import {self.pascal_name}AuthorizerConfig\n"
+            0, f"from {folder}.config import {self.pascal_name}Config\n"
         )
 
         comment = "".join(word.capitalize() for word in self.belongs.split("_"))
@@ -137,7 +139,7 @@ def test_authorizer_should_fail_with_invalid_secret():
             comment_index = self.lambda_stack.index(f"        # {comment}\n")
             self.lambda_stack.insert(
                 comment_index + 1,
-                f"        {self.pascal_name}AuthorizerConfig(self.services)\n",
+                f"        {self.pascal_name}Config(self.services)\n",
             )
         except:
             services_index = next(
@@ -152,7 +154,7 @@ def test_authorizer_should_fail_with_invalid_secret():
             self.lambda_stack.insert(services_index + 2, f"        # {comment}\n")
             self.lambda_stack.insert(
                 services_index + 3,
-                f"        {self.pascal_name}AuthorizerConfig(self.services)\n",
+                f"        {self.pascal_name}Config(self.services)\n",
             )
 
         return self

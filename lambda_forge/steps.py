@@ -28,6 +28,9 @@ class Steps:
             commands=[
                 'pytest --junitxml=pytest-report/test-results.xml -k "unit.py"',
             ],
+            cache=codebuild.Cache.local(
+                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
+            ),
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
@@ -36,11 +39,6 @@ class Steps:
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
-                    "cache": {
-                        "paths": [
-                            "/root/.cache/pip/**/*",
-                        ]
-                    },
                     "reports": {
                         report_group.report_group_arn: {
                             "files": "test-results.xml",
@@ -83,6 +81,9 @@ class Steps:
                 f"coverage xml --fail-under={self.context.coverage}",
                 "touch coverage.xml",
             ],
+            cache=codebuild.Cache.local(
+                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
+            ),
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
@@ -143,6 +144,9 @@ def pytest_generate_tests(metafunc):
                 "pytest -m integration --collect-only . -q",
                 "python validate_integration_tests.py",
             ],
+             cache=codebuild.Cache.local(
+                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
+            ),
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
@@ -172,6 +176,9 @@ def pytest_generate_tests(metafunc):
                 f"echo '{validate_docs.decode()}' > validate_docs.py",
                 "python validate_docs.py",
             ],
+             cache=codebuild.Cache.local(
+                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
+            ),
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
@@ -209,6 +216,9 @@ def pytest_generate_tests(metafunc):
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
                 environment_variables=env,
+            ),
+             cache=codebuild.Cache.local(
+                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
@@ -275,6 +285,9 @@ def pytest_generate_tests(metafunc):
             install_commands=[
                 "pip install -r requirements.txt",
             ],
+             cache=codebuild.Cache.local(
+                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
+            ),
             commands=[
                 f"echo '{generate_docs.decode()}' > generate_docs.py",
                 "python generate_docs.py",
@@ -303,7 +316,7 @@ def pytest_generate_tests(metafunc):
                         "paths": [
                             "/root/.cache/pip/**/*",
                         ]
-                    }                    
+                    }
                 }
             ),
         )

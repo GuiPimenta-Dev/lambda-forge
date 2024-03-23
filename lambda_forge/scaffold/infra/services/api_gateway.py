@@ -1,9 +1,10 @@
 from aws_cdk import Duration
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
+from lambda_forge.interfaces import IAPIGateway
+from lambda_forge import track
 
-
-class APIGateway:
+class APIGateway(IAPIGateway):
     def __init__(self, scope, context) -> None:
         self.endpoints = {}
         self.context = context
@@ -37,6 +38,7 @@ class APIGateway:
             },
         )
 
+    @track
     def create_endpoint(self, method, path, function, public=False, authorizer=None):
         resource = self.create_resource(path)
         if public:

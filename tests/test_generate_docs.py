@@ -49,26 +49,17 @@ def module_loader(content):
 
 def test_it_should_generate_the_refactored_docs():
 
-    functions = [
-        {
-            "file_path": "./functions/authorizers/docs_authorizer/main.lambda_handler",
-            "name": "DocsAuthorizer",
-            "description": "Function used to authorize the docs endpoints",
-        },
+    endpoints = [
         {
             "file_path": "./functions/function_name/main.lambda_handler",
             "name": "FunctionName",
             "description": "description",
-        },
-    ]
-    api_endpoints = {
-        "FunctionName": {
             "method": "GET",
             "endpoint": "/function_name/{a_string}/{an_int}",
-        }
-    }
+        },
+    ]
 
-    spec = generate_docs(functions, api_endpoints, "name", module_loader(Mock()))
+    spec = generate_docs(endpoints, "name", module_loader(Mock()))
 
     assert spec == {
         "components": {

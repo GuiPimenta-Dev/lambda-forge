@@ -1,7 +1,5 @@
 import json
 from functools import wraps
-import os
-import pkg_resources
 
 
 def track(func):

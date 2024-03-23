@@ -42,8 +42,8 @@ def test_it_should_not_create_dev_stack_when_no_dev_is_true():
         "",
         "app = cdk.App()",
         "",
-        "StagingStack = StagingStack(app)",
-        "ProdStack = ProdStack(app)",
+        "StagingStack(app)",
+        "ProdStack(app)",
         "",
         "app.synth()",
     ]
@@ -73,8 +73,8 @@ def test_it_should_not_create_staging_stack_when_no_staging_is_true():
         "",
         "app = cdk.App()",
         "",
-        "DevStack = DevStack(app)",
-        "ProdStack = ProdStack(app)",
+        "DevStack(app)",
+        "ProdStack(app)",
         "",
         "app.synth()",
     ]
@@ -102,8 +102,40 @@ def test_it_should_not_create_prod_stack_when_no_prod_is_true():
         "",
         "app = cdk.App()",
         "",
-        "DevStack = DevStack(app)",
-        "StagingStack = StagingStack(app)",
+        "DevStack(app)",
+        "StagingStack(app)",
+        "",
+        "app.synth()",
+    ]
+
+
+def test_it_should_create_all_stages_by_default():
+
+    runner.invoke(
+        project,
+        [
+            "project_name",
+            "--repo-owner",
+            "owner",
+            "--repo-name",
+            "repo",
+            "--bucket",
+            "bucket",
+        ],
+    )
+
+    app = read_file_lines("app.py")
+    assert app == [
+        "import aws_cdk as cdk",
+        "from infra.stacks.dev_stack import DevStack",
+        "from infra.stacks.staging_stack import StagingStack",
+        "from infra.stacks.prod_stack import ProdStack",
+        "",
+        "app = cdk.App()",
+        "",
+        "DevStack(app)",
+        "StagingStack(app)",
+        "ProdStack(app)",
         "",
         "app.synth()",
     ]
@@ -176,6 +208,7 @@ def test_it_should_add_the_cdk_json_file():
         "    },",
         '    "bucket": "bucket",',
         '    "coverage": 80,',
+        '    "base_url": "",',
         '    "dev": {',
         '      "arns": {}',
         "    },",
@@ -205,21 +238,14 @@ def test_it_should_create_the_files_when_asking_for_docs():
     )
     files = list_files(".")
     assert files == [
-        "./generate_docs.py",
-        "./conftest.py",
         "./pytest.ini",
         "./requirements.txt",
         "./.pre-commit-config.yaml",
-        "./cdk.context.json",
         "./cdk.json",
         "./__init__.py",
         "./.coveragerc",
-        "./source.bat",
-        "./validate_docs.py",
-        "./swagger_yml_to_ui.py",
         "./.gitignore",
         "./app.py",
-        "./validate_integration_tests.py",
         "./infra/__init__.py",
         "./infra/stacks/staging_stack.py",
         "./infra/stacks/lambda_stack.py",
@@ -227,20 +253,16 @@ def test_it_should_create_the_files_when_asking_for_docs():
         "./infra/stacks/prod_stack.py",
         "./infra/stacks/dev_stack.py",
         "./infra/stages/__init__.py",
-        "./infra/steps/__init__.py",
-        "./infra/steps/code_build_step.py",
         "./infra/services/api_gateway.py",
         "./infra/services/aws_lambda.py",
         "./infra/services/__init__.py",
+        "./authorizers/__init__.py",
+        "./authorizers/utils/__init__.py",
+        "./authorizers/docs/config.py",
+        "./authorizers/docs/__init__.py",
+        "./authorizers/docs/unit.py",
+        "./authorizers/docs/main.py",
         "./functions/__init__.py",
-        "./functions/docs/config.py",
-        "./functions/docs/__init__.py",
-        "./functions/authorizers/__init__.py",
-        "./functions/authorizers/docs_authorizer/config.py",
-        "./functions/authorizers/docs_authorizer/__init__.py",
-        "./functions/authorizers/docs_authorizer/unit.py",
-        "./functions/authorizers/docs_authorizer/main.py",
-        "./functions/authorizers/utils/__init__.py",
     ]
 
 
@@ -259,21 +281,14 @@ def test_it_should_create_the_files_when_not_asking_for_docs():
     files = list_files(".")
 
     assert files == [
-        "./generate_docs.py",
-        "./conftest.py",
         "./pytest.ini",
         "./requirements.txt",
         "./.pre-commit-config.yaml",
-        "./cdk.context.json",
         "./cdk.json",
         "./__init__.py",
         "./.coveragerc",
-        "./source.bat",
-        "./validate_docs.py",
-        "./swagger_yml_to_ui.py",
         "./.gitignore",
         "./app.py",
-        "./validate_integration_tests.py",
         "./infra/__init__.py",
         "./infra/stacks/staging_stack.py",
         "./infra/stacks/lambda_stack.py",
@@ -281,8 +296,6 @@ def test_it_should_create_the_files_when_not_asking_for_docs():
         "./infra/stacks/prod_stack.py",
         "./infra/stacks/dev_stack.py",
         "./infra/stages/__init__.py",
-        "./infra/steps/__init__.py",
-        "./infra/steps/code_build_step.py",
         "./infra/services/api_gateway.py",
         "./infra/services/aws_lambda.py",
         "./infra/services/__init__.py",
@@ -307,21 +320,14 @@ def test_it_should_create_the_files_with_public_docs():
     files = list_files(".")
 
     assert files == [
-        "./generate_docs.py",
-        "./conftest.py",
         "./pytest.ini",
         "./requirements.txt",
         "./.pre-commit-config.yaml",
-        "./cdk.context.json",
         "./cdk.json",
         "./__init__.py",
         "./.coveragerc",
-        "./source.bat",
-        "./validate_docs.py",
-        "./swagger_yml_to_ui.py",
         "./.gitignore",
         "./app.py",
-        "./validate_integration_tests.py",
         "./infra/__init__.py",
         "./infra/stacks/staging_stack.py",
         "./infra/stacks/lambda_stack.py",
@@ -329,96 +335,14 @@ def test_it_should_create_the_files_with_public_docs():
         "./infra/stacks/prod_stack.py",
         "./infra/stacks/dev_stack.py",
         "./infra/stages/__init__.py",
-        "./infra/steps/__init__.py",
-        "./infra/steps/code_build_step.py",
         "./infra/services/api_gateway.py",
         "./infra/services/aws_lambda.py",
         "./infra/services/__init__.py",
         "./functions/__init__.py",
-        "./functions/docs/config.py",
-        "./functions/docs/__init__.py",
     ]
 
 
-def test_it_should_update_lambda_stack_with_no_docs():
-    runner.invoke(
-        project,
-        [
-            "project_name",
-            "--repo-owner",
-            "owner",
-            "--repo-name",
-            "repo",
-            "--no-docs",
-        ],
-    )
-
-    lambda_stack = read_file_lines("infra/stacks/lambda_stack.py")
-    assert lambda_stack == [
-        "from aws_cdk import Stack",
-        "from constructs import Construct",
-        "from infra.services import Services",
-        "",
-        "",
-        "class LambdaStack(Stack):",
-        "    def __init__(",
-        "        self,",
-        "        scope: Construct,",
-        "        stage,",
-        "        arns,",
-        "        **kwargs,",
-        "    ) -> None:",
-        "",
-        '        name = scope.node.try_get_context("name")',
-        '        super().__init__(scope, f"{name}-CDK", **kwargs)',
-        "",
-        "        self.services = Services(self, stage, arns)",
-    ]
-
-
-def test_it_should_update_lambda_stack_with_public_docs():
-    runner.invoke(
-        project,
-        [
-            "project_name",
-            "--repo-owner",
-            "owner",
-            "--repo-name",
-            "repo",
-            "--public-docs",
-            "--bucket",
-            "bucket",
-        ],
-    )
-
-    lambda_stack = read_file_lines("infra/stacks/lambda_stack.py")
-    assert lambda_stack == [
-        "from functions.docs.config import DocsConfig",
-        "from aws_cdk import Stack",
-        "from constructs import Construct",
-        "from infra.services import Services",
-        "",
-        "",
-        "class LambdaStack(Stack):",
-        "    def __init__(",
-        "        self,",
-        "        scope: Construct,",
-        "        stage,",
-        "        arns,",
-        "        **kwargs,",
-        "    ) -> None:",
-        "",
-        '        name = scope.node.try_get_context("name")',
-        '        super().__init__(scope, f"{name}-CDK", **kwargs)',
-        "",
-        "        self.services = Services(self, stage, arns)",
-        "",
-        "        # Docs",
-        "        DocsConfig(scope, self.services)",
-    ]
-
-
-def test_it_should_always_update_lambda_stack_with_private_docs():
+def test_it_should_always_update_lambda_stack_with_the_authorizer_for_docs():
     runner.invoke(
         project,
         [
@@ -434,31 +358,21 @@ def test_it_should_always_update_lambda_stack_with_private_docs():
 
     lambda_stack = read_file_lines("infra/stacks/lambda_stack.py")
     assert lambda_stack == [
-        "from functions.docs.config import DocsConfig",
-        "from functions.authorizers.docs_authorizer.config import "
-        "DocsAuthorizerConfig",
+        "from authorizers.docs.config import DocsAuthorizerConfig",
         "from aws_cdk import Stack",
         "from constructs import Construct",
         "from infra.services import Services",
+        "from lambda_forge.builders import release",
         "",
         "",
+        "@release",
         "class LambdaStack(Stack):",
-        "    def __init__(",
-        "        self,",
-        "        scope: Construct,",
-        "        stage,",
-        "        arns,",
-        "        **kwargs,",
-        "    ) -> None:",
+        "    def __init__(self, scope: Construct, context, **kwargs) -> None:",
         "",
-        '        name = scope.node.try_get_context("name")',
-        '        super().__init__(scope, f"{name}-CDK", **kwargs)',
+        '        super().__init__(scope, f"{context.name}-CDK", **kwargs)',
         "",
-        "        self.services = Services(self, stage, arns)",
+        "        self.services = Services(self, context)",
         "",
         "        # Authorizers",
         "        DocsAuthorizerConfig(self.services)",
-        "",
-        "        # Docs",
-        "        DocsConfig(scope, self.services)",
     ]
