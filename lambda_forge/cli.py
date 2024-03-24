@@ -113,7 +113,6 @@ def create_project(
         .with_cdk(repo_owner, repo_name, bucket, coverage)
         .with_gitignore()
         .with_pytest_ini()
-        .with_pre_commit()
         .with_coveragerc()
         .with_requirements()
         .with_deploy_stage(not no_docs, None if public_docs else "docs")

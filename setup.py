@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambda_forge",
-    version="1.0.213",
+    version="1.0.215",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -11,12 +11,8 @@ setup(
         "constructs>=10.0.0,<11.0.0",
         "boto3==1.26.25",
         "click==8.1.3",
-        "pre-commit==2.20.0",
-        "requests==2.31.0",
-        "PyYAML==6.0",
         "pytest==8.1.1",
         "coverage==7.2.3",
-        "moto==4.1.7",
         "python-dotenv==1.0.1",
     ],
     include_package_data=True,
