@@ -369,7 +369,7 @@ def test_it_should_always_update_lambda_stack_with_the_authorizer_for_docs():
         "class LambdaStack(Stack):",
         "    def __init__(self, scope: Construct, context, **kwargs) -> None:",
         "",
-        '        super().__init__(scope, f"{context.name}-CDK", **kwargs)',
+        '        super().__init__(scope, f"{context.name}-Lambda-Stack", **kwargs)',
         "",
         "        self.services = Services(self, context)",
         "",

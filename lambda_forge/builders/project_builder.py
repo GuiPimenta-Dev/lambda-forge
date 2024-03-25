@@ -526,7 +526,6 @@ class DeployStage(cdk.Stage):
     def build(self):
         self.copy_folders("lambda_forge", "scaffold", "")
         self.make_file("", ".gitignore", self.gitignore)
-        self.make_file("", ".pre-commit-config.yaml", self.pre_commit)
         self.make_file("", ".coveragerc", self.coverage)
         self.make_file("", "pytest.ini", self.pytest_ini)
         self.make_file("", "requirements.txt", self.requirements)

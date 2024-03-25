@@ -125,7 +125,7 @@ def test_it_should_update_lambda_stack_when_creating_an_authorizer():
         "class LambdaStack(Stack):",
         "    def __init__(self, scope: Construct, context, **kwargs) -> None:",
         "",
-        '        super().__init__(scope, f"{context.name}-CDK", **kwargs)',
+        '        super().__init__(scope, f"{context.name}-Lambda-Stack", **kwargs)',
         "",
         "        self.services = Services(self, context)",
         "",

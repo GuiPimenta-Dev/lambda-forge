@@ -96,15 +96,16 @@ class APIGateway(IAPIGateway):
             )
         return resource
 
-    def create_docs(self, enabled, authorizer):
+    def create_docs(self, enabled, authorizer, endpoint="/docs"):
         if not enabled:
             return
-
+        
+        endpoint = endpoint.strip("/")
         s3_integration_role = iam.Role(
             self.scope,
-            "api-gateway-s3",
+            f"{endpoint}-api-gateway-s3",
             assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            role_name=f"{self.context.stage}-{self.context.name}-API-Gateway-S3-Integration-Role",
+            role_name=f"{self.context.stage}-{self.context.name}-{endpoint}-S3-Integration-Role",
         )
 
         s3_integration_role.add_to_policy(
@@ -119,7 +120,7 @@ class APIGateway(IAPIGateway):
             )
         )
 
-        docs_resource = self.api.root.add_resource("docs")
+        docs_resource = self.api.root.add_resource(endpoint)
 
         if authorizer and authorizer not in self.authorizers:
             raise Exception(f"Authorizer {authorizer} not found")
