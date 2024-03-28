@@ -40,6 +40,11 @@ def forge():
     default=False,
 )
 @click.option(
+    "--region",
+    help="AWS region to deploy the project",
+    default="us-east-2",
+)
+@click.option(
     "--bucket",
     help="Bucket used to store the documentation",
     default="",
@@ -58,6 +63,7 @@ def project(
     no_prod,
     no_docs,
     public_docs,
+    region,
     bucket,
     coverage,
 ):
@@ -79,6 +85,7 @@ def project(
         no_prod,
         no_docs,
         public_docs,
+        region,
         bucket,
         coverage,
     )
@@ -93,6 +100,7 @@ def create_project(
     no_prod,
     no_docs,
     public_docs,
+    region,
     bucket,
     coverage,
 ):
@@ -110,7 +118,7 @@ def create_project(
 
     project_builder = (
         project_builder.with_app()
-        .with_cdk(repo_owner, repo_name, bucket, coverage)
+        .with_cdk(repo_owner, repo_name, region, bucket, coverage)
         .with_gitignore()
         .with_pytest_ini()
         .with_coveragerc()
@@ -212,7 +220,7 @@ def create_authorizer(name, description, default):
 AVALABLE_SERVICES = sorted(
     [
         "sns",
-        "dynamodb",
+        "dynamo_db",
         "s3",
         "layers",
         "state_machine",
@@ -244,7 +252,7 @@ def create_service(service):
     services = {
         "sns": service_builder.with_sns,
         "layers": service_builder.with_layers,
-        "dynamodb": service_builder.with_dynamodb,
+        "dynamo_db": service_builder.with_dynamodb,
         "s3": service_builder.with_s3,
         "state_machine": service_builder.with_state_machine,
         "event_bridge": service_builder.with_event_bridge,

@@ -426,7 +426,7 @@ markers =
 """
         return self
 
-    def with_cdk(self, repo_owner, repo_name, bucket, coverage):
+    def with_cdk(self, repo_owner, repo_name, region, bucket, coverage):
         cdk = {
             "app": "python3 app.py",
             "watch": {
@@ -462,7 +462,7 @@ markers =
                 "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": True,
                 "@aws-cdk/aws-route53-patters:useCertificate": True,
                 "@aws-cdk/customresources:installLatestAwsSdkDefault": False,
-                "region": "us-east-2",
+                "region": region,
                 "account": "",
                 "name": self.name.title().replace("_", "-").replace(" ", "-"),
                 "repo": {"owner": repo_owner, "name": repo_name},

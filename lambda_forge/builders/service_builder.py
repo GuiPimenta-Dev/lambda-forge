@@ -11,20 +11,27 @@ class ServiceBuilder(FileService):
 
     def with_sns(self):
         f = """from aws_cdk.aws_sns import Topic
+from aws_cdk import aws_lambda_event_sources
 
 
 class SNS:
-    def __init__(self, scope, arns) -> None:
+    def __init__(self, scope, resources) -> None:
 
         self.sns_topic = Topic.from_topic_arn(
             scope,
             id="SNSTopic",
-            topic_arn=arns["sns_topic_arn"],
+            topic_arn=resources["arns"]["sns_topic_arn"],
         )
+
+    @staticmethod
+    def create_trigger(topic, function):
+        sns_subscription = aws_lambda_event_sources.SnsEventSource(topic)
+        function.add_event_source(sns_subscription)
 """
         self.make_file("infra/services", "sns.py", f)
         self.update_services(
-            "from infra.services.sns import SNS", "self.sns = SNS(scope, arns)"
+            "from infra.services.sns import SNS",
+            "self.sns = SNS(scope, context.resources)",
         )
 
         return self
@@ -52,16 +59,15 @@ class Layers:
     def with_dynamodb(self):
         f = """from aws_cdk import aws_dynamodb as dynamo_db
 from aws_cdk import aws_iam as iam
-from aws_cdk import aws_stepfunctions_tasks as sfn_tasks
 
 
 class DynamoDB:
-    def __init__(self, scope, arns: dict) -> None:
+    def __init__(self, scope, resources: dict) -> None:
 
         self.dynamo = dynamo_db.Table.from_table_arn(
             scope,
             "Dynamo",
-            arns["dynamo_arn"],
+            resources["arns"]["dynamo_arn"],
         )
 
     @staticmethod
@@ -76,7 +82,7 @@ class DynamoDB:
         self.make_file("infra/services", "dynamo_db.py", f)
         self.update_services(
             "from infra.services.dynamo_db import DynamoDB",
-            "self.dynamo_db = DynamoDB(scope, arns)",
+            "self.dynamo_db = DynamoDB(scope, context.resources)",
         )
 
         return self
@@ -86,18 +92,18 @@ class DynamoDB:
 
         
 class SecretsManager:
-    def __init__(self, scope, arns) -> None:
+    def __init__(self, scope, resources) -> None:
 
         self.secrets_manager = secrets_manager.Secret.from_secret_complete_arn(
             scope,
             id="SecretsManager",
-            secret_complete_arn=arns["secrets_manager_arn"],
+            secret_complete_arn=resources["arns"]["secrets_manager_arn"],
         )
 """
         self.make_file("infra/services", "secrets_manager.py", f)
         self.update_services(
             "from infra.services.secrets_manager import SecretsManager",
-            "self.secrets_manager = SecretsManager(scope, arns)",
+            "self.secrets_manager = SecretsManager(scope, context.resources)",
         )
 
         return self
@@ -107,18 +113,18 @@ class SecretsManager:
 
 
 class Cognito:
-    def __init__(self, scope, arns) -> None:
+    def __init__(self, scope, resources) -> None:
 
         self.cognito = cognito.UserPool.from_user_pool_arn(
             scope,
             "Cognito",
-            user_pool_arn=arns["cognito_arn"],
+            user_pool_arn=resources["arns"]["cognito_arn"],
         )
 """
         self.make_file("infra/services", "cognito.py", f)
         self.update_services(
             "from infra.services.cognito import Cognito",
-            "self.cognito = Cognito(scope, arns)",
+            "self.cognito = Cognito(scope, context.resources)",
         )
 
         return self
@@ -128,18 +134,18 @@ class Cognito:
 
 
 class S3:
-    def __init__(self, scope, arns) -> None:
+    def __init__(self, scope, resources) -> None:
 
         self.s3 = s3.Bucket.from_bucket_arn(
             scope,
             "S3",
-            bucket_arn=arns["s3_arn"],
+            bucket_arn=resources["arns"]["s3_arn"],
         )
 """
 
         self.make_file("infra/services", "s3.py", f)
         self.update_services(
-            "from infra.services.s3 import S3", "self.s3 = S3(scope, arns)"
+            "from infra.services.s3 import S3", "self.s3 = S3(scope, context.resources)"
         )
 
         return self
@@ -149,17 +155,18 @@ class S3:
 
 
 class KMS:
-    def __init__(self, scope, arns) -> None:
+    def __init__(self, scope, resources) -> None:
 
         self.kms = kms.Key.from_key_arn(
             scope,
             "KMS",
-            key_arn=arns["kms_arn"],
+            key_arn=resources["arns"]["kms_arn"],
         )
     """
         self.make_file("infra/services", "kms.py", f)
         self.update_services(
-            "from infra.services.kms import KMS", "self.kms = KMS(scope, arns)"
+            "from infra.services.kms import KMS",
+            "self.kms = KMS(scope, context.resources)",
         )
 
         return self
@@ -169,17 +176,18 @@ class KMS:
 
 
 class SQS:
-    def __init__(self, scope, arns) -> None:
+    def __init__(self, scope, resources) -> None:
 
         self.sqs = sqs.Queue.from_queue_arn(
             scope,
             "SQS",
-            queue_arn=arns["sqs_arn"],
+            queue_arn=resources["arns"]["sqs_arn"],
         )
     """
         self.make_file("infra/services", "sqs.py", f)
         self.update_services(
-            "from infra.services.sqs import SQS", "self.sqs = SQS(scope, arns)"
+            "from infra.services.sqs import SQS",
+            "self.sqs = SQS(scope, context.resources)",
         )
 
         return self
@@ -189,18 +197,18 @@ class SQS:
 
 
 class StateMachine:
-    def __init__(self, scope, arns: dict) -> None:
+    def __init__(self, scope, resources: dict) -> None:
         self.state_machine = state_machine.StateMachine.from_state_machine_arn(
             scope,
             id="StateMachine",
-            state_machine_arn=arns["state_machine_arn"],
+            state_machine_arn=resources["arns"]["state_machine_arn"],
         )
 
     """
         self.make_file("infra/services", "state_machine.py", f)
         self.update_services(
             "from infra.services.state_machine import StateMachine",
-            "self.state_machine = StateMachine(scope, arns)",
+            "self.state_machine = StateMachine(scope, context.resources)",
         )
 
         return self
@@ -212,18 +220,13 @@ import aws_cdk.aws_events_targets as targets
 
 
 class EventBridge:
-    def __init__(self, scope, arns, stage) -> None:
+    def __init__(self, scope, resources, stage) -> None:
         self.scope = scope
         self.stage = stage
+        
 
-        self.event_bridge = events.EventBus.from_event_bus_arn(
-            scope,
-            id="EventBridge",
-            event_bus_arn=arns["event_bridge_arn"],
-        )
-
-    def create_rule(self, name, expression, target, only_prod=False):
-        if only_prod and self.stage != "Prod":
+    def create_rule(self, name, expression, target, stages=None):
+        if stages is not None and self.stage not in stages:
             return
         events.Rule(
             self.scope,
@@ -235,7 +238,7 @@ class EventBridge:
         self.make_file("infra/services", "event_bridge.py", f)
         self.update_services(
             "from infra.services.event_bridge import EventBridge",
-            "self.event_bridge = EventBridge(scope, arns, stage)",
+            "self.event_bridge = EventBridge(scope, context.resources, context.stage)",
         )
 
         return self
