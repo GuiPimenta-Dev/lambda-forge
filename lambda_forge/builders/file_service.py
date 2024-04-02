@@ -17,6 +17,7 @@ class FileService:
     def file_exists(self, path: str) -> bool:
         return os.path.exists(path)
 
+
     def make_dir(self, path: str) -> None:
         os.makedirs(path, exist_ok=True)
 

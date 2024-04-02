@@ -15,28 +15,10 @@ class APIGateway(IAPIGateway):
         self.api = apigateway.RestApi(
             scope,
             id=f"{self.context.stage}-{self.context.name}-API",
-            description=f"{self.context.stage} {self.context.name} CDK API",
+            description=f"{self.context.stage} {self.context.name} API",
             deploy_options={"stage_name": self.context.stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
             binary_media_types=["multipart/form-data"],
-            minimum_compression_size=0,
-            default_cors_preflight_options={
-                "allow_origins": ["*"],
-                "allow_headers": [
-                    "Content-Type",
-                    "applicationId",
-                    "applicationid",
-                    "Access-Control-Allow-Credentials",
-                    "Access-Control-Allow-Origin",
-                    "X-Amz-Date",
-                    "Authorization",
-                    "X-Api-Key",
-                    "X-Amz-Security-Token",
-                    "X-Amz-User-Agent",
-                ],
-                "allow_methods": apigateway.Cors.ALL_METHODS,
-                "allow_credentials": True,
-            },
         )
 
     @track

@@ -45,7 +45,6 @@ class SNS:
 from lambda_forge import Path
 
 
-
 class Layers:
     def __init__(self, scope) -> None:
 

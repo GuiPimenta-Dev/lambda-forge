@@ -223,6 +223,7 @@ AVALABLE_SERVICES = sorted(
         "dynamo_db",
         "s3",
         "layers",
+        "state_machine",
         "event_bridge",
         "sqs",
         "secrets_manager",
@@ -265,5 +266,5 @@ def create_service(service):
 
 
 if __name__ == "__main__":
-    # forge()
-    create_project("test", "test", "test", False, False, False, False, False, "", 80)
+    forge()
+    
