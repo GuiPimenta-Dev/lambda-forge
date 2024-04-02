@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 import shutil
-from importlib import resources
 
 
 from typing import List
@@ -37,11 +36,12 @@ class FileService:
     def copy_folders(
         self, package_name: str, resource_name: str, destination: str
     ) -> None:
-        with resources.path(package_name, resource_name) as src:
-            dst = Path(self.root_dir + destination)
+        src = Path(self.root_dir) / package_name / resource_name
+        dst = Path(self.root_dir) / destination
 
-            for src_path in Path(src).glob("**/*"):
-                if src_path.is_file():
-                    dst_path = dst / src_path.relative_to(src)
-                    dst_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src_path, dst_path)
+        for src_path in src.glob("**/*"):
+            if src_path.is_file():
+                dst_path = dst / src_path.relative_to(src)
+                dst_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src_path, dst_path)
+        

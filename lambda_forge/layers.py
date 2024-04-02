@@ -95,10 +95,11 @@ setup(
         # Print the error message and the stderr from the subprocess, if it fails
         print("Error:", e)
         print("Error Output:", e.stderr)
+    
     setup_path.unlink()
 
 
-def install_all_packages():
+def install_all_layers():
     base_path = 'layers'
 
     for layer in _list_subfolders(base_path):

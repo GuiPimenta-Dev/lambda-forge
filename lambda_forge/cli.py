@@ -327,6 +327,4 @@ def create_layer(name, description, install):
 
 
 if __name__ == "__main__":
-    # forge()
-    create_project("test", "test", "test", False, False, False, False, False, "us-east-2", "", 80)
-    
+    forge()
