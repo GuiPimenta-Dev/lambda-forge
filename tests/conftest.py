@@ -8,7 +8,7 @@ import os
 def clean_project_structure():
     yield
 
-    folders_to_delete = ["functions", "authorizers", "infra"]
+    folders_to_delete = ["functions", "authorizers", "infra", "layers"]
     files_to_delete = [
         ".coveragerc",
         ".pre-commit-config.yaml",

@@ -2,12 +2,19 @@ import click
 
 from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
 from lambda_forge.builders.function_builder import FunctionBuilder
+from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
-
+from lambda_forge import layers
 
 @click.group()
 def forge():
+    """
+    Forge CLI tool for structuring and deploying AWS Lambda projects.
+
+    This command group provides a suite of tools for building and managing AWS Lambda
+    projects, including creating projects, functions, authorizers, services, and layers.
+    """
     pass
 
 
@@ -68,7 +75,12 @@ def project(
     coverage,
 ):
     """
-    Forges the initial project structure.
+    Initializes a new AWS Lambda project with a specified structure.
+
+    This command sets up the initial project structure, including development, staging,
+    and production environments, API documentation, and AWS deployment configurations.
+
+    Requires specifying a S3 bucket if API documentation is enabled.    
     """
 
     if no_docs is False and not bucket:
@@ -151,7 +163,12 @@ def create_project(
 )
 def function(name, description, method, belongs, endpoint, no_api, public):
     """
-    Forjes a function with the required folder structure.
+    Creates a Lambda function with a predefined structure and API Gateway integration.
+
+    Sets up a new Lambda function, including configuration files, unit tests, and
+    optionally an API Gateway endpoint.
+
+    An HTTP method must be provided if an API Gateway endpoint is not skipped.    
     """
     method = method.upper() if method else None
     create_function(name, description, method, belongs, endpoint, no_api, public)
@@ -202,7 +219,12 @@ def create_function(
 )
 def authorizer(name, description, default):
     """
-    Forjes an authorizer with the required folder structure.
+    Generates an authorizer for AWS Lambda functions.
+
+    Creates an authorizer Lambda function, including configuration and deployment setup,
+    to control access to other Lambda functions.
+
+    The authorizer can be marked as the default for all private endpoints lacking a specific authorizer.
     """
     create_authorizer(name, description, default)
 
@@ -240,8 +262,12 @@ AVALABLE_SERVICES = sorted(
 )
 def service(service):
     """
-    Forjes the structure of a service.
+    Scaffolds the structure for a specified AWS service integration.
 
+    Creates boilerplate code and configuration for integrating with AWS services like
+    SNS, DynamoDB, S3, etc., within the Lambda project.
+
+    The 'service' parameter is limited to a predefined list of supported AWS services.
     """
     create_service(service)
 
@@ -264,7 +290,43 @@ def create_service(service):
 
     service_builder.build()
 
+@forge.command()
+@click.option(
+    "--name",
+    help="Name of the layer to create",
+)
+@click.option(
+    "--description",
+    help="Layer description",
+)
+@click.option(
+    "--install",
+    help="Install all custom layers locally",
+    is_flag=True,
+)
+def layer(name, description, install):
+    """
+    Creates and installs a new Lambda layer.
+
+    Sets up a new directory for the Lambda layer, prepares it for use with AWS Lambda,
+    and updates the project's requirements.txt to include the new layer.
+
+    This command facilitates layer management within the Lambda project structure.
+    """
+    create_layer(name, description, install)
+
+def create_layer(name, description, install):
+    if name:
+        if not description:
+            raise click.UsageError("You must provide a description for the layer")
+        LayerBuilder.a_layer().with_layers().with_custom_layers(name, description).build()
+        layers.create_and_install_package(name)
+        
+    if install:
+        layers.install_all_layers()
+
 
 if __name__ == "__main__":
-    forge()
+    # forge()
+    create_project("test", "test", "test", False, False, False, False, False, "us-east-2", "", 80)
     

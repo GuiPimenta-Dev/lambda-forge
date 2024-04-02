@@ -1,4 +1,3 @@
-import os
 from lambda_forge.builders.file_service import FileService
 
 
@@ -53,21 +52,10 @@ class Layers:
             id="Layer",
             layer_version_arn="",
         )
-
-        self.custom_layer = _lambda.LayerVersion(
-            scope, 
-            'CustomLayer',
-            code=_lambda.Code.from_asset(Path.layer('layers/custom')),
-            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9],
-            description='Custom Layer Description'
-        )
 """     
         file_exists = self.file_exists("infra/services/layers.py")
         if not file_exists:
             self.make_file("infra/services", "layers.py", f)
-            self.make_dir("layers")
-            self.make_dir("layers/custom")
-            self.make_file("layers/custom", "__init__.py")
             self.update_services(
                 "from infra.services.layers import Layers", "self.layers = Layers(scope)"
             )
