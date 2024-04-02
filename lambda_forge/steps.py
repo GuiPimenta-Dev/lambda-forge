@@ -269,6 +269,7 @@ def pytest_generate_tests(metafunc):
                 "npm install -g aws-cdk",
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "pip install -r requirements.txt",
+                "npm install -g redoc-cli",
             ],
             cache=codebuild.Cache.local(
                 codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
@@ -281,7 +282,9 @@ def pytest_generate_tests(metafunc):
                 "python generate_docs.py",
                 f"echo '{swagger_yml_to_ui.decode()}' > swagger_yml_to_ui.py",
                 "python swagger_yml_to_ui.py < docs.yaml > swagger.html",
+                "redoc-cli bundle -o redoc.html docs.yaml",
                 f"aws s3 cp swagger.html s3://{bucket}/{self.context.name}/{self.context.stage.lower()}-swagger.html",
+                f"aws s3 cp redoc.html s3://{bucket}/{self.context.name}/{self.context.stage.lower()}-redoc.html",
             ],
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,

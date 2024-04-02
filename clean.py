@@ -9,6 +9,7 @@ def clean_project_structure():
         "functions",
         "infra",
         "authorizers",
+        "layers",
         "build",
         "cdk.out",
         "lambda_forge.egg-info",

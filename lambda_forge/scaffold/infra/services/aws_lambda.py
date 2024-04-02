@@ -20,20 +20,16 @@ class AWSLambda(IAWSLambda):
         layers=[],
         environment={},
     ):
-        handler = (
-            f"src.{directory}.main.lambda_handler"
-            if directory
-            else "src.main.lambda_handler"
-        )
+        
         function = Function(
             scope=self.scope,
             id=name,
             description=description,
             function_name=f"{self.context.stage}-{self.context.name}-{name}",
             runtime=Runtime.PYTHON_3_9,
-            handler=handler,
+            handler=Path.handler(directory),
             environment=environment,
-            code=Code.from_asset(path=Path.file(path)),
+            code=Code.from_asset(path=Path.function(path)),
             layers=layers,
             timeout=Duration.minutes(timeout),
         )

@@ -13,6 +13,9 @@ class FileService:
 
     def join(self, *args) -> str:
         return os.path.join(*args)
+    
+    def file_exists(self, path: str) -> bool:
+        return os.path.exists(path)
 
     def make_dir(self, path: str) -> None:
         os.makedirs(path, exist_ok=True)

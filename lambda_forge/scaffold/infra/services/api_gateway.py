@@ -96,15 +96,15 @@ class APIGateway(IAPIGateway):
             )
         return resource
 
-    def create_docs(self, enabled, authorizer, endpoint="/docs"):
+    def create_docs(self, authorizer, endpoint="/docs", redoc=False, enabled=True):
         if not enabled:
             return
 
         s3_integration_role = iam.Role(
             self.scope,
-            f"{endpoint.replace('/','-')}-api-gateway-s3",
+            f"{endpoint.replace('/','')}-api-gateway-s3",
             assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            role_name=f"{self.context.stage}-{self.context.name}-{endpoint.replace('/','-')}-S3-Integration-Role",
+            role_name=f"{self.context.stage}-{self.context.name}-{endpoint.replace('/','')}-S3",
         )
 
         s3_integration_role.add_to_policy(
@@ -126,11 +126,13 @@ class APIGateway(IAPIGateway):
 
         authorizer = self.authorizers[authorizer] if authorizer else None
 
+        doc_provider = "redoc" if redoc else "swagger"
+
         docs_resource.add_method(
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}-swagger.html",
+                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}-{doc_provider}.html",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,

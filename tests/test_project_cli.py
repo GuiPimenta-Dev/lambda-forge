@@ -5,6 +5,8 @@ from tests.conftest import read_file_lines, list_files
 
 runner = CliRunner()
 
+def get_diff(list1, list2):
+    return [item for item in list1 if item not in list2]
 
 def test_it_should_raise_an_error_when_bucket_is_none_and_no_doc_is_false():
 
@@ -236,11 +238,11 @@ def test_it_should_create_the_files_when_asking_for_docs():
             "bucket",
         ],
     )
-    files = list_files(".")
-    assert files == [
+
+    created_files = list_files(".")
+    expected_files = [
         "./pytest.ini",
         "./requirements.txt",
-        "./.pre-commit-config.yaml",
         "./cdk.json",
         "./__init__.py",
         "./.coveragerc",
@@ -264,6 +266,7 @@ def test_it_should_create_the_files_when_asking_for_docs():
         "./authorizers/docs/main.py",
         "./functions/__init__.py",
     ]
+    assert set(created_files) == set(expected_files) 
 
 
 def test_it_should_create_the_files_when_not_asking_for_docs():
@@ -278,12 +281,11 @@ def test_it_should_create_the_files_when_not_asking_for_docs():
             "--no-docs",
         ],
     )
-    files = list_files(".")
 
-    assert files == [
+    created_files = list_files(".")
+    expected_files = [
         "./pytest.ini",
         "./requirements.txt",
-        "./.pre-commit-config.yaml",
         "./cdk.json",
         "./__init__.py",
         "./.coveragerc",
@@ -300,7 +302,9 @@ def test_it_should_create_the_files_when_not_asking_for_docs():
         "./infra/services/aws_lambda.py",
         "./infra/services/__init__.py",
         "./functions/__init__.py",
+        "./authorizers/__init__.py",
     ]
+    assert set(created_files) == set(expected_files)
 
 
 def test_it_should_create_the_files_with_public_docs():
@@ -317,12 +321,11 @@ def test_it_should_create_the_files_with_public_docs():
             "--public-docs",
         ],
     )
-    files = list_files(".")
 
-    assert files == [
+    created_files = list_files(".")
+    expected_files = [
         "./pytest.ini",
         "./requirements.txt",
-        "./.pre-commit-config.yaml",
         "./cdk.json",
         "./__init__.py",
         "./.coveragerc",
@@ -339,7 +342,9 @@ def test_it_should_create_the_files_with_public_docs():
         "./infra/services/aws_lambda.py",
         "./infra/services/__init__.py",
         "./functions/__init__.py",
+        "./authorizers/__init__.py"
     ]
+    assert set(created_files) == set(expected_files)
 
 
 def test_it_should_always_update_lambda_stack_with_the_authorizer_for_docs():

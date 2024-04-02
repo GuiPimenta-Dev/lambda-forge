@@ -1,3 +1,4 @@
+import os
 from lambda_forge.builders.file_service import FileService
 
 
@@ -23,21 +24,26 @@ class SNS:
             topic_arn=resources["arns"]["sns_topic_arn"],
         )
 
-    @staticmethod
-    def create_trigger(topic, function):
+    def create_trigger(self, topic, function, stages=None):
+        if stages and self.stage not in stages:
+            return
         sns_subscription = aws_lambda_event_sources.SnsEventSource(topic)
         function.add_event_source(sns_subscription)
 """
-        self.make_file("infra/services", "sns.py", f)
-        self.update_services(
-            "from infra.services.sns import SNS",
-            "self.sns = SNS(scope, context.resources)",
-        )
+        file_exists = self.file_exists("infra/services/sns.py")
+        if not file_exists:
+            self.make_file("infra/services", "sns.py", f)
+            self.update_services(
+                "from infra.services.sns import SNS",
+                "self.sns = SNS(scope, context.resources, context.stage)",
+            )
 
         return self
 
     def with_layers(self):
         f = """from aws_cdk import aws_lambda as _lambda
+from lambda_forge import Path
+
 
 
 class Layers:
@@ -48,11 +54,24 @@ class Layers:
             id="Layer",
             layer_version_arn="",
         )
-"""
-        self.make_file("infra/services", "layers.py", f)
-        self.update_services(
-            "from infra.services.layers import Layers", "self.layers = Layers(scope)"
+
+        self.custom_layer = _lambda.LayerVersion(
+            scope, 
+            'CustomLayer',
+            code=_lambda.Code.from_asset(Path.layer('layers/custom')),
+            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9],
+            description='Custom Layer Description'
         )
+"""     
+        file_exists = self.file_exists("infra/services/layers.py")
+        if not file_exists:
+            self.make_file("infra/services", "layers.py", f)
+            self.make_dir("layers")
+            self.make_dir("layers/custom")
+            self.make_file("layers/custom", "__init__.py")
+            self.update_services(
+                "from infra.services.layers import Layers", "self.layers = Layers(scope)"
+            )
 
         return self
 
@@ -79,11 +98,13 @@ class DynamoDB:
             )
         )
 """
-        self.make_file("infra/services", "dynamo_db.py", f)
-        self.update_services(
-            "from infra.services.dynamo_db import DynamoDB",
-            "self.dynamo_db = DynamoDB(scope, context.resources)",
-        )
+        file_exists = self.file_exists("infra/services/dynamo_db.py")
+        if not file_exists:
+            self.make_file("infra/services", "dynamo_db.py", f)
+            self.update_services(
+                "from infra.services.dynamo_db import DynamoDB",
+                "self.dynamo_db = DynamoDB(scope, context.resources)",
+            )
 
         return self
 
@@ -100,8 +121,10 @@ class SecretsManager:
             secret_complete_arn=resources["arns"]["secrets_manager_arn"],
         )
 """
-        self.make_file("infra/services", "secrets_manager.py", f)
-        self.update_services(
+        file_exists = self.file_exists("infra/services/secrets_manager.py")
+        if not file_exists:
+            self.make_file("infra/services", "secrets_manager.py", f)
+            self.update_services(
             "from infra.services.secrets_manager import SecretsManager",
             "self.secrets_manager = SecretsManager(scope, context.resources)",
         )
@@ -121,11 +144,13 @@ class Cognito:
             user_pool_arn=resources["arns"]["cognito_arn"],
         )
 """
-        self.make_file("infra/services", "cognito.py", f)
-        self.update_services(
-            "from infra.services.cognito import Cognito",
-            "self.cognito = Cognito(scope, context.resources)",
-        )
+        file_exists = self.file_exists("infra/services/cognito.py")
+        if not file_exists:
+            self.make_file("infra/services", "cognito.py", f)
+            self.update_services(
+                "from infra.services.cognito import Cognito",
+                "self.cognito = Cognito(scope, context.resources)",
+            )
 
         return self
 
@@ -142,11 +167,12 @@ class S3:
             bucket_arn=resources["arns"]["s3_arn"],
         )
 """
-
-        self.make_file("infra/services", "s3.py", f)
-        self.update_services(
-            "from infra.services.s3 import S3", "self.s3 = S3(scope, context.resources)"
-        )
+        file_exists = self.file_exists("infra/services/s3.py")
+        if not file_exists:
+            self.make_file("infra/services", "s3.py", f)
+            self.update_services(
+                "from infra.services.s3 import S3", "self.s3 = S3(scope, context.resources)"
+            )
 
         return self
 
@@ -163,11 +189,13 @@ class KMS:
             key_arn=resources["arns"]["kms_arn"],
         )
     """
-        self.make_file("infra/services", "kms.py", f)
-        self.update_services(
-            "from infra.services.kms import KMS",
-            "self.kms = KMS(scope, context.resources)",
-        )
+        file_exists = self.file_exists("infra/services/kms.py")
+        if not file_exists:
+            self.make_file("infra/services", "kms.py", f)
+            self.update_services(
+                "from infra.services.kms import KMS",
+                "self.kms = KMS(scope, context.resources)",
+            )
 
         return self
 
@@ -184,34 +212,16 @@ class SQS:
             queue_arn=resources["arns"]["sqs_arn"],
         )
     """
-        self.make_file("infra/services", "sqs.py", f)
-        self.update_services(
-            "from infra.services.sqs import SQS",
-            "self.sqs = SQS(scope, context.resources)",
-        )
+        file_exists = self.file_exists("infra/services/sqs.py")
+        if not file_exists:
+            self.make_file("infra/services", "sqs.py", f)
+            self.update_services(
+                "from infra.services.sqs import SQS",
+                "self.sqs = SQS(scope, context.resources)",
+            )
 
         return self
 
-    def with_state_machine(self):
-        f = """from aws_cdk import aws_stepfunctions as state_machine
-
-
-class StateMachine:
-    def __init__(self, scope, resources: dict) -> None:
-        self.state_machine = state_machine.StateMachine.from_state_machine_arn(
-            scope,
-            id="StateMachine",
-            state_machine_arn=resources["arns"]["state_machine_arn"],
-        )
-
-    """
-        self.make_file("infra/services", "state_machine.py", f)
-        self.update_services(
-            "from infra.services.state_machine import StateMachine",
-            "self.state_machine = StateMachine(scope, context.resources)",
-        )
-
-        return self
 
     def with_event_bridge(self):
         f = """
@@ -224,7 +234,6 @@ class EventBridge:
         self.scope = scope
         self.stage = stage
         
-
     def create_rule(self, name, expression, target, stages=None):
         if stages is not None and self.stage not in stages:
             return
@@ -235,11 +244,13 @@ class EventBridge:
             targets=[targets.LambdaFunction(handler=target)],
         )
 """
-        self.make_file("infra/services", "event_bridge.py", f)
-        self.update_services(
-            "from infra.services.event_bridge import EventBridge",
-            "self.event_bridge = EventBridge(scope, context.resources, context.stage)",
-        )
+        file_exists = self.file_exists("infra/services/event_bridge.py")
+        if not file_exists:
+            self.make_file("infra/services", "event_bridge.py", f)
+            self.update_services(
+                "from infra.services.event_bridge import EventBridge",
+                "self.event_bridge = EventBridge(scope, context.resources, context.stage)",
+            )
 
         return self
 

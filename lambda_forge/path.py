@@ -14,7 +14,11 @@ class Path:
         return cls._instance
 
     @staticmethod
-    def file(src):
+    def handler(directory):
+        return f"src.{directory}.main.lambda_handler" if directory else "src.main.lambda_handler"
+    
+    @staticmethod
+    def function(src):
         if Path._temp_dir is None:
             Path()
 
@@ -27,5 +31,21 @@ class Path:
 
         # Copy the source directory to the destination
         shutil.copytree(src, f"{destination_path}/src", dirs_exist_ok=True)
+
+        return destination_path
+
+    @staticmethod
+    def layer(path):
+        if Path._temp_dir is None:
+            Path()
+
+        # Adjust the path to be relative to the temporary directory
+        destination_path = os.path.join(Path._temp_dir, path, "python")
+
+        # Ensure the destination directory exists
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+
+        # Copy the source directory to the destination
+        shutil.copytree(path, destination_path, dirs_exist_ok=True)
 
         return destination_path

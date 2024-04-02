@@ -121,7 +121,11 @@ from constructs import Construct
 from infra.stages.deploy import DeployStage
 from lambda_forge import context, create_context, Steps
 
-@context(stage="Prod", resources="prod", staging=create_context(stage="Staging", resources="staging"))
+@context(
+    stage="Prod",
+    resources="prod",
+    staging=create_context(stage="Staging", resources="staging"),
+)
 class ProdStack(cdk.Stack):
     def __init__(self, scope: Construct, context, **kwargs) -> None:
         super().__init__(scope, f"{{context.stage}}-{{context.name}}-Stack", **kwargs)
@@ -146,7 +150,7 @@ class ProdStack(cdk.Stack):
             pipeline_name=f"{{context.stage}}-{{context.name}}-Pipeline",
         )
 
-        steps = Steps(self, context, source)
+        steps = Steps(self, context.staging, source)
 
         # pre
         unit_tests = steps.run_unit_tests()
