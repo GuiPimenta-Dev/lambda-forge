@@ -40,12 +40,12 @@ class Path:
             Path()
 
         # Adjust the path to be relative to the temporary directory
-        destination_path = os.path.join(Path._temp_dir, path, "python")
+        destination_path = os.path.join(Path._temp_dir, path)
 
         # Ensure the destination directory exists
         os.makedirs(os.path.dirname(destination_path), exist_ok=True)
 
         # Copy the source directory to the destination
-        shutil.copytree(path, destination_path, dirs_exist_ok=True)
+        shutil.copytree(path, f"{destination_path}/python", dirs_exist_ok=True)
 
         return destination_path

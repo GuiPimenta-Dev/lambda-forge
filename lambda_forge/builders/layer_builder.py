@@ -17,11 +17,12 @@ from lambda_forge import Path
 class Layers:
     def __init__(self, scope) -> None:
 
-        self.layer = _lambda.LayerVersion.from_layer_version_arn(
-            scope,
-            id="Layer",
-            layer_version_arn="",
-        )
+        # self.layer = _lambda.LayerVersion.from_layer_version_arn(
+        #     scope,
+        #     id="Layer",
+        #     layer_version_arn="",
+        # )
+        pass
 """     
         file_exists = self.file_exists("infra/services/layers.py")
         if not file_exists:
@@ -33,6 +34,7 @@ class Layers:
         return self
   
     def with_custom_layers(self, name, description):
+        description = description if description else ""
         layers_lines = self.read_lines("infra/services/layers.py")
 
         layers_lines.append(f"\n")

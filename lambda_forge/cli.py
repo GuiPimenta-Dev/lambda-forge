@@ -292,8 +292,8 @@ def create_service(service):
 
 @forge.command()
 @click.option(
-    "--name",
-    help="Name of the layer to create",
+    "--custom",
+    help="Name of the custom layer to create",
 )
 @click.option(
     "--description",
@@ -304,7 +304,7 @@ def create_service(service):
     help="Install all custom layers locally",
     is_flag=True,
 )
-def layer(name, description, install):
+def layer(custom, description, install):
     """
     Creates and installs a new Lambda layer.
 
@@ -313,14 +313,15 @@ def layer(name, description, install):
 
     This command facilitates layer management within the Lambda project structure.
     """
-    create_layer(name, description, install)
+    create_layer(custom, description, install)
 
 def create_layer(name, description, install):
+    layer_builder = LayerBuilder.a_layer().with_layers()
     if name:
-        if not description:
-            raise click.UsageError("You must provide a description for the layer")
-        LayerBuilder.a_layer().with_layers().with_custom_layers(name, description).build()
+        layer_builder.with_custom_layers(name, description)
         layers.create_and_install_package(name)
+    
+    layer_builder.build()
         
     if install:
         layers.install_all_layers()

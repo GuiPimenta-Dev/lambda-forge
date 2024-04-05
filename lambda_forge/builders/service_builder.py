@@ -17,15 +17,17 @@ from aws_cdk import aws_lambda_event_sources
 class SNS:
     def __init__(self, scope, resources) -> None:
 
-        self.sns_topic = Topic.from_topic_arn(
-            scope,
-            id="SNSTopic",
-            topic_arn=resources["arns"]["sns_topic_arn"],
-        )
+        # self.sns_topic = Topic.from_topic_arn(
+        #     scope,
+        #     id="SNSTopic",
+        #     topic_arn=resources["arns"]["sns_topic_arn"],
+        # )
+        pass
 
     def create_trigger(self, topic, function, stages=None):
         if stages and self.stage not in stages:
             return
+
         sns_subscription = aws_lambda_event_sources.SnsEventSource(topic)
         function.add_event_source(sns_subscription)
 """
@@ -47,11 +49,12 @@ from lambda_forge import Path
 class Layers:
     def __init__(self, scope) -> None:
 
-        self.layer = _lambda.LayerVersion.from_layer_version_arn(
-            scope,
-            id="Layer",
-            layer_version_arn="",
-        )
+        # self.layer = _lambda.LayerVersion.from_layer_version_arn(
+        #     scope,
+        #     id="Layer",
+        #     layer_version_arn="",
+        # )
+        pass
 """     
         file_exists = self.file_exists("infra/services/layers.py")
         if not file_exists:
@@ -70,14 +73,15 @@ from aws_cdk import aws_iam as iam
 class DynamoDB:
     def __init__(self, scope, resources: dict) -> None:
 
-        self.dynamo = dynamo_db.Table.from_table_arn(
-            scope,
-            "Dynamo",
-            resources["arns"]["dynamo_arn"],
-        )
+        # self.dynamo = dynamo_db.Table.from_table_arn(
+        #     scope,
+        #     "Dynamo",
+        #     resources["arns"]["dynamo_arn"],
+        # )
+        pass
 
     @staticmethod
-    def add_query_permission(function, table):
+    def add_query_permission(table, function):
         function.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["dynamodb:Query"],
@@ -102,11 +106,12 @@ class DynamoDB:
 class SecretsManager:
     def __init__(self, scope, resources) -> None:
 
-        self.secrets_manager = secrets_manager.Secret.from_secret_complete_arn(
-            scope,
-            id="SecretsManager",
-            secret_complete_arn=resources["arns"]["secrets_manager_arn"],
-        )
+        # self.secrets_manager = secrets_manager.Secret.from_secret_complete_arn(
+        #     scope,
+        #     id="SecretsManager",
+        #     secret_complete_arn=resources["arns"]["secrets_manager_arn"],
+        # )
+        pass
 """
         file_exists = self.file_exists("infra/services/secrets_manager.py")
         if not file_exists:
@@ -125,11 +130,12 @@ class SecretsManager:
 class Cognito:
     def __init__(self, scope, resources) -> None:
 
-        self.cognito = cognito.UserPool.from_user_pool_arn(
-            scope,
-            "Cognito",
-            user_pool_arn=resources["arns"]["cognito_arn"],
-        )
+        # self.cognito = cognito.UserPool.from_user_pool_arn(
+        #     scope,
+        #     "Cognito",
+        #     user_pool_arn=resources["arns"]["cognito_arn"],
+        # )
+        pass
 """
         file_exists = self.file_exists("infra/services/cognito.py")
         if not file_exists:
@@ -148,11 +154,12 @@ class Cognito:
 class S3:
     def __init__(self, scope, resources) -> None:
 
-        self.s3 = s3.Bucket.from_bucket_arn(
-            scope,
-            "S3",
-            bucket_arn=resources["arns"]["s3_arn"],
-        )
+        # self.s3 = s3.Bucket.from_bucket_arn(
+        #     scope,
+        #     "S3",
+        #     bucket_arn=resources["arns"]["s3_arn"],
+        # )
+        pass
 """
         file_exists = self.file_exists("infra/services/s3.py")
         if not file_exists:
@@ -170,11 +177,12 @@ class S3:
 class KMS:
     def __init__(self, scope, resources) -> None:
 
-        self.kms = kms.Key.from_key_arn(
-            scope,
-            "KMS",
-            key_arn=resources["arns"]["kms_arn"],
-        )
+        # self.kms = kms.Key.from_key_arn(
+        #     scope,
+        #     "KMS",
+        #     key_arn=resources["arns"]["kms_arn"],
+        # )
+        pass
     """
         file_exists = self.file_exists("infra/services/kms.py")
         if not file_exists:
@@ -193,11 +201,12 @@ class KMS:
 class SQS:
     def __init__(self, scope, resources) -> None:
 
-        self.sqs = sqs.Queue.from_queue_arn(
-            scope,
-            "SQS",
-            queue_arn=resources["arns"]["sqs_arn"],
-        )
+        # self.sqs = sqs.Queue.from_queue_arn(
+        #     scope,
+        #     "SQS",
+        #     queue_arn=resources["arns"]["sqs_arn"],
+        # )
+        pass
     """
         file_exists = self.file_exists("infra/services/sqs.py")
         if not file_exists:

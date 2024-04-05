@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambda_forge",
-    version="1.0.249",
+    version="1.0.268",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -17,7 +17,7 @@ setup(
     ],
     include_package_data=True,
     package_data={
-        "lambda_forge": ["files/*", "files/**/*"],
+        "lambda_forge": ["builders/*", "builders/**/*", "scaffold/*", "scaffold/**/**", "scaffold/**/**/*"],
     },
     author="Guilherme Alves Pimenta",
     author_email="guialvespimenta27@gmail.com",
