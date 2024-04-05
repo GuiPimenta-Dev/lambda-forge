@@ -17,7 +17,7 @@ def test_install_all_packages():
   package_name = "pkg"
 
   layers.create_and_install_package(package_name)
-  layers.install_all_packages()
+  layers.install_all_layers()
 
   files = list_files("layers")
   
