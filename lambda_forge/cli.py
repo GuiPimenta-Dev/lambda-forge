@@ -41,12 +41,6 @@ def forge():
     default=False,
 )
 @click.option(
-    "--public-docs",
-    help="Create public documentation for the api endpoints",
-    is_flag=True,
-    default=False,
-)
-@click.option(
     "--region",
     help="AWS region to deploy the project",
     default="us-east-2",
@@ -69,7 +63,6 @@ def project(
     no_staging,
     no_prod,
     no_docs,
-    public_docs,
     region,
     bucket,
     coverage,
@@ -96,7 +89,6 @@ def project(
         no_staging,
         no_prod,
         no_docs,
-        public_docs,
         region,
         bucket,
         coverage,
@@ -111,7 +103,6 @@ def create_project(
     no_staging,
     no_prod,
     no_docs,
-    public_docs,
     region,
     bucket,
     coverage,
@@ -135,15 +126,10 @@ def create_project(
         .with_pytest_ini()
         .with_coveragerc()
         .with_requirements()
-        .with_deploy_stage(not no_docs, None if public_docs else "docs")
+        .with_deploy_stage(not no_docs)
         .build()
     )
-    if no_docs is False and public_docs is False:
-        AuthorizerBuilder.an_authorizer(
-            "docs",
-            "Function used to authorize the docs endpoints",
-            "authorizers",
-        ).with_config().with_main().with_lambda_stack().with_unit().build()
+ 
 
 
 @forge.command()

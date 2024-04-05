@@ -105,7 +105,7 @@ class StagingStack(cdk.Stack):
                 unit_tests,
                 coverage,
                 validate_integration_tests,
-                validate_docs,
+                {"validate_docs" if self.docs else ""}
             ],
             post=[integration_tests{", generate_docs" if self.docs else ""}],
         )
@@ -167,7 +167,7 @@ class ProdStack(cdk.Stack):
                 unit_tests,
                 coverage,
                 validate_integration_tests,
-                validate_docs,
+                {"validate_docs" if self.docs else ""}
             ],
             post=[integration_tests],
         )
@@ -482,9 +482,8 @@ markers =
         self.cdk = json.dumps(cdk, indent=2)
         return self
 
-    def with_deploy_stage(self, enabled, authorizer):
-        authorizer = authorizer if enabled else None
-        authorizer = f'"{authorizer}"' if authorizer else None
+    def with_deploy_stage(self, enabled):
+        enabled = "" if enabled else ", enabled=False"
         self.deploy_stage = f"""import aws_cdk as cdk
 from constructs import Construct
 
@@ -497,7 +496,7 @@ class DeployStage(cdk.Stage):
 
         lambda_stack = LambdaStack(self, context)
         
-        lambda_stack.services.api_gateway.create_docs(enabled={enabled}, authorizer={authorizer})
+        lambda_stack.services.api_gateway.create_docs(authorizer=None{enabled})
 """
         return self
 
