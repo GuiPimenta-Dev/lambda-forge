@@ -414,9 +414,7 @@ repos:
         self.coverage = """
 [run]
 branch = True
-include =
-    functions/**/main.py
-    functions/**/utils.py
+include = functions/**/main.py
 
 omit=
 """
@@ -424,7 +422,8 @@ omit=
 
     def with_pytest_ini(self):
         self.pytest_ini = """[pytest]
-python_files = unit.py integration.py
+render_collapsed = all
+python_files = unit.py integration.py main.py
 markers =
     integration(method, endpoint): mark a test as an integration test.
 """

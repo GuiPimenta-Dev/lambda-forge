@@ -223,11 +223,16 @@ def authorizer(name, description, default, no_tests):
 
 
 def create_authorizer(name, description, default, no_tests):
-    authorizer_builder = AuthorizerBuilder.an_authorizer(name, description, "authorizers").with_config(default).with_main().with_lambda_stack()
+    authorizer_builder = (
+        AuthorizerBuilder.an_authorizer(name, description, "authorizers")
+        .with_config(default)
+        .with_main()
+        .with_lambda_stack()
+    )
 
     if no_tests is False:
         authorizer_builder = authorizer_builder.with_unit()
-    
+
     authorizer_builder.build()
 
 

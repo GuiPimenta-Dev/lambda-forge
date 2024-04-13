@@ -1,8 +1,9 @@
+from typing import Literal
 from aws_cdk import Duration
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
-from lambda_forge.interfaces import IAPIGateway
 from lambda_forge import track
+from lambda_forge.interfaces import IAPIGateway
 
 
 class APIGateway(IAPIGateway):
@@ -15,25 +16,34 @@ class APIGateway(IAPIGateway):
         self.api = apigateway.RestApi(
             scope,
             id=f"{self.context.stage}-{self.context.name}-API",
-            description=f"{self.context.stage} {self.context.name} API",
+            description=f"{self.context.stage} {self.context.name} CDK API",
             deploy_options={"stage_name": self.context.stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
             binary_media_types=["multipart/form-data"],
+            minimum_compression_size=0,
+            default_cors_preflight_options={
+                "allow_origins": ["*"],
+                "allow_headers": [
+                    "Content-Type",
+                    "applicationId",
+                    "applicationid",
+                    "Access-Control-Allow-Credentials",
+                    "Access-Control-Allow-Origin",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                    "X-Amz-User-Agent",
+                ],
+                "allow_methods": apigateway.Cors.ALL_METHODS,
+                "allow_credentials": True,
+            },
         )
 
     @track
     def create_endpoint(self, method, path, function, public=False, authorizer=None):
         resource = self.create_resource(path)
-        if public:
-            authorizer = None
-        else:
-            authorizer_name = authorizer or self.default_authorizer
-            if not authorizer_name:
-                raise ValueError("No default authorizer set and no authorizer provided.")
-
-            authorizer = self.authorizers.get(authorizer_name)
-            if authorizer is None:
-                raise ValueError(f"Authorizer '{authorizer_name}' not found.")
+        authorizer = self.get_authorizer(public, authorizer)
 
         resource.add_method(
             method,
@@ -72,12 +82,16 @@ class APIGateway(IAPIGateway):
             resource = resource.get_resource(subresource) or resource.add_resource(subresource)
         return resource
 
-    def create_docs(self, authorizer, endpoint="/docs", redoc=False, enabled=True):
+    def create_docs(
+        self,
+        authorizer=None,
+        public=False,
+        endpoint="/docs",
+        enabled=True,
+        mode: Literal["swagger", "redoc", "diagram"] = "swagger",
+    ):
         if not enabled:
             return
-        
-        if self.context.bucket is None:
-            raise Exception("No bucket set for documentation")
 
         s3_integration_role = iam.Role(
             self.scope,
@@ -103,15 +117,13 @@ class APIGateway(IAPIGateway):
         if authorizer and authorizer not in self.authorizers:
             raise Exception(f"Authorizer {authorizer} not found")
 
-        authorizer = self.authorizers[authorizer] if authorizer else None
-
-        doc_provider = "redoc" if redoc else "swagger"
+        authorizer = self.get_authorizer(public, authorizer)
 
         docs_resource.add_method(
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}-{doc_provider}.html",
+                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}-{mode}",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,
@@ -135,3 +147,17 @@ class APIGateway(IAPIGateway):
                 }
             ],
         )
+
+    def get_authorizer(self, public, authorizer):
+        if public:
+            authorizer = None
+        else:
+            authorizer_name = authorizer or self.default_authorizer
+            if not authorizer_name:
+                raise ValueError("No default authorizer set and no authorizer provided.")
+
+            authorizer = self.authorizers.get(authorizer_name)
+            if authorizer is None:
+                raise ValueError(f"Authorizer '{authorizer_name}' not found.")
+
+        return authorizer

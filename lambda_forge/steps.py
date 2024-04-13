@@ -263,10 +263,9 @@ def pytest_generate_tests(metafunc):
                 "npm install -g aws-cdk",
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
                 "forge layer --install",
-                "pip install -r requirements.txt",
-                "npm install -g redoc-cli",
-                "npm install cdk-dia",
-                "sudo apt install graphviz"
+                "pip install -r requirements.txt pytest-html coverage",
+                "npm install -g redoc-cli cdk-dia",
+                "sudo apt install -y graphviz",
             ],
             cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             env=env,

@@ -115,7 +115,7 @@ def test_lambda_handler():
 
         if folder in self.lambda_stack:
             return self
-        
+
         self.lambda_stack.insert(0, f"from {folder}.config import {self.pascal_name}Config\n")
 
         directory = self.belongs or self.function_name

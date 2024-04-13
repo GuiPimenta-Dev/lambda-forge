@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambda_forge",
-    version="1.0.301",
+    version="1.0.310",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -14,7 +14,7 @@ setup(
         "pytest==6.2.5",
         "coverage==7.2.3",
         "python-dotenv==1.0.1",
-        "b-aws-websocket-api==2.0.0"
+        "b-aws-websocket-api==2.0.0",
     ],
     include_package_data=True,
     package_data={
