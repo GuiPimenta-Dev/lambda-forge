@@ -26,9 +26,7 @@ def transform_file_path(path):
 
 def validate_dataclass(path, attribute_name, attribute):
     if not dataclasses.is_dataclass(attribute):
-        raise Exception(
-            f"{attribute_name} is not a dataclass on {transform_file_path(path)}.main"
-        )
+        raise Exception(f"{attribute_name} is not a dataclass on {transform_file_path(path)}.main")
 
 
 def validate_paths(endpoint, function_file):
@@ -36,9 +34,7 @@ def validate_paths(endpoint, function_file):
         return
     path = getattr(function_file, "Path", None)
     if path is None:
-        raise Exception(
-            f"Path is missing on {transform_file_path(endpoint['path'])}.main"
-        )
+        raise Exception(f"Path is missing on {transform_file_path(endpoint['path'])}.main")
 
     validate_dataclass(endpoint["path"], "Path", path)
 
@@ -60,9 +56,7 @@ def validate_docs(endpoints, loader=default_module_loader):
         for attr_name in ["Input", "Output"]:
             attribute = getattr(function_file, attr_name, None)
             if attribute is None:
-                raise Exception(
-                    f"{attr_name} is missing on {transform_file_path(endpoint['path'])}.main"
-                )
+                raise Exception(f"{attr_name} is missing on {transform_file_path(endpoint['path'])}.main")
             validate_dataclass(endpoint["path"], attr_name, attribute)
 
 

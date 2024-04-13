@@ -91,7 +91,5 @@ def list_files(root_dir="."):
 
 def list_files_related_to(*args):
     my_list = list_files(".")
-    filtered_list = [
-        item for item in my_list if any(substring in item for substring in args)
-    ]
+    filtered_list = [item for item in my_list if any(substring in item for substring in args)]
     return filtered_list

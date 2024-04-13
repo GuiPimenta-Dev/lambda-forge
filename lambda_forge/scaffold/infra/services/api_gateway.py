@@ -29,9 +29,7 @@ class APIGateway(IAPIGateway):
         else:
             authorizer_name = authorizer or self.default_authorizer
             if not authorizer_name:
-                raise ValueError(
-                    "No default authorizer set and no authorizer provided."
-                )
+                raise ValueError("No default authorizer set and no authorizer provided.")
 
             authorizer = self.authorizers.get(authorizer_name)
             if authorizer is None:
@@ -69,18 +67,17 @@ class APIGateway(IAPIGateway):
 
     def create_resource(self, endpoint):
         resources = list(filter(None, endpoint.split("/")))
-        resource = self.api.root.get_resource(
-            resources[0]
-        ) or self.api.root.add_resource(resources[0])
+        resource = self.api.root.get_resource(resources[0]) or self.api.root.add_resource(resources[0])
         for subresource in resources[1:]:
-            resource = resource.get_resource(subresource) or resource.add_resource(
-                subresource
-            )
+            resource = resource.get_resource(subresource) or resource.add_resource(subresource)
         return resource
 
     def create_docs(self, authorizer, endpoint="/docs", redoc=False, enabled=True):
         if not enabled:
             return
+        
+        if self.context.bucket is None:
+            raise Exception("No bucket set for documentation")
 
         s3_integration_role = iam.Role(
             self.scope,

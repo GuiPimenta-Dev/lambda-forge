@@ -70,8 +70,7 @@ def test_it_should_configure_the_config_file_correctly_for_a_non_default_authori
         '            description="description"',
         "        )",
         "",
-        "        services.api_gateway.create_authorizer(function, "
-        'name="authorizer_name", default=False)',
+        "        services.api_gateway.create_authorizer(function, " 'name="authorizer_name", default=False)',
     ]
 
 
@@ -95,8 +94,7 @@ def test_it_should_configure_the_config_file_correctly_for_a_default_authorizer(
         '            description="description"',
         "        )",
         "",
-        "        services.api_gateway.create_authorizer(function, "
-        'name="authorizer_name", default=True)',
+        "        services.api_gateway.create_authorizer(function, " 'name="authorizer_name", default=True)',
     ]
 
 
@@ -112,8 +110,7 @@ def test_it_should_update_lambda_stack_when_creating_an_authorizer():
 
     lambda_stack = read_file_lines("infra/stacks/lambda_stack.py")
     assert lambda_stack == [
-        "from authorizers.authorizer_name.config import "
-        "AuthorizerNameAuthorizerConfig",
+        "from authorizers.authorizer_name.config import " "AuthorizerNameAuthorizerConfig",
         "from authorizers.docs.config import DocsAuthorizerConfig",
         "from aws_cdk import Stack",
         "from constructs import Construct",
@@ -174,6 +171,5 @@ def test_it_should_not_add_the_authorizer_string_case_the_user_already_added_it(
         '            description="description"',
         "        )",
         "",
-        "        services.api_gateway.create_authorizer(function, "
-        'name="authorizer_name_authorizer", default=False)',
+        "        services.api_gateway.create_authorizer(function, " 'name="authorizer_name_authorizer", default=False)',
     ]

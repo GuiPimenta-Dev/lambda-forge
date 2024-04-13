@@ -161,11 +161,7 @@ def test_it_should_generate_the_refactored_docs():
                     "responses": {
                         "200": {
                             "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "$ref": "#/components/schemas/FunctionNameOutput"
-                                    }
-                                }
+                                "application/json": {"schema": {"$ref": "#/components/schemas/FunctionNameOutput"}}
                             },
                             "description": "Successful " "response",
                         }

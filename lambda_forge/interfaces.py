@@ -19,9 +19,7 @@ class IAWSLambda(ABC):
 
 class IAPIGateway(ABC):
     @abstractmethod
-    def create_endpoint(
-        self, method: str, path: str, function: str, public: bool, authorizer: str
-    ) -> dict:
+    def create_endpoint(self, method: str, path: str, function: str, public: bool, authorizer: str) -> dict:
         pass
 
     @abstractmethod

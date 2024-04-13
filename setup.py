@@ -2,22 +2,29 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambda_forge",
-    version="1.0.270",
+    version="1.0.301",
     packages=find_packages(),
     license="MIT",
     install_requires=[
         "attrs==22.1.0",
-        "aws-cdk-lib==2.29.1",
+        "aws-cdk-lib>=2.0.0,<3.0.0",
         "constructs>=10.0.0,<11.0.0",
-        "boto3==1.26.25",
+        "boto3==1.26.59",
         "click==8.1.3",
-        "pytest==8.1.1",
+        "pytest==6.2.5",
         "coverage==7.2.3",
         "python-dotenv==1.0.1",
+        "b-aws-websocket-api==2.0.0"
     ],
     include_package_data=True,
     package_data={
-        "lambda_forge": ["builders/*", "builders/**/*", "scaffold/*", "scaffold/**/**", "scaffold/**/**/*"],
+        "lambda_forge": [
+            "builders/*",
+            "builders/**/*",
+            "scaffold/*",
+            "scaffold/**/**",
+            "scaffold/**/**/*",
+        ],
     },
     author="Guilherme Alves Pimenta",
     author_email="guialvespimenta27@gmail.com",

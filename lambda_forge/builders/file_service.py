@@ -13,10 +13,9 @@ class FileService:
 
     def join(self, *args) -> str:
         return os.path.join(*args)
-    
+
     def file_exists(self, path: str) -> bool:
         return os.path.exists(path)
-
 
     def make_dir(self, path: str) -> None:
         os.makedirs(path, exist_ok=True)
@@ -34,9 +33,7 @@ class FileService:
         with open(path, "r") as f:
             return f.readlines()
 
-    def copy_folders(
-        self, package_name: str, resource_name: str, destination: str
-    ) -> None:
+    def copy_folders(self, package_name: str, resource_name: str, destination: str) -> None:
         with resources.path(package_name, resource_name) as src:
             dst = Path(self.root_dir + destination)
 
@@ -45,5 +42,3 @@ class FileService:
                     dst_path = dst / src_path.relative_to(src)
                     dst_path.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(src_path, dst_path)
-
-    

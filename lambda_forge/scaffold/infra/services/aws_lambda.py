@@ -20,7 +20,7 @@ class AWSLambda(IAWSLambda):
         layers=[],
         environment={},
     ):
-        
+
         function = Function(
             scope=self.scope,
             id=name,

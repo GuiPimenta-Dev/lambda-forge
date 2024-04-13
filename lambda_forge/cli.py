@@ -7,6 +7,7 @@ from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge import layers
 
+
 @click.group()
 def forge():
     """
@@ -22,18 +23,14 @@ def forge():
 @click.argument("name")
 @click.option("--repo-owner", help="Owner of the repository", required=True)
 @click.option("--repo-name", help="Repository name", required=True)
-@click.option(
-    "--no-dev", help="Do not create a dev environment", is_flag=True, default=False
-)
+@click.option("--no-dev", help="Do not create a dev environment", is_flag=True, default=False)
 @click.option(
     "--no-staging",
     help="Do not create a staging environment",
     is_flag=True,
     default=False,
 )
-@click.option(
-    "--no-prod", help="Do not create a prod environment", is_flag=True, default=False
-)
+@click.option("--no-prod", help="Do not create a prod environment", is_flag=True, default=False)
 @click.option(
     "--no-docs",
     help="Do not create documentation for the api endpoints",
@@ -73,13 +70,11 @@ def project(
     This command sets up the initial project structure, including development, staging,
     and production environments, API documentation, and AWS deployment configurations.
 
-    Requires specifying a S3 bucket if API documentation is enabled.    
+    Requires specifying a S3 bucket if API documentation is enabled.
     """
 
     if no_docs is False and not bucket:
-        raise click.UsageError(
-            "You must provide a S3 bucket for the docs or use the flag --no-docs"
-        )
+        raise click.UsageError("You must provide a S3 bucket for the docs or use the flag --no-docs")
 
     create_project(
         name,
@@ -129,35 +124,38 @@ def create_project(
         .with_deploy_stage(not no_docs)
         .build()
     )
- 
 
 
 @forge.command()
 @click.argument("name")
 @click.option("--description", required=True, help="Description for the endpoint")
-@click.option(
-    "--method", required=False, help="HTTP method for the endpoint", default=None
-)
-@click.option("--belongs", help="Folder name you want to share code accross lambdas")
+@click.option("--method", required=False, help="HTTP method for the endpoint", default=None)
+@click.option("--belongs-to", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
+@click.option(
+    "--no-tests",
+    help="Do not create unit tests and integration tests files",
+    is_flag=True,
+    default=False,
+)
 @click.option(
     "--public",
     help="Endpoint is public",
     is_flag=True,
     default=False,
 )
-def function(name, description, method, belongs, endpoint, no_api, public):
+def function(name, description, method, belongs_to, endpoint, no_api, no_tests, public):
     """
     Creates a Lambda function with a predefined structure and API Gateway integration.
 
     Sets up a new Lambda function, including configuration files, unit tests, and
     optionally an API Gateway endpoint.
 
-    An HTTP method must be provided if an API Gateway endpoint is not skipped.    
+    An HTTP method must be provided if an API Gateway endpoint is not skipped.
     """
     method = method.upper() if method else None
-    create_function(name, description, method, belongs, endpoint, no_api, public)
+    create_function(name, description, method, belongs_to, endpoint, no_api, no_tests, public)
 
 
 def create_function(
@@ -167,29 +165,32 @@ def create_function(
     belongs=None,
     endpoint=None,
     no_api=False,
+    no_tests=False,
     public=False,
 ):
     if no_api is False and not http_method:
-        raise click.UsageError(
-            "You must provide a method for the API Gateway endpoint or use the flag --no-api"
-        )
+        raise click.UsageError("You must provide a method for the API Gateway endpoint or use the flag --no-api")
 
-    function_builder = FunctionBuilder.a_function(name, description).with_config(
-        belongs
-    )
+    function_builder = FunctionBuilder.a_function(name, description).with_config(belongs)
 
     if no_api is True:
-        function_builder = function_builder.with_unit().with_main()
+        if no_tests is True:
+            function_builder = function_builder.with_main()
+        else:
+            function_builder = function_builder.with_unit().with_main()
 
     elif no_api is False:
         endpoint = endpoint or belongs or name
-        function_builder = (
-            function_builder.with_endpoint(endpoint)
-            .with_api(http_method, public)
-            .with_integration(http_method)
-            .with_unit()
-            .with_main()
-        )
+        if no_tests is True:
+            function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
+        else:
+            function_builder = (
+                function_builder.with_endpoint(endpoint)
+                .with_api(http_method, public)
+                .with_integration(http_method)
+                .with_unit()
+                .with_main()
+            )
 
     function_builder.with_lambda_stack().build()
 
@@ -203,7 +204,13 @@ def create_function(
     is_flag=True,
     default=False,
 )
-def authorizer(name, description, default):
+@click.option(
+    "--no-tests",
+    help="Do not create unit tests and integration tests files",
+    is_flag=True,
+    default=False,
+)
+def authorizer(name, description, default, no_tests):
     """
     Generates an authorizer for AWS Lambda functions.
 
@@ -212,17 +219,16 @@ def authorizer(name, description, default):
 
     The authorizer can be marked as the default for all private endpoints lacking a specific authorizer.
     """
-    create_authorizer(name, description, default)
+    create_authorizer(name, description, default, no_tests)
 
 
-def create_authorizer(name, description, default):
-    authorizer_builder = AuthorizerBuilder.an_authorizer(
-        name, description, "authorizers"
-    )
+def create_authorizer(name, description, default, no_tests):
+    authorizer_builder = AuthorizerBuilder.an_authorizer(name, description, "authorizers").with_config(default).with_main().with_lambda_stack()
 
-    authorizer_builder.with_config(
-        default
-    ).with_main().with_unit().with_lambda_stack().build()
+    if no_tests is False:
+        authorizer_builder = authorizer_builder.with_unit()
+    
+    authorizer_builder.build()
 
 
 AVALABLE_SERVICES = sorted(
@@ -276,6 +282,7 @@ def create_service(service):
 
     service_builder.build()
 
+
 @forge.command()
 @click.option(
     "--custom",
@@ -301,14 +308,15 @@ def layer(custom, description, install):
     """
     create_layer(custom, description, install)
 
+
 def create_layer(name, description, install):
     layer_builder = LayerBuilder.a_layer().with_layers()
     if name:
         layer_builder.with_custom_layers(name, description)
         layers.create_and_install_package(name)
-    
+
     layer_builder.build()
-        
+
     if install:
         layers.install_all_layers()
 

@@ -5,14 +5,14 @@ from tests.conftest import read_file_lines, list_files
 
 runner = CliRunner()
 
+
 def get_diff(list1, list2):
     return [item for item in list1 if item not in list2]
 
+
 def test_it_should_raise_an_error_when_bucket_is_none_and_no_doc_is_false():
 
-    result = runner.invoke(
-        project, ["project_name", "--repo-owner", "owner", "--repo-name", "repo"]
-    )
+    result = runner.invoke(project, ["project_name", "--repo-owner", "owner", "--repo-name", "repo"])
 
     assert (
         result.output
@@ -181,22 +181,19 @@ def test_it_should_add_the_cdk_json_file():
         '      "aws",',
         '      "aws-cn"',
         "    ],",
-        '    "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": '
-        "true,",
+        '    "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": ' "true,",
         '    "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": true,',
         '    "@aws-cdk/aws-ecs:arnFormatIncludesClusterName": true,',
         '    "@aws-cdk/aws-iam:minimizePolicies": true,',
         '    "@aws-cdk/core:validateSnapshotRemovalPolicy": true,',
-        '    "@aws-cdk/aws-codepipeline:crossAccountKeyAliasStackSafeResourceName": '
-        "true,",
+        '    "@aws-cdk/aws-codepipeline:crossAccountKeyAliasStackSafeResourceName": ' "true,",
         '    "@aws-cdk/aws-s3:createDefaultLoggingPolicy": true,',
         '    "@aws-cdk/aws-sns-subscriptions:restrictSqsDescryption": true,',
         '    "@aws-cdk/aws-apigateway:disableCloudWatchRole": true,',
         '    "@aws-cdk/core:enablePartitionLiterals": true,',
         '    "@aws-cdk/aws-events:eventsTargetQueueSameAccount": true,',
         '    "@aws-cdk/aws-iam:standardizedServicePrincipals": true,',
-        '    "@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker": '
-        "true,",
+        '    "@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker": ' "true,",
         '    "@aws-cdk/aws-iam:importedRoleStackSafeDefaultPolicyName": true,',
         '    "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": true,',
         '    "@aws-cdk/aws-route53-patters:useCertificate": true,',
@@ -266,7 +263,7 @@ def test_it_should_create_the_files_when_asking_for_docs():
         "./authorizers/docs/main.py",
         "./functions/__init__.py",
     ]
-    assert set(created_files) == set(expected_files) 
+    assert set(created_files) == set(expected_files)
 
 
 def test_it_should_create_the_files_when_not_asking_for_docs():
@@ -342,7 +339,7 @@ def test_it_should_create_the_files_with_public_docs():
         "./infra/services/aws_lambda.py",
         "./infra/services/__init__.py",
         "./functions/__init__.py",
-        "./authorizers/__init__.py"
+        "./authorizers/__init__.py",
     ]
     assert set(created_files) == set(expected_files)
 

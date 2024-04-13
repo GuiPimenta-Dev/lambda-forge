@@ -20,7 +20,4 @@ def test_it_should_raise_an_error_if_not_all_endpoints_are_tested():
     with pytest.raises(Exception) as exc_info:
         validate_tests(endpoints, tested_endpoints)
 
-    assert (
-        str(exc_info.value)
-        == "Endpoint /function_name with method GET should have at least 1 integration test."
-    )
+    assert str(exc_info.value) == "Endpoint /function_name with method GET should have at least 1 integration test."

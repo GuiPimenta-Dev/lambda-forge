@@ -5,10 +5,10 @@ class LayerBuilder(FileService):
     @staticmethod
     def a_layer():
         return LayerBuilder()
-  
+
     def __init__(self) -> None:
         self.services = self.read_lines("infra/services/__init__.py")
-    
+
     def with_layers(self):
         f = """from aws_cdk import aws_lambda as _lambda
 from lambda_forge import Path
@@ -23,16 +23,17 @@ class Layers:
         #     layer_version_arn="",
         # )
         pass
-"""     
+"""
         file_exists = self.file_exists("infra/services/layers.py")
         if not file_exists:
             self.make_file("infra/services", "layers.py", f)
             self.update_services(
-                "from infra.services.layers import Layers", "self.layers = Layers(scope)"
+                "from infra.services.layers import Layers",
+                "self.layers = Layers(scope)",
             )
 
         return self
-  
+
     def with_custom_layers(self, name, description):
         description = description if description else ""
         layers_lines = self.read_lines("infra/services/layers.py")
@@ -46,7 +47,6 @@ class Layers:
         layers_lines.append(f"            description='{description}',\n")
         layers_lines.append("         )\n")
 
-
         self.write_lines("infra/services/layers.py", layers_lines)
         return self
 
@@ -54,6 +54,5 @@ class Layers:
         self.services.insert(0, f"{import_statement}\n")
         self.services.append(f"        {instance_statement}\n")
 
-    
     def build(self):
-      self.write_lines("infra/services/__init__.py", self.services)
+        self.write_lines("infra/services/__init__.py", self.services)

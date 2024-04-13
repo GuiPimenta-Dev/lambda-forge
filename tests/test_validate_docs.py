@@ -44,10 +44,7 @@ def test_it_should_throw_an_error_if_input_is_not_a_dataclass():
     with pytest.raises(Exception) as exc_info:
         validate_docs(endpoints, module_loader(mock))
 
-    assert (
-        str(exc_info.value)
-        == "Input is not a dataclass on functions.function_name.main"
-    )
+    assert str(exc_info.value) == "Input is not a dataclass on functions.function_name.main"
 
 
 def test_it_should_throw_an_error_if_output_is_not_a_dataclass():
@@ -68,10 +65,7 @@ def test_it_should_throw_an_error_if_output_is_not_a_dataclass():
     with pytest.raises(Exception) as exc_info:
         validate_docs(endpoints, module_loader(mock))
 
-    assert (
-        str(exc_info.value)
-        == "Output is not a dataclass on functions.function_name.main"
-    )
+    assert str(exc_info.value) == "Output is not a dataclass on functions.function_name.main"
 
 
 def test_it_should_throw_an_error_if_input_is_missing():
@@ -134,10 +128,7 @@ def test_it_should_throw_an_error_if_path_id_parameter_is_missing_case_the_endpo
     with pytest.raises(Exception) as exc_info:
         validate_docs(endpoints, module_loader(mock))
 
-    assert (
-        str(exc_info.value)
-        == "Path parameter id is missing in Path on functions.function_name.main"
-    )
+    assert str(exc_info.value) == "Path parameter id is missing in Path on functions.function_name.main"
 
 
 def test_it_should_not_throw_an_error_if_path_id_parameter_is_on_the_dataclass():
@@ -201,6 +192,4 @@ def test_it_should_throw_an_error_if_path_class_is_not_a_dataclass_case_the_endp
     with pytest.raises(Exception) as exc_info:
         validate_docs(endpoints, module_loader(mock))
 
-    assert (
-        str(exc_info.value) == "Path is not a dataclass on functions.function_name.main"
-    )
+    assert str(exc_info.value) == "Path is not a dataclass on functions.function_name.main"

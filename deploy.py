@@ -24,9 +24,7 @@ def update_setup_py(new_version):
     """Updates the setup.py file with the new version."""
     with open("setup.py", "r") as file:
         content = file.read()
-    content = re.sub(
-        r"(version=['\"])([^'\"]+)(['\"])", rf"\g<1>{new_version}\3", content
-    )
+    content = re.sub(r"(version=['\"])([^'\"]+)(['\"])", rf"\g<1>{new_version}\3", content)
     with open("setup.py", "w") as file:
         file.write(content)
 
@@ -40,9 +38,7 @@ def build_and_upload():
 
     """Builds the package and uploads it to TestPyPI."""
     subprocess.run(["python", "setup.py", "sdist", "bdist_wheel"], check=True)
-    subprocess.run(
-        ["twine", "upload", "--repository", "testpypi", "dist/*"], check=True
-    )
+    subprocess.run(["twine", "upload", "--repository", "testpypi", "dist/*"], check=True)
 
 
 def main():

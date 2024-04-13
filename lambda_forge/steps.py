@@ -23,14 +23,13 @@ class Steps:
             input=self.source,
             install_commands=[
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
+                "forge layer --install",
                 "pip install -r requirements.txt",
             ],
             commands=[
                 'pytest --junitxml=pytest-report/test-results.xml -k "unit.py"',
             ],
-            cache=codebuild.Cache.local(
-                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
-            ),
+            cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             env=env,
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
@@ -76,6 +75,7 @@ class Steps:
             input=self.source,
             install_commands=[
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
+                "forge layer --install",
                 "pip install -r requirements.txt",
             ],
             env=env,
@@ -84,9 +84,7 @@ class Steps:
                 f"coverage xml --fail-under={self.context.coverage}",
                 "touch coverage.xml",
             ],
-            cache=codebuild.Cache.local(
-                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
-            ),
+            cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
@@ -126,21 +124,23 @@ class Steps:
         )
 
     def validate_integration_tests(self, env={}, role_policy_statements=[]):
-        validate_integration_tests = pkg_resources.resource_string(
-            __name__, "validate_integration_tests.py"
-        )
+        validate_integration_tests = pkg_resources.resource_string(__name__, "validate_integration_tests.py")
+
         conftest = """import json 
 def pytest_generate_tests(metafunc):
     for mark in metafunc.definition.iter_markers(name="integration"):
         with open("tested_endpoints.txt", "a") as f:
             f.write(f"{json.dumps(mark.kwargs)}|")"""
+
         env = {"TRACK": "true"} | env
+
         return pipelines.CodeBuildStep(
             "Validate Integration Tests",
             input=self.source,
             install_commands=[
                 "npm install -g aws-cdk",
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
+                "forge layer --install",
                 "pip install -r requirements.txt",
             ],
             env=env,
@@ -152,9 +152,7 @@ def pytest_generate_tests(metafunc):
                 "pytest -m integration --collect-only . -q",
                 "python validate_integration_tests.py",
             ],
-            cache=codebuild.Cache.local(
-                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
-            ),
+            cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
@@ -182,6 +180,7 @@ def pytest_generate_tests(metafunc):
             install_commands=[
                 "npm install -g aws-cdk",
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
+                "forge layer --install",
                 "pip install -r requirements.txt",
             ],
             commands=[
@@ -191,9 +190,7 @@ def pytest_generate_tests(metafunc):
                 "python validate_docs.py",
             ],
             env=env,
-            cache=codebuild.Cache.local(
-                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
-            ),
+            cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
@@ -225,21 +222,18 @@ def pytest_generate_tests(metafunc):
             input=self.source,
             install_commands=[
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
+                "forge layer --install",
                 "pip install -r requirements.txt",
             ],
             env=env,
-            commands=[
-                'pytest --junitxml=pytest-report/test-results.xml -k "integration.py"'
-            ],
+            commands=['pytest --junitxml=pytest-report/test-results.xml -k "integration.py"'],
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
                 environment_variables=env,
             ),
-            cache=codebuild.Cache.local(
-                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
-            ),
+            cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             partial_build_spec=codebuild.BuildSpec.from_object(
                 {
                     "reports": {
@@ -254,26 +248,27 @@ def pytest_generate_tests(metafunc):
             role_policy_statements=role_policy_statements,
         )
 
-    def generate_docs(self, env={}, role_policy_statements=[]):
+    def generate_docs(self, stage=None, env={}, role_policy_statements=[]):
+        stage = stage or self.context.stage
         generate_docs = pkg_resources.resource_string(__name__, "generate_docs.py")
-        swagger_yml_to_ui = pkg_resources.resource_string(
-            __name__, "swagger_yml_to_ui.py"
-        )
+        swagger_yml_to_ui = pkg_resources.resource_string(__name__, "swagger_yml_to_ui.py")
+        generate_diagram = pkg_resources.resource_string(__name__, "generate_diagram.py")
         bucket = self.scope.node.try_get_context("bucket")
 
         env = {"TRACK": "true"} | env
         return pipelines.CodeBuildStep(
-            f"Generate {self.context.stage} Docs",
+            f"Generate {stage} Docs",
             input=self.source,
             install_commands=[
                 "npm install -g aws-cdk",
                 "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
+                "forge layer --install",
                 "pip install -r requirements.txt",
                 "npm install -g redoc-cli",
+                "npm install cdk-dia",
+                "sudo apt install graphviz"
             ],
-            cache=codebuild.Cache.local(
-                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
-            ),
+            cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             env=env,
             commands=[
                 "cdk synth",
@@ -283,8 +278,11 @@ def pytest_generate_tests(metafunc):
                 f"echo '{swagger_yml_to_ui.decode()}' > swagger_yml_to_ui.py",
                 "python swagger_yml_to_ui.py < docs.yaml > swagger.html",
                 "redoc-cli bundle -o redoc.html docs.yaml",
+                f"echo '{generate_diagram.decode()}' > generate_diagram.py",
+                f"python generate_diagram.py {self.context.stage}",
                 f"aws s3 cp swagger.html s3://{bucket}/{self.context.name}/{self.context.stage.lower()}-swagger.html",
                 f"aws s3 cp redoc.html s3://{bucket}/{self.context.name}/{self.context.stage.lower()}-redoc.html",
+                f"aws s3 cp diagram.png s3://{bucket}/{self.context.name}/{self.context.stage.lower()}-diagram.png",
             ],
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,

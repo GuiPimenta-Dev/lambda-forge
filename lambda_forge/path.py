@@ -16,7 +16,7 @@ class Path:
     @staticmethod
     def handler(directory):
         return f"src.{directory}.main.lambda_handler" if directory else "src.main.lambda_handler"
-    
+
     @staticmethod
     def function(src):
         if Path._temp_dir is None:
