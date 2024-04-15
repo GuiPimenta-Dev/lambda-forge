@@ -1,0 +1,118 @@
+[
+  {
+    "title": "SQS",
+    "color": "#00ff00",
+    "name": "Dev-Demo-EventStream",
+    "triggers": [
+      {
+        "title": "S3",
+        "color": "#00ff00",
+        "name": "Dev-Demo-DataProcessing",
+        "input": "{\"name\": str, \"age\": int}",
+        "output": "{\"name\": str, \"age\": int}",
+        "triggers": [
+          {
+            "title": "SQS",
+            "color": "#ff00ff",
+            "name": "Dev-Demo-HelloWorld"
+          },
+          {
+            "title": "API Gateway",
+            "color": "#ff0000",
+            "name": "Dev-Demo-EventStream"
+          }
+        ]
+      },
+      {
+        "title": "SQS",
+        "color": "#ffff00",
+        "name": "Dev-Demo-HelloWorld",
+        "input": "{\"name\": str, \"age\": int}",
+        "output": "{\"name\": str, \"age\": int}",
+        "triggers": [
+          {
+            "title": "SQS",
+            "color": "#0000ff",
+            "name": "Dev-Demo-HelloWorld"
+          },
+          {
+            "title": "API Gateway",
+            "color": "#00ff00",
+            "name": "Dev-Demo-EventStream"
+          },
+          {
+            "title": "SQS",
+            "color": "#ff0000",
+            "name": "Dev-Demo-HelloWorld"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "SQS",
+    "color": "#ffff00",
+    "name": "Dev-Demo-DataProcessing",
+    "triggers": [
+      {
+        "title": "SQS",
+        "color": "#0000ff",
+        "name": "Dev-Demo-DataProcessing",
+        "input": "{\"name\": str, \"age\": int}",
+        "output": "{\"name\": str, \"age\": int}",
+        "triggers": [
+          {
+            "title": "SQS",
+            "color": "#ff0000",
+            "name": "Dev-Demo-EventStream"
+          },
+          {
+            "title": "SQS",
+            "color": "#0000ff",
+            "name": "Dev-Demo-DataProcessing"
+          }
+        ]
+      },
+      {
+        "title": "SQS",
+        "color": "#ff0000",
+        "name": "Dev-Demo-HelloWorld",
+        "input": "{\"name\": str, \"age\": int}",
+        "output": "{\"name\": str, \"age\": int}",
+        "triggers": [
+          {
+            "title": "S3",
+            "color": "#0000ff",
+            "name": "Dev-Demo-EventStream"
+          },
+          {
+            "title": "S3",
+            "color": "#0000ff",
+            "name": "Dev-Demo-DataProcessing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "SQS",
+    "color": "#00ffff",
+    "name": "Dev-Demo-DataProcessing",
+    "triggers": [
+      {
+        "title": "S3",
+        "color": "#ffff00",
+        "name": "Dev-Demo-DataProcessing",
+        "input": "{\"name\": str, \"age\": int}",
+        "output": "{\"name\": str, \"age\": int}",
+        "triggers": [
+          {
+            "title": "S3",
+            "color": "#ff0000",
+            "name": "Dev-Demo-EventStream"
+          }
+        ]
+      }
+    ]
+  }
+]

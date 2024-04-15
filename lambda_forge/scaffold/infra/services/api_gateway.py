@@ -1,4 +1,3 @@
-from typing import Literal
 from aws_cdk import Duration
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
@@ -15,8 +14,8 @@ class APIGateway(IAPIGateway):
         self.default_authorizer = None
         self.api = apigateway.RestApi(
             scope,
-            id=f"{self.context.stage}-{self.context.name}-API",
-            description=f"{self.context.stage} {self.context.name} CDK API",
+            id=f"{self.context.stage}-{self.context.name}-Rest",
+            description=f"{self.context.stage} {self.context.name} Rest API",
             deploy_options={"stage_name": self.context.stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
             binary_media_types=["multipart/form-data"],
@@ -88,14 +87,14 @@ class APIGateway(IAPIGateway):
         public=False,
         endpoint="/docs",
         enabled=True,
-        mode: Literal["swagger", "redoc", "diagram"] = "swagger",
+        artifact = "swagger",
     ):
         if not enabled:
             return
 
         s3_integration_role = iam.Role(
             self.scope,
-            f"{endpoint.replace('/','')}-api-gateway-s3",
+            f"{endpoint.replace('/','')}-API-Gateway-S3",
             assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
             role_name=f"{self.context.stage}-{self.context.name}-{endpoint.replace('/','')}-S3",
         )
@@ -123,7 +122,7 @@ class APIGateway(IAPIGateway):
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}-{mode}",
+                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}-{artifact.lower()}",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,

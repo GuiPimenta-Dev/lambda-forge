@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wiki</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        #container {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+        #md-preview, #md-input {
+            margin: 0 10px;
+            height: 90vh;
+            overflow: auto;
+        }
+        #md-preview {
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #md-input {
+            display: none; /* Initially hidden */
+            width: 50%; /* Set width to occupy 50% of the screen */
+            font-family: monospace;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            height: 90vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <textarea id="md-input"></textarea>
+        <div id="md-preview"></div>
+    </div>
+    <script>
+        const mdPreview = document.getElementById('md-preview');
+        const mdInput = document.getElementById('md-input');
+        let isEditing = false;
+        let initialMd = `\n# Welcome to Our Wiki\n\nWelcome to our intuitive online Markdown viewer, designed with editing capabilities to enhance your documentation experience.\n\n## Key Features\n\n- **Real-Time Markdown Rendering**: View your Markdown content as it comes to life in real-time.\n- **Effortless Markdown Editing**: Double-click anywhere in the content below to start crafting or modifying your content with ease.\n\nThis platform serves as a collaborative hub, enabling our team to effortlessly share and access knowledge. It's all about making information sharing seamless and efficient.\n\nDive in and enjoy a streamlined Markdown editing journey!\n`;
+
+        // Function to render Markdown
+        function renderMarkdown(md) {
+            mdPreview.innerHTML = marked.parse(md);
+        }
+
+        // Toggle editor on double-click
+        mdPreview.addEventListener('dblclick', () => {
+            if (!isEditing) {
+                mdInput.style.display = 'block';
+                mdInput.value = initialMd;
+                mdInput.focus();
+                isEditing = true;
+            } else {
+                mdInput.style.display = 'none';
+                isEditing = false;
+                initialMd = mdInput.value; // Update the Markdown content
+                renderMarkdown(mdInput.value); // Re-render the preview with the updated content
+            }
+        });
+
+        // Prevent the editor from closing when clicking inside it
+        mdInput.addEventListener('dblclick', (event) => {
+            event.stopPropagation();
+        });
+
+        // Live preview update
+        mdInput.addEventListener('input', () => {
+            renderMarkdown(mdInput.value);
+            initialMd = mdInput.value; // Keep the edited content up to date
+        });
+
+        // Initial render
+        renderMarkdown(initialMd);
+    </script>
+</body>
+</html>

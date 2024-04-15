@@ -173,7 +173,7 @@ class ProdStack(cdk.Stack):
         )
 
         # post
-        generate_docs = steps.generate_docs()
+        generate_docs = steps.generate_docs(stage=context.stage)
 
         pipeline.add_stage(
             DeployStage(self, context),

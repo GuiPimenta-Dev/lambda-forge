@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wiki</title>
+    <link rel="icon" href="logo" type="image/png"> 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        #md-preview {
+            width: 100%;
+            height: 90vh;
+            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="md-preview"></div>
+    <script>
+        const mdPreview = document.getElementById('md-preview');
+        let initialMd = `as bc d er g`;
+
+        // Function to render Markdown
+        function renderMarkdown(md) {
+            mdPreview.innerHTML = marked.parse(md);
+        }
+
+        // Initial render
+        renderMarkdown(initialMd);
+    </script>
+</body>
+</html>
