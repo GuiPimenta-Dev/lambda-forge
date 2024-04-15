@@ -1,6 +1,7 @@
 import subprocess
 import sys
 
+
 # Get CDK stacks using AWS CLI
 def get_stacks():
     result = subprocess.run(["cdk", "list"], capture_output=True, text=True)
@@ -24,5 +25,3 @@ for stack in stacks_to_exclude:
     run.append(stack)
 
 subprocess.run(run)
-
-

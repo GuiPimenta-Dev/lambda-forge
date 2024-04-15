@@ -6,7 +6,7 @@ if __name__ == "__main__":
     file = sys.argv[1]
     title = sys.argv[2]
     favicon = sys.argv[3]
-    
+
     with open(file, "r") as file:
         content = file.read()
 

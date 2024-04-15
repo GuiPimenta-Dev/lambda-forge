@@ -280,7 +280,16 @@ def pytest_generate_tests(metafunc):
         )
 
     def generate_docs(
-        self, name="Generate Docs", stage=None, env={}, role_policy_statements=[], requirements="requirements.txt", api_docs=True, diagram=True, wikis = [],
+        self,
+        name="Generate Docs",
+        stage=None,
+        env={},
+        role_policy_statements=[],
+        requirements="requirements.txt",
+        api=True,
+        diagram=True,
+        todo=True,
+        wikis=[],
     ):
         stage = stage or self.context.stage
         generate_docs = pkg_resources.resource_string(__name__, "generate_docs.py")
@@ -288,32 +297,39 @@ def pytest_generate_tests(metafunc):
         generate_diagram = pkg_resources.resource_string(__name__, "generate_diagram.py")
         embed_image_in_html = pkg_resources.resource_string(__name__, "embed_image_in_html.py")
         generate_wiki = pkg_resources.resource_string(__name__, "generate_wiki.py")
+        todo = pkg_resources.resource_string(__name__, "generate_todo.py")
 
         commands = ["cdk synth", "rm -rf cdk.out"]
-        
-        if api_docs:
-            api_docs_commands = [
-               f"echo '{generate_docs.decode()}' > generate_docs.py",
+
+        if api:
+            api_commands = [
+                f"echo '{generate_docs.decode()}' > generate_docs.py",
                 "python generate_docs.py",
                 f"echo '{swagger_yml_to_ui.decode()}' > swagger_yml_to_ui.py",
                 "python swagger_yml_to_ui.py < docs.yaml > swagger.html",
                 "redoc-cli bundle -o redoc.html docs.yaml",
-                f"aws s3 cp swagger.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}-swagger.html",
-                f"aws s3 cp redoc.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}-redoc.html",
+                f"aws s3 cp swagger.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/swagger.html",
+                f"aws s3 cp redoc.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/redoc.html",
             ]
-            commands += api_docs_commands
-        
+            commands += api_commands
+
         if diagram:
             diagram_commands = [
-                    f"echo '{generate_diagram.decode()}' > generate_diagram.py",
-                    f"python generate_diagram.py {stage}",
-                    f"echo '{embed_image_in_html.decode()}' > embed_image_in_html.py",
-                    "python embed_image_in_html.py diagram.png diagram.html",
-                    "ls -la",
-                    f"aws s3 cp diagram.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}-diagram.html",
+                f"echo '{generate_diagram.decode()}' > generate_diagram.py",
+                f"python generate_diagram.py {stage}",
+                f"echo '{embed_image_in_html.decode()}' > embed_image_in_html.py",
+                "python embed_image_in_html.py diagram.png diagram.html",
+                f"aws s3 cp diagram.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/diagram.html",
             ]
             commands += diagram_commands
 
+        if todo:
+            todo_commands = [
+                f"echo '{todo.decode()}' > generate_todo.py",
+                "python generate_todo.py",
+                f"aws s3 cp todo.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/todo.html",
+            ]
+            commands += todo_commands
 
         if wikis:
             commands.append(f"echo '{generate_wiki.decode()}' > generate_wiki.py")
@@ -321,10 +337,10 @@ def pytest_generate_tests(metafunc):
                 title = wiki.get("title", "Wiki").title()
                 favicon = wiki.get("favicon", "favicon.png")
                 file_path = wiki.get("file_path", "")
-                commands.append(f"python generate_wiki.py '{file_path}' '{title}' '{favicon}'")
-                commands.append("ls -la")
-                commands.append(f"aws s3 cp {title}.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}-{title.lower()}.html")
-
+                commands.append(f"python generate_wiki.py '{file_path}' '{file_path}' '{favicon}'")
+                commands.append(
+                    f"aws s3 cp {title}.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/{title.lower()}.html"
+                )
 
         env = {"TRACK": "true"} | env
         return pipelines.CodeBuildStep(

@@ -87,7 +87,7 @@ class APIGateway(IAPIGateway):
         public=False,
         endpoint="/docs",
         enabled=True,
-        artifact = "swagger",
+        artifact="swagger",
     ):
         if not enabled:
             return
@@ -122,7 +122,7 @@ class APIGateway(IAPIGateway):
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}-{artifact.lower()}",
+                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}/{artifact.lower()}",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,
