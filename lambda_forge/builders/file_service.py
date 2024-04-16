@@ -32,13 +32,20 @@ class FileService:
     def read_lines(self, path: str) -> List:
         with open(path, "r") as f:
             return f.readlines()
-
+        
     def copy_folders(self, package_name: str, resource_name: str, destination: str) -> None:
-        with resources.path(package_name, resource_name) as src:
-            dst = Path(self.root_dir + destination)
+        # Assuming `root_dir` is defined elsewhere in your class
+        dst = Path(self.root_dir) / destination
 
-            for src_path in Path(src).glob("**/*"):
-                if src_path.is_file():
-                    dst_path = dst / src_path.relative_to(src)
-                    dst_path.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(src_path, dst_path)
+        # Use importlib.resources.files to obtain a path-like object pointing to 'resource_name'
+        src = resources.files(package_name) / resource_name
+
+        # Ensure destination directory exists
+        dst.mkdir(parents=True, exist_ok=True)
+
+        # Iterate over all files in the source directory and copy them
+        for src_path in src.glob("**/*"):
+            if src_path.is_file():
+                dst_path = dst / src_path.relative_to(src)
+                dst_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure parent directory exists
+                shutil.copy2(src_path, dst_path)
