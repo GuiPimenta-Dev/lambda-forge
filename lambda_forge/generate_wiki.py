@@ -10,8 +10,6 @@ if __name__ == "__main__":
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
 
-    # Escape single quotes in the content to prevent breaking the JS string
-    # and convert newlines to \n so they are preserved in the JS string
     content_escaped = json.dumps(content)
 
     html_template = f"""
@@ -41,15 +39,12 @@ if __name__ == "__main__":
     <div id="md-preview"></div>
     <script>
         const mdPreview = document.getElementById('md-preview');
-        // Use the escaped Markdown content
         let initialMd = {content_escaped};
 
-        // Function to render Markdown
         function renderMarkdown(md) {{
             mdPreview.innerHTML = marked.parse(md);
         }}
 
-        // Initial render
         renderMarkdown(initialMd);
     </script>
 </body>
@@ -57,5 +52,5 @@ if __name__ == "__main__":
 """
 
     # Save the HTML content to a file with UTF-8 encoding
-    with open(f"{title}.html", "w", encoding='utf-8') as file:
+    with open(f"{title}.html", "w") as file:
         file.write(html_template)
