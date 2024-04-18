@@ -1,0 +1,79 @@
+/* Custom styling for pytest HTML report */
+
+/* Body styling */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container styling */
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styling */
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 32px;
+  color: #444;
+}
+
+/* Test case styling */
+.testcase {
+  margin-bottom: 20px;
+}
+
+/* Test name styling */
+.testcase h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Test result styling */
+.testcase .result {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Passed test result styling */
+.passed {
+  background-color: #dff0d8;
+  border: 1px solid #d0e9c6;
+}
+
+/* Failed test result styling */
+.failed {
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+}
+
+/* Skipped test result styling */
+.skipped {
+  background-color: #fcf8e3;
+  border: 1px solid #faebcc;
+}
+
+/* Footer styling */
+.footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.footer p {
+  font-size: 14px;
+  color: #666;
+}

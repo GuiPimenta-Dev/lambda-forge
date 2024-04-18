@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Waka</title>
+    <link rel="icon" href="https://docs.lambda-forge.com/images/favicon.png" type="image/png"> 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        #md-preview {
+            width: 100%;
+            height: 90vh;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="md-preview"></div>
+    <script>
+        const mdPreview = document.getElementById('md-preview');
+        // Use the escaped Markdown content
+        let initialMd = "# Documentation Hub\n\nWelcome to our Documentation Hub! This Markdown file serves as a central hub for accessing all our project documentation. Here, you'll find links to various documents, guides, and resources to help you navigate and understand our project better.\n\n## Table of Contents\n\n1. [Introduction](#introduction)\n2. [Getting Started](#getting-started)\n3. [User Guides](#user-guides)\n4. [API Documentation](#api-documentation)\n5. [FAQs](#faqs)\n6. [Troubleshooting](#troubleshooting)\n7. [Contributing Guidelines](#contributing-guidelines)\n8. [Code of Conduct](#code-of-conduct)\n9. [License](#license)\n\n## Introduction\n\nProvide a brief overview of the project and its purpose. This section should give readers a high-level understanding of what the project is about and why it exists.\n\n## Getting Started\n\n#\n\n#\n\nThis section should contain resources and guides for users who are new to the project and want to get started. Include installation instructions, system requirements, and any other information necessary to set up the project.\n\n## User Guides\n\n# OLA\n\nHere, users can find detailed guides on how to use various features of the project. Each guide should be comprehensive and easy to follow, providing step-by-step instructions and examples where necessary.\n\n## API Documentation\n\nIf your project has an API, provide detailed documentation here. Include information on endpoints, request and response formats, authentication methods, and any other relevant details.\n\n## FAQs\n\nCompile a list of frequently asked questions along with their answers. This section can help users quickly find solutions to common issues or queries.\n\n## Troubleshooting\n\nIn this section, provide troubleshooting tips and solutions for common problems users might encounter while using the project. Include error messages, possible causes, and recommended solutions.\n\n## Contributing Guidelines\n\nIf you welcome contributions to your project, include guidelines for contributors here. Explain how users can contribute code, report bugs, or suggest improvements to the project.\n\n## Code of Conduct\n\nProvide a code of conduct that sets the tone for interactions within the project community. This code should outline expected behavior and consequences for violations.\n\n## License\n\nSpecify the project's license and include any additional terms or conditions. Make sure users understand their rights and obligations when using or modifying the project.\n";
+
+        // Function to render Markdown
+        function renderMarkdown(md) {
+            mdPreview.innerHTML = marked.parse(md);
+        }
+
+        // Initial render
+        renderMarkdown(initialMd);
+    </script>
+</body>
+</html>

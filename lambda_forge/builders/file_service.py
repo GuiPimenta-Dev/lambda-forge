@@ -32,7 +32,7 @@ class FileService:
     def read_lines(self, path: str) -> List:
         with open(path, "r") as f:
             return f.readlines()
-        
+
     def copy_folders(self, package_name: str, resource_name: str, destination: str) -> None:
         # Assuming `root_dir` is defined elsewhere in your class
         dst = Path(self.root_dir) / destination

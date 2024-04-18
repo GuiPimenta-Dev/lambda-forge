@@ -52,6 +52,14 @@ class {self.pascal_name}Config:
             """
         return self
 
+    def with_websocket(self):
+
+        self.config += f"""
+        services.websockets.create_route("", function)
+
+            """
+        return self
+
     def with_integration(self, http_method):
         self.integration = f"""import pytest
 import requests

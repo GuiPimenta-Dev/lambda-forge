@@ -129,10 +129,11 @@ def create_project(
 @forge.command()
 @click.argument("name")
 @click.option("--description", required=True, help="Description for the endpoint")
-@click.option("--method", required=False, help="HTTP method for the endpoint", default=None)
+@click.option("--method", required=False, help="HTTP method for the endpoint", default="GET")
 @click.option("--belongs-to", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
+@click.option("--websocket", help="Function is going to be used for websockets", is_flag=True)
 @click.option(
     "--no-tests",
     help="Do not create unit tests and integration tests files",
@@ -145,7 +146,7 @@ def create_project(
     is_flag=True,
     default=False,
 )
-def function(name, description, method, belongs_to, endpoint, no_api, no_tests, public):
+def function(name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public):
     """
     Creates a Lambda function with a predefined structure and API Gateway integration.
 
@@ -155,7 +156,7 @@ def function(name, description, method, belongs_to, endpoint, no_api, no_tests, 
     An HTTP method must be provided if an API Gateway endpoint is not skipped.
     """
     method = method.upper() if method else None
-    create_function(name, description, method, belongs_to, endpoint, no_api, no_tests, public)
+    create_function(name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public)
 
 
 def create_function(
@@ -165,21 +166,24 @@ def create_function(
     belongs=None,
     endpoint=None,
     no_api=False,
+    websocket=False,
     no_tests=False,
     public=False,
 ):
-    if no_api is False and not http_method:
-        raise click.UsageError("You must provide a method for the API Gateway endpoint or use the flag --no-api")
 
     function_builder = FunctionBuilder.a_function(name, description).with_config(belongs)
 
     if no_api is True:
-        if no_tests is True:
-            function_builder = function_builder.with_main()
-        else:
-            function_builder = function_builder.with_unit().with_main()
+        function_builder = function_builder.with_main()
+        if no_tests is False:
+            function_builder = function_builder.with_unit()
 
-    elif no_api is False:
+    elif websocket is True:
+        function_builder = function_builder.with_websocket().with_main()
+        if no_tests is False:
+            function_builder = function_builder.with_unit()
+
+    else:
         endpoint = endpoint or belongs or name
         if no_tests is True:
             function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
@@ -237,18 +241,7 @@ def create_authorizer(name, description, default, no_tests):
 
 
 AVALABLE_SERVICES = sorted(
-    [
-        "sns",
-        "dynamo_db",
-        "s3",
-        "layers",
-        "state_machine",
-        "event_bridge",
-        "sqs",
-        "secrets_manager",
-        "cognito",
-        "kms",
-    ]
+    ["sns", "dynamo_db", "s3", "event_bridge", "sqs", "secrets_manager", "cognito", "kms", "websockets"]
 )
 
 
@@ -274,7 +267,6 @@ def create_service(service):
 
     services = {
         "sns": service_builder.with_sns,
-        "layers": service_builder.with_layers,
         "dynamo_db": service_builder.with_dynamodb,
         "s3": service_builder.with_s3,
         "event_bridge": service_builder.with_event_bridge,
@@ -282,6 +274,7 @@ def create_service(service):
         "secrets_manager": service_builder.with_secrets_manager,
         "cognito": service_builder.with_cognito,
         "kms": service_builder.with_kms,
+        "websockets": service_builder.with_websockets,
     }
     service_builder = services[service]()
 

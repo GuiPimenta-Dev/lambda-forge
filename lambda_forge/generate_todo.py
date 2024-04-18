@@ -109,10 +109,9 @@ def iterate_files_and_generate_html(files):
         html_file.write(html)
 
 
-
 if __name__ == "__main__":
-  with open("cdk.json", "r") as json_file:
-      context = json.load(json_file)["context"]
-      functions = context["functions"]
+    with open("cdk.json", "r") as json_file:
+        context = json.load(json_file)["context"]
+        functions = context["functions"]
 
-  iterate_files_and_generate_html(functions)
+    iterate_files_and_generate_html(functions)

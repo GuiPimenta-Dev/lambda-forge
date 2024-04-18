@@ -288,6 +288,7 @@ def pytest_generate_tests(metafunc):
         requirements="requirements.txt",
         api=True,
         diagram=True,
+        tests=True,        
         todo=True,
         wikis=[],
     ):
@@ -297,7 +298,9 @@ def pytest_generate_tests(metafunc):
         generate_diagram = pkg_resources.resource_string(__name__, "generate_diagram.py")
         embed_image_in_html = pkg_resources.resource_string(__name__, "embed_image_in_html.py")
         generate_wiki = pkg_resources.resource_string(__name__, "generate_wiki.py")
-        todo = pkg_resources.resource_string(__name__, "generate_todo.py")
+        # pytest_html_styles = pkg_resources.resource_string(__name__, "pytests_html_styles.css")
+        # todo = pkg_resources.resource_string(__name__, "generate_todo.py")
+
 
         commands = ["cdk synth", "rm -rf cdk.out"]
 
@@ -323,24 +326,54 @@ def pytest_generate_tests(metafunc):
             ]
             commands += diagram_commands
 
-        if todo:
-            todo_commands = [
-                f"echo '{todo.decode()}' > generate_todo.py",
-                "python generate_todo.py",
-                f"aws s3 cp todo.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/todo.html",
-            ]
-            commands += todo_commands
+
+        # if todo:
+        #     todo_commands = [
+        #         f"echo '{todo.decode()}' > generate_todo.py",
+        #         "python generate_todo.py",
+        #         f"aws s3 cp todo.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/todo.html",
+        #     ]
+        #     commands += todo_commands
 
         if wikis:
-            commands.append(f"echo '{generate_wiki.decode()}' > generate_wiki.py")
+            wikis_commands = [
+                f"echo '{generate_wiki.decode()}' > generate_wiki.py",
+            ]
             for wiki in wikis:
+                file_path = wiki.get("file_path", "")
                 title = wiki.get("title", "Wiki").title()
                 favicon = wiki.get("favicon", "favicon.png")
-                file_path = wiki.get("file_path", "")
-                commands.append(f"python generate_wiki.py '{file_path}' '{file_path}' '{favicon}'")
-                commands.append(
+                wikis_commands.append(f"python generate_wiki.py '{file_path}' '{title}' '{favicon}'")
+                wikis_commands.append("ls")
+                wikis_commands.append(f"cat {title}.html")
+                wikis_commands.append(
                     f"aws s3 cp {title}.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/{title.lower()}.html"
                 )
+                wikis_commands.append(
+                    f"aws s3 cp {title}.html s3://{self.context.bucket}/{self.context.name}/funciona.html"
+                )
+                wikis_commands.append(f"cat {title}.html")
+
+            commands += wikis_commands
+
+        if tests:
+            
+            conftest = f"""def pytest_html_report_title(report):
+    report.title = "Test Report"
+"""
+            
+            test_commands = [
+                f"echo '{conftest}' > conftest.py",
+                "rm -rf cdk.out",
+                "rm -rf __pycache__/",
+                # f"echo '{pytest_html_styles.decode()}' > pytests_html_styles.css",
+                "coverage run -m pytest --html=report.html --self-contained-html || echo 'skipping failure'",
+                "rm -rf cdk.out",
+                "coverage html",
+                f"aws s3 cp report.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/tests.html",
+                f"aws s3 cp htmlcov/index.html s3://{self.context.bucket}/{self.context.name}/{stage.lower()}/coverage.html",
+            ]
+            commands += test_commands
 
         env = {"TRACK": "true"} | env
         return pipelines.CodeBuildStep(
