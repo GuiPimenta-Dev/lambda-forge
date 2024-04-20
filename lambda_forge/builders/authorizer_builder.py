@@ -153,10 +153,8 @@ def test_authorizer_should_fail_with_invalid_secret():
     def build(self):
         folder_path = self.join("authorizers", self.authorizer_name)
         self.make_dir(folder_path)
-        self.make_dir("authorizers/utils")
         self.make_file(self.join("authorizers"), "__init__.py")
         self.make_file(folder_path, "__init__.py")
-        self.make_file("authorizers/utils", "__init__.py")
         self.make_file(folder_path, "config.py", self.config)
         self.make_file(folder_path, "main.py", self.main)
         self.make_file(folder_path, "unit.py", self.unit)

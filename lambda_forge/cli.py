@@ -1,6 +1,7 @@
 import click
 
 from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
+from lambda_forge.builders.docs_builder import DocsBuilder
 from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
@@ -124,6 +125,9 @@ def create_project(
         .with_deploy_stage(not no_docs)
         .build()
     )
+    
+    if not no_docs:
+        DocsBuilder.a_doc().with_config().with_lambda_stack().build()
 
 
 @forge.command()

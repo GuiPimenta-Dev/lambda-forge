@@ -3,6 +3,8 @@ from aws_cdk import aws_codebuild as codebuild
 from aws_cdk import aws_iam as iam
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
+from aws_cdk.aws_ecr import Repository
+
 import pkg_resources
 
 
@@ -45,6 +47,69 @@ class Steps:
             env=env,
             build_environment=codebuild.BuildEnvironment(
                 build_image=codebuild.LinuxBuildImage.STANDARD_5_0,
+                privileged=True,
+                compute_type=codebuild.ComputeType.SMALL,
+                environment_variables=env,
+            ),
+            partial_build_spec=codebuild.BuildSpec.from_object(
+                {
+                    "reports": {
+                        report_group.report_group_arn: {
+                            "files": "test-results.xml",
+                            "base-directory": "pytest-report",
+                            "file-format": "JUNITXML",
+                        }
+                    },
+                }
+            ),
+            role_policy_statements=[
+                iam.PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=[
+                        "codebuild:CreateReportGroup",
+                        "codebuild:CreateReport",
+                        "codebuild:UpdateReport",
+                        "codebuild:BatchPutTestCases",
+                        "codebuild:BatchPutCodeCoverages",
+                    ],
+                    resources=[report_group.report_group_arn],
+                )
+            ]
+            + role_policy_statements,
+        )
+        
+    def run_unit_tests_code_build(
+        self,
+        name="Code Build Unit Tests",
+        stage=None,
+        report_group_name=None,
+        env={},
+        role_policy_statements=[],
+        requirements="requirements.txt",
+    ):
+
+        stage = stage or self.context.stage
+
+        report_group_name = report_group_name or f"{stage}-{self.context.name}-UnitReportGroup"
+        report_group = codebuild.ReportGroup(
+            self.scope,
+            report_group_name,
+        )
+        
+        return pipelines.CodeBuildStep(
+            name,
+            input=self.source,
+            install_commands=[
+                "forge layer --install",
+                f"pip install -r {requirements}",
+            ],
+            commands=[
+                'pytest --junitxml=pytest-report/test-results.xml -k "unit.py"',
+            ],
+            cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
+            env=env,
+            build_environment=codebuild.BuildEnvironment(
+                build_image=codebuild.LinuxBuildImage.from_docker_registry("211125768252.dkr.ecr.us-east-2.amazonaws.com/cdk-hnb659fds-container-assets-211125768252-us-east-2:latest"),
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
                 environment_variables=env,
@@ -298,7 +363,6 @@ def pytest_generate_tests(metafunc):
         generate_diagram = pkg_resources.resource_string(__name__, "generate_diagram.py")
         embed_image_in_html = pkg_resources.resource_string(__name__, "embed_image_in_html.py")
         generate_wiki = pkg_resources.resource_string(__name__, "generate_wiki.py")
-        # pytest_html_styles = pkg_resources.resource_string(__name__, "pytests_html_styles.css")
         # todo = pkg_resources.resource_string(__name__, "generate_todo.py")
 
 
@@ -366,7 +430,6 @@ def pytest_generate_tests(metafunc):
                 f"echo '{conftest}' > conftest.py",
                 "rm -rf cdk.out",
                 "rm -rf __pycache__/",
-                # f"echo '{pytest_html_styles.decode()}' > pytests_html_styles.css",
                 "coverage run -m pytest --html=report.html --self-contained-html || echo 'skipping failure'",
                 "rm -rf cdk.out",
                 "coverage html",

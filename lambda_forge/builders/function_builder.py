@@ -146,9 +146,7 @@ def test_lambda_handler():
         if self.belongs:
             folder_path = self.join("functions", self.belongs, self.function_name)
             self.make_dir(folder_path)
-            self.make_dir(f"functions/{self.belongs}/utils")
             self.make_file(folder_path, "__init__.py")
-            self.make_file(f"functions/{self.belongs}/utils", "__init__.py")
         else:
             folder_path = self.join("functions", self.function_name)
             self.make_dir(folder_path)
