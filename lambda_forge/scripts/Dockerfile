@@ -1,6 +1,8 @@
 FROM python:3.9-slim
 
-COPY . .
+WORKDIR /lambdaforge
+
+COPY . /lambdaforge
 
 ENV NODE_VERSION=16.13.0
 RUN apt-get update \

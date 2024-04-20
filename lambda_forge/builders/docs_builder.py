@@ -29,7 +29,6 @@ class DocsConfig:
 """
         return self
 
-
     def with_lambda_stack(self):
         self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
         self.lambda_stack.insert(0, f"from docs.config import DocsConfig\n")

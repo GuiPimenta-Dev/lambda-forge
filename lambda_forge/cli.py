@@ -125,7 +125,7 @@ def create_project(
         .with_deploy_stage(not no_docs)
         .build()
     )
-    
+
     if not no_docs:
         DocsBuilder.a_doc().with_config().with_lambda_stack().build()
 

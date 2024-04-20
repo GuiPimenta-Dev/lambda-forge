@@ -132,6 +132,10 @@ setup(
 def install_all_layers():
     base_path = "layers"
 
+    if not os.path.exists(base_path):
+        print("No layers to install.")
+        return
+    
     for layer in _list_subfolders(base_path):
         _install_package_and_cleanup(layer, base_path)
         _remove_egg_info_directories(base_path)

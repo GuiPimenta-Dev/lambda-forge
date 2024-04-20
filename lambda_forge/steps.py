@@ -109,7 +109,9 @@ class Steps:
             cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             env=env,
             build_environment=codebuild.BuildEnvironment(
-                build_image=codebuild.LinuxBuildImage.from_docker_registry("211125768252.dkr.ecr.us-east-2.amazonaws.com/cdk-hnb659fds-container-assets-211125768252-us-east-2:latest"),
+                build_image=codebuild.LinuxBuildImage.from_docker_registry(
+                    "public.ecr.aws/x8r4y7j7/lambda-forge-generate-docs"
+                ),
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
                 environment_variables=env,
@@ -136,7 +138,14 @@ class Steps:
                         "codebuild:BatchPutCodeCoverages",
                     ],
                     resources=[report_group.report_group_arn],
-                )
+                ),
+                iam.PolicyStatement(
+    effect=iam.Effect.ALLOW,
+    actions=[
+        "ecr:*",
+    ],
+    resources=["*"],
+),
             ]
             + role_policy_statements,
         )
