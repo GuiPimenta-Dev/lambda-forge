@@ -1,9 +1,10 @@
 FROM python:3.9-slim
 
-WORKDIR /lambdaforge
+WORKDIR /lambda-forge
 
-COPY . /lambdaforge
+COPY . /lambda-forge
 
+# Install nvm with Node.js and npm
 ENV NODE_VERSION=16.13.0
 RUN apt-get update \
   && apt-get install -y curl jq 
@@ -16,20 +17,18 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
 
-# Install Node.js and npm
+# Install Node.js dependencies
 RUN apt-get update && apt-get install -y gnupg \
   && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
   && apt-get install -y nodejs graphviz \
   && apt-get clean && rm -rf /var/lib/apt/lists/* \ 
-  && npm install -g aws-cdk \ 
-  && npm install -g redoc-cli cdk-dia
+  && npm install -g aws-cdk redoc-cli cdk-dia
 
 # Install Python dependencies
 RUN pip install --upgrade pip \
-  && pip install pyyaml pytest-html coverage awscli\ 
-  && pip install -r requirements.txt \ 
+  && pip install pyyaml pytest-html coverage awscli boto3==1.33.2 botocore==1.33.2 \ 
+  && pip install -r base-requirements.txt \ 
   && pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/ --upgrade
-
 
 # Set environment variables
 ENV TRACK=true

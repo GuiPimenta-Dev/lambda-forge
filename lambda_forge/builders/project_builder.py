@@ -424,10 +424,9 @@ omit=
         self.pytest_ini = """[pytest]
 render_collapsed = all
 python_files = unit.py integration.py main.py
+norecursedirs = cdk.out
 markers =
     integration(method, endpoint): mark a test as an integration test.
-
-norecursedirs = cdk.out
 """
         return self
 
