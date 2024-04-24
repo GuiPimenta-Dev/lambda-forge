@@ -22,6 +22,8 @@ from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 from infra.stages.deploy import DeployStage
 from lambda_forge import context
+from infra.steps import Steps
+
 
 @context(stage="Dev", resources="dev")
 class DevStack(cdk.Stack):
@@ -47,9 +49,14 @@ class DevStack(cdk.Stack):
             ),
             pipeline_name=f"{context.stage}-{context.name}-Pipeline",
         )
+        
+        steps = Steps(self, context, source)
 
+        # post
+        swagger = steps.swagger()
+        redoc = steps.redoc()
 
-        pipeline.add_stage(DeployStage(self, context))
+        pipeline.add_stage(DeployStage(self, context), post=[swagger, redoc])
 """
         return self
 
@@ -60,7 +67,9 @@ from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 
 from infra.stages.deploy import DeployStage
-from lambda_forge import context, Steps
+from lambda_forge import context
+from infra.steps import Steps
+
 
 @context(stage="Staging", resources="staging")
 class StagingStack(cdk.Stack):
@@ -96,8 +105,11 @@ class StagingStack(cdk.Stack):
         validate_integration_tests = steps.validate_integration_tests()
 
         # post
-        generate_docs = steps.generate_docs()
+        redoc = steps.redoc()
+        swagger = steps.swagger()
         integration_tests = steps.run_integration_tests()
+        tests_report = steps.tests_report()
+        coverage_report = steps.coverage_report()
 
         pipeline.add_stage(
             DeployStage(self, context),
@@ -105,9 +117,15 @@ class StagingStack(cdk.Stack):
                 unit_tests,
                 coverage,
                 validate_integration_tests,
-                {"validate_docs" if self.docs else ""}
+                validate_docs,
             ],
-            post=[integration_tests{", generate_docs" if self.docs else ""}],
+            post=[
+                redoc,
+                swagger,
+                integration_tests,
+                tests_report,
+                coverage_report,
+            ],
         )
 """
         return self
@@ -119,13 +137,11 @@ from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 
 from infra.stages.deploy import DeployStage
-from lambda_forge import context, create_context, Steps
+from lambda_forge import context
+from infra.steps import Steps
 
-@context(
-    stage="Prod",
-    resources="prod",
-    staging=create_context(stage="Staging", resources="staging"),
-)
+
+@context(stage="Prod", resources="prod")
 class ProdStack(cdk.Stack):
     def __init__(self, scope: Construct, context, **kwargs) -> None:
         super().__init__(scope, f"{{context.stage}}-{{context.name}}-Stack", **kwargs)
@@ -150,34 +166,28 @@ class ProdStack(cdk.Stack):
             pipeline_name=f"{{context.stage}}-{{context.name}}-Pipeline",
         )
 
-        steps = Steps(self, context.staging, source)
+        steps = Steps(self, context, source)
 
         # pre
         unit_tests = steps.run_unit_tests()
-        coverage = steps.run_coverage()
-        validate_docs = steps.validate_docs()
-        validate_integration_tests = steps.validate_integration_tests()
-
-        # post
         integration_tests = steps.run_integration_tests()
 
-        pipeline.add_stage(
-            DeployStage(self, context.staging),
-            pre=[
-                unit_tests,
-                coverage,
-                validate_integration_tests,
-                {"validate_docs" if self.docs else ""}
-            ],
-            post=[integration_tests],
-        )
-
         # post
-        generate_docs = steps.generate_docs(stage=context.stage)
+        diagram = steps.diagram()
+        redoc = steps.redoc()
+        swagger = steps.swagger()
 
         pipeline.add_stage(
             DeployStage(self, context),
-            post=[{"generate_docs" if self.docs else ""}],
+            pre=[
+                unit_tests, 
+                integration_tests,
+            ],
+            post=[
+                diagram,
+                redoc,
+                swagger, 
+            ],
         )
 """
         return self
@@ -482,8 +492,7 @@ markers =
         self.cdk = json.dumps(cdk, indent=2)
         return self
 
-    def with_deploy_stage(self, enabled):
-        enabled = "" if enabled else ", enabled=False"
+    def with_deploy_stage(self):
         self.deploy_stage = f"""import aws_cdk as cdk
 from constructs import Construct
 

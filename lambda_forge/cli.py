@@ -122,7 +122,7 @@ def create_project(
         .with_pytest_ini()
         .with_coveragerc()
         .with_requirements()
-        .with_deploy_stage(not no_docs)
+        .with_deploy_stage()
         .build()
     )
 

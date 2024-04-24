@@ -18,7 +18,13 @@ class CodeBuild:
         partial_build_spec={},
         permissions=[],
         requirements="requirements.txt",
+        report_group=None,
     ):
+
+        if report_group:
+            group_build_spec, group_permissions = self.create_report_group(**report_group)
+            partial_build_spec.update(group_build_spec)
+            permissions.extend(group_permissions)
 
         PUBLIC_ECR = "public.ecr.aws/x8r4y7j7/lambda-forge:latest"
 
@@ -44,8 +50,8 @@ class CodeBuild:
             role_policy_statements=[*self.get_role_policy_statements(permissions)],
         )
 
-    def create_report_group(self, name, files, file_format, base_directory=".", coverage=False):
-        report_type = codebuild.ReportGroupType.CODE_COVERAGE if coverage else codebuild.ReportGroupType.TEST
+    def create_report_group(self, name, files, file_format, file_type, base_directory="."):
+        report_type = codebuild.ReportGroupType.CODE_COVERAGE if file_type == "coverage" else codebuild.ReportGroupType.TEST
         report_group = codebuild.ReportGroup(
             self.scope, f"{self.context.stage}-{self.context.name}-{name}", type=report_type
         )
