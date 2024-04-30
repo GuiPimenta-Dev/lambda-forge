@@ -356,6 +356,14 @@ def create_layer(name, description, install):
     default=30,
 )
 def live(function_name, timeout):
+    """
+    Starts a live development environment for the specified Lambda function.
+    
+    This command creates a live development environment for the specified Lambda function,
+    allowing you to test and debug the function in real-time with AWS IoT Core.
+    
+    The 'function_name' parameter must match the name of an existing Lambda function in the project.
+    """
     create_live_dev(function_name, timeout)
 
 
