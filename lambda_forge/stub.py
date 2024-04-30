@@ -83,7 +83,6 @@ class Stub:
         cert, private, ca = self.__create_certificates()
         temp_dir = tempfile.mkdtemp()
 
-
         current_dir = os.path.dirname(os.path.abspath(__file__))
         live = current_dir + "/live.py"
         files_to_copy = [live, cert, private, ca]
@@ -149,30 +148,26 @@ class Stub:
     def create_endpoint(self, function_arn, stub_name):
         self.logger.change_spinner_legend("Creating API Gateway Endpoint")
         root_id = self.rest_api["id"]
-        
-        all_resources = self.api_client.get_resources(restApiId=root_id)['items']
-        parent_id = next((resource['id'] for resource in all_resources if resource['path'] == '/'), None)
-        
-        urlpaths = self.urlpath.split('/')
+
+        all_resources = self.api_client.get_resources(restApiId=root_id)["items"]
+        parent_id = next((resource["id"] for resource in all_resources if resource["path"] == "/"), None)
+
+        urlpaths = self.urlpath.split("/")
         current_path = ""
-        
+
         for part in urlpaths:
             current_path += f"/{part}"
-            existing_resource = next((resource for resource in all_resources if resource['path'] == current_path), None)
-            
+            existing_resource = next((resource for resource in all_resources if resource["path"] == current_path), None)
+
             if not existing_resource:
-                resource = self.api_client.create_resource(
-                    restApiId=root_id, parentId=parent_id, pathPart=part
-                )
-                parent_id = resource['id']  
-                all_resources.append({'id': resource['id'], 'path': current_path})
+                resource = self.api_client.create_resource(restApiId=root_id, parentId=parent_id, pathPart=part)
+                parent_id = resource["id"]
+                all_resources.append({"id": resource["id"], "path": current_path})
             else:
-                parent_id = existing_resource['id']
-        
-        self.api_client.put_method(
-            restApiId=root_id, resourceId=parent_id, httpMethod="ANY", authorizationType="NONE"
-        )
-        
+                parent_id = existing_resource["id"]
+
+        self.api_client.put_method(restApiId=root_id, resourceId=parent_id, httpMethod="ANY", authorizationType="NONE")
+
         self.api_client.put_integration(
             restApiId=root_id,
             resourceId=parent_id,
@@ -181,10 +176,10 @@ class Stub:
             integrationHttpMethod="POST",
             uri=f"arn:aws:apigateway:{self.region}:lambda:path/2015-03-31/functions/{function_arn}/invocations",
         )
-        
+
         # Deploy the API
         self.api_client.create_deployment(restApiId=root_id, stageName="live")
-        
+
         # Set Lambda permissions
         self.lambda_client.add_permission(
             FunctionName=stub_name,
@@ -193,29 +188,31 @@ class Stub:
             Principal="apigateway.amazonaws.com",
             SourceArn=f"arn:aws:execute-api:{self.region}:{self.account}:{root_id}/*/*{current_path}",
         )
-    
+
     def delete_api_gateway_resources(self, function_name):
-        root_id = self.rest_api['id']
+        root_id = self.rest_api["id"]
         try:
-            function_arn = self.lambda_client.get_function(FunctionName=function_name)['Configuration']['FunctionArn']
+            function_arn = self.lambda_client.get_function(FunctionName=function_name)["Configuration"]["FunctionArn"]
         except self.lambda_client.exceptions.ResourceNotFoundException:
-            return            
+            return
 
         # Retrieve all resources
-        resources = self.api_client.get_resources(restApiId=root_id)['items']
+        resources = self.api_client.get_resources(restApiId=root_id)["items"]
 
         # Find all resources that are linked to the specific Lambda function
         linked_resources = []
         for resource in resources:
-            for method in resource.get('resourceMethods', {}).keys():
-                integration = self.api_client.get_integration(restApiId=root_id, resourceId=resource['id'], httpMethod=method)
-                if integration.get('uri', '').endswith(f"functions/{function_arn}/invocations"):
+            for method in resource.get("resourceMethods", {}).keys():
+                integration = self.api_client.get_integration(
+                    restApiId=root_id, resourceId=resource["id"], httpMethod=method
+                )
+                if integration.get("uri", "").endswith(f"functions/{function_arn}/invocations"):
                     linked_resources.append(resource)
 
         # Delete resources linked to Lambda, deepest first
-        for resource in sorted(linked_resources, key=lambda x: x['path'].count('/'), reverse=True):
+        for resource in sorted(linked_resources, key=lambda x: x["path"].count("/"), reverse=True):
             try:
-                self.api_client.delete_resource(restApiId=root_id, resourceId=resource['id'])
+                self.api_client.delete_resource(restApiId=root_id, resourceId=resource["id"])
             except Exception as e:
                 pass
         # Optionally delete the Lambda function

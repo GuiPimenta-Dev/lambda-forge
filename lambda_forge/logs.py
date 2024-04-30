@@ -4,6 +4,7 @@ import time
 import threading
 import pyfiglet
 
+
 class Logger:
     spinner = {"running": False, "legend": None}
     colors = {
@@ -56,18 +57,18 @@ class Logger:
 
     def lambda_forge_gradient_figlet(text):
         figlet_text = pyfiglet.figlet_format(text, width=200)
-        lines = figlet_text.split('\n')
-        
+        lines = figlet_text.split("\n")
+
         colors = [
             (244, 94, 172),  # Rose Bonbon
             (253, 205, 18),  # Mikado Yellow
             (22, 173, 175),  # Vivid Cerulean:
             (37, 171, 190),  # Light Sea Green
-            (0, 0, 0)        # Black
+            (0, 0, 0),  # Black
         ]
         max_len = max(len(line) for line in lines)
         for line in lines:
-            if line.strip():  
+            if line.strip():
                 print_line = ""
                 for i, char in enumerate(line):
                     num_colors = len(colors) - 1

@@ -13,6 +13,7 @@ data = json.load(open("cdk.json", "r"))
 region = data["context"]["region"]
 account = data["context"]["account"]
 
+
 def run_live(function_name, timeout):
 
     iot_client = boto3.client("iot", region_name=region)
@@ -22,7 +23,7 @@ def run_live(function_name, timeout):
 
     with open(os.devnull, "w") as devnull:
         subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT)
-    
+
     data = json.load(open("cdk.json", "r"))
     functions = data["context"]["functions"]
 
@@ -35,11 +36,11 @@ def run_live(function_name, timeout):
 
     for function in functions:
         if function["name"] == function_name:
-            urlpath = function.get("endpoint", function["name"].lower())            
+            urlpath = function.get("endpoint", function["name"].lower())
             stub = Stub(function["name"], region, timeout, iot_endpoint, account, urlpath)
             stub.delete_api_gateway_resources(stub_name)
             stub_url = stub.create_stub()
-         
+
             logger.log(f"\rEndpoint URL: {stub_url}", "cyan")
 
             current_dir = os.path.dirname(os.path.abspath(__file__))
