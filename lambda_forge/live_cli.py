@@ -13,7 +13,7 @@ data = json.load(open("cdk.json", "r"))
 region = data["context"]["region"]
 account = data["context"]["account"]
 
-def run_live(function_name, timeout, recreate):
+def run_live(function_name, timeout):
 
     lambda_client = boto3.client("lambda", region_name=region)
     iot_client = boto3.client("iot", region_name=region)
@@ -27,15 +27,15 @@ def run_live(function_name, timeout, recreate):
     data = json.load(open("cdk.json", "r"))
     functions = data["context"]["functions"]
 
-    function_names = [function["name"].lower() for function in functions]
-    if function_name.lower() not in function_names:
+    function_names = [function["name"] for function in functions]
+    if function_name not in function_names:
         logger.log(f"Function {function_name} Not Found", "red", 1, 1)
         exit()
 
     stub_name = f"{function_name}-Live"
 
     for function in functions:
-        if function["name"].lower() == function_name.lower():
+        if function["name"] == function_name:
             urlpath = function.get("endpoint", function["name"].lower())            
             stub = Stub(function["name"], region, timeout, iot_endpoint, account, urlpath)
             stub.delete_api_gateway_resources(stub_name)
