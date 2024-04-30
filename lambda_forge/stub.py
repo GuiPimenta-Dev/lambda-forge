@@ -150,30 +150,25 @@ class Stub:
         self.logger.change_spinner_legend("Creating API Gateway Endpoint")
         root_id = self.rest_api["id"]
         
-        # Get all existing resources
         all_resources = self.api_client.get_resources(restApiId=root_id)['items']
         parent_id = next((resource['id'] for resource in all_resources if resource['path'] == '/'), None)
         
-        # Split the path and create resources as necessary
-        urlpaths = self.urlpath.strip('/').split('/')
+        urlpaths = self.urlpath.split('/')
         current_path = ""
         
         for part in urlpaths:
             current_path += f"/{part}"
-            # Check if the current path segment exists
             existing_resource = next((resource for resource in all_resources if resource['path'] == current_path), None)
             
             if not existing_resource:
-                # Create a new resource for the segment
                 resource = self.api_client.create_resource(
                     restApiId=root_id, parentId=parent_id, pathPart=part
                 )
-                parent_id = resource['id']  # Update the parent ID for the next iteration
+                parent_id = resource['id']  
                 all_resources.append({'id': resource['id'], 'path': current_path})
             else:
                 parent_id = existing_resource['id']
         
-        # Create method and integration on the final resource
         self.api_client.put_method(
             restApiId=root_id, resourceId=parent_id, httpMethod="ANY", authorizationType="NONE"
         )
