@@ -355,7 +355,7 @@ def create_layer(name, description, install):
     help="Timeout in seconds for the function",
     default=30,
 )
-def live(function_name, timeout):
+def live_server(function_name, timeout):
     """
     Starts a live development environment for the specified Lambda function.
     
