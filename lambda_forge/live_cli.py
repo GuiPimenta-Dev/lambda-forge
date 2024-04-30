@@ -13,7 +13,7 @@ data = json.load(open("cdk.json", "r"))
 region = data["context"]["region"]
 account = data["context"]["account"]
 
-def run_live(function_name, timeout, urlpath, recreate):
+def run_live(function_name, timeout, recreate):
 
     lambda_client = boto3.client("lambda", region_name=region)
     iot_client = boto3.client("iot", region_name=region)
@@ -32,21 +32,16 @@ def run_live(function_name, timeout, urlpath, recreate):
         logger.log(f"Function {function_name} Not Found", "red", 1, 1)
         exit()
 
-    if recreate:
-        lambda_client.delete_function(FunctionName=f'{function_name}-Live')
-        logger.log(f"Function {function_name}-Live Deleted", "red", 1, 1)
+    stub_name = f"{function_name}-Live"
 
     for function in functions:
         if function["name"].lower() == function_name.lower():
-            try:
-                stub = lambda_client.get_function(FunctionName=f"{function['name']}-Live")
-                stub_url = stub["Configuration"]["Environment"]["Variables"]["API_URL"]
-            except lambda_client.exceptions.ResourceNotFoundException:
-                stub = Stub(function["name"], region, timeout, iot_endpoint, account, urlpath)
-                stub_url = stub.create_stub()
-
+            urlpath = function.get("endpoint", function["name"].lower())            
+            stub = Stub(function["name"], region, timeout, iot_endpoint, account, urlpath)
+            stub.delete_api_gateway_resources(stub_name)
+            stub_url = stub.create_stub()
+         
             logger.log(f"\rEndpoint URL: {stub_url}", "cyan")
-
 
             current_dir = os.path.dirname(os.path.abspath(__file__))
             subprocess.run(

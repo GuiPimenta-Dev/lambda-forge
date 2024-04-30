@@ -1,3 +1,4 @@
+import os
 import click
 
 from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
@@ -371,11 +372,6 @@ def create_layer(name, description, install):
     help="Timeout in seconds for the function",
     default=30,
 )
-# @click.option(
-#     "--urlpath",
-#     help="Endpoint URL path",
-#     default=None,
-# )
 @click.option(
     "--recreate",
     help="Recreate the Live function",
@@ -383,19 +379,15 @@ def create_layer(name, description, install):
     default=False,
 )
 def live(function_name, timeout, recreate):
-    urlpath = None
-    create_live_dev(function_name, timeout, urlpath, recreate)
+    create_live_dev(function_name, timeout, recreate)
 
 
-def create_live_dev(function_name, timeout, urlpath, recreate):
+def create_live_dev(function_name, timeout, recreate):
+    os.environ["JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION"] = "1"
     text = "Live Development"
     ascii_art = pyfiglet.figlet_format(text, width=200)
     logger.log(ascii_art, "green", 1)
-      
-    if urlpath is None:
-        urlpath = function_name.lower()
-
-    live_cli.run_live(function_name, timeout, urlpath, recreate)
+    live_cli.run_live(function_name, timeout, recreate)
 
 
 if __name__ == "__main__":
