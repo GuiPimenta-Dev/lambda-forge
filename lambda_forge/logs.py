@@ -2,7 +2,7 @@ import itertools
 import sys
 import time
 import threading
-
+import pyfiglet
 
 class Logger:
     spinner = {"running": False, "legend": None}
@@ -53,3 +53,38 @@ class Logger:
 
         if post_break_lines:
             print("\n" * post_break_lines)
+
+    def lambda_forge_gradient_figlet(text):
+        figlet_text = pyfiglet.figlet_format(text, width=200)
+        lines = figlet_text.split('\n')
+        
+        colors = [
+            (244, 94, 172),  # Rose Bonbon
+            (253, 205, 18),  # Mikado Yellow
+            (22, 173, 175),  # Vivid Cerulean:
+            (37, 171, 190),  # Light Sea Green
+            (0, 0, 0)        # Black
+        ]
+        max_len = max(len(line) for line in lines)
+        for line in lines:
+            if line.strip():  
+                print_line = ""
+                for i, char in enumerate(line):
+                    num_colors = len(colors) - 1
+                    color_index = int((i / max_len) * num_colors)
+                    next_color_index = min(color_index + 1, num_colors)
+                    factor = (i / max_len) * num_colors - color_index
+                    color = interpolate_color(colors[color_index], colors[next_color_index], factor)
+                    print_line += rgb_to_ansi(*color) + char
+                print(print_line + "\x1b[0m")
+            else:
+                print()
+
+            def rgb_to_ansi(r, g, b):
+                return f"\x1b[38;2;{r};{g};{b}m"
+
+            def interpolate_color(color1, color2, factor):
+                r = int(color1[0] + (color2[0] - color1[0]) * factor)
+                g = int(color1[1] + (color2[1] - color1[1]) * factor)
+                b = int(color1[2] + (color2[2] - color1[2]) * factor)
+                return (r, g, b)

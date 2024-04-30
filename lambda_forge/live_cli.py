@@ -15,7 +15,6 @@ account = data["context"]["account"]
 
 def run_live(function_name, timeout):
 
-    lambda_client = boto3.client("lambda", region_name=region)
     iot_client = boto3.client("iot", region_name=region)
 
     iot_endpoint = iot_client.describe_endpoint()["endpointAddress"]

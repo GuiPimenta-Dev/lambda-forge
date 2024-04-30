@@ -377,11 +377,11 @@ def live(function_name, timeout):
 
 
 def create_live_dev(function_name, timeout):
-    os.environ["JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION"] = "1"
     text = "Live Development"
     ascii_art = pyfiglet.figlet_format(text, width=200)
     logger.log(ascii_art, "green", 1)
     live_cli.run_live(function_name, timeout)
+
 
 
 if __name__ == "__main__":
