@@ -13,20 +13,13 @@ class CodeBuild:
         self,
         name,
         commands,
+        docker_registry="public.ecr.aws/x8r4y7j7/lambda-forge:latest",
         install_commands=[],
         env={},
         partial_build_spec={},
         permissions=[],
         requirements="requirements.txt",
-        report_group=None,
     ):
-
-        if report_group:
-            group_build_spec, group_permissions = self.create_report_group(**report_group)
-            partial_build_spec.update(group_build_spec)
-            permissions.extend(group_permissions)
-
-        PUBLIC_ECR = "public.ecr.aws/x8r4y7j7/lambda-forge:latest"
 
         return pipelines.CodeBuildStep(
             name,
@@ -40,7 +33,7 @@ class CodeBuild:
             env=env,
             commands=commands,
             build_environment=codebuild.BuildEnvironment(
-                build_image=codebuild.LinuxBuildImage.from_docker_registry(PUBLIC_ECR),
+                build_image=codebuild.LinuxBuildImage.from_docker_registry(docker_registry),
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
                 environment_variables=env,
@@ -49,37 +42,6 @@ class CodeBuild:
             cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
             role_policy_statements=[*self.get_role_policy_statements(permissions)],
         )
-
-    def create_report_group(self, name, files, file_format, file_type, base_directory="."):
-        report_type = codebuild.ReportGroupType.CODE_COVERAGE if file_type == "coverage" else codebuild.ReportGroupType.TEST
-        report_group = codebuild.ReportGroup(
-            self.scope, f"{self.context.stage}-{self.context.name}-{name}", type=report_type
-        )
-
-        report_group_build_spec = {
-            "reports": {
-                report_group.report_group_arn: {
-                    "files": files,
-                    "base-directory": base_directory,
-                    "file-format": file_format,
-                }
-            },
-        }
-
-        report_group_permissions = [
-            {
-                "actions": [
-                    "codebuild:CreateReportGroup",
-                    "codebuild:CreateReport",
-                    "codebuild:UpdateReport",
-                    "codebuild:BatchPutTestCases",
-                    "codebuild:BatchPutCodeCoverages",
-                ],
-                "resources": [report_group.report_group_arn],
-            }
-        ]
-
-        return report_group_build_spec, report_group_permissions
 
     @staticmethod
     def get_role_policy_statements(permissions):

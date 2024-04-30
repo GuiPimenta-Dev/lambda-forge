@@ -55,6 +55,7 @@ def track(func):
 def release(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
+        os.environ["JSII_SILENCE_WARNING_UNTESTED_NODE_VERSION"] = "1"
         should_track = check_track_env_variable()
         if not should_track:
             return func(*args, **kwargs)

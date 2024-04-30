@@ -1,9 +1,9 @@
 from aws_cdk import pipelines as pipelines
 
-from infra.steps.codebuild import CodeBuild
+from lambda_forge.codebuild import CodeBuild
 
 
-class Steps:
+class CodeBuildSteps:
     def __init__(self, scope, context, source):
         self.context = context
         self.codebuild = CodeBuild(scope, context, source)
@@ -18,33 +18,19 @@ class Steps:
             }
         ]
 
-    def run_unit_tests(self):
-        
-        report_group = {
-            "name": "UnitTestsReport",
-            "files": "test-results.xml",
-            "file_format": "JUNITXML",
-            "file_type": "test",
-        }
-        
+    def unit_tests(self, name="UnitTests", permissions=[]):
+
         return self.codebuild.create_step(
-            name="UnitTests",
+            name=name,
+            permissions=permissions,
             commands=['pytest --junitxml=test-results.xml -k "unit.py"'],
-            report_group=report_group,
         )
 
-    def run_coverage(self):
-        
-        report_group = {
-            "name": "CoverageReport",
-            "files": "coverage.xml",
-            "file_format": "COBERTURAXML",
-            "file_type": "coverage",
-        }
+    def coverage(self, name="Coverage", permissions=[]):
 
         return self.codebuild.create_step(
-            name="Coverage",
-            report_group=report_group,
+            name=name,
+            permissions=permissions,
             commands=[
                 'coverage run -m pytest -k "unit.py"',
                 f"coverage xml --fail-under={self.context.coverage}",
@@ -52,17 +38,17 @@ class Steps:
             ],
         )
 
-    def validate_docs(self):
-        
+    def validate_docs(self, name="ValidateDocs"):
+
         return self.codebuild.create_step(
-            name="ValidateDocs",
+            name=name,
             commands=["cdk synth", "python validate_docs.py"],
         )
 
-    def validate_integration_tests(self):
-        
+    def validate_integration_tests(self, name="ValidateIntegrationTests"):
+
         return self.codebuild.create_step(
-            name="ValidateIntegrationTests",
+            name=name,
             commands=[
                 "cdk synth",
                 "echo 'from additional_fixtures import *' >> conftest.py",
@@ -71,24 +57,17 @@ class Steps:
             ],
         )
 
-    def run_integration_tests(self):
-        
-        report_group = {
-            "name": "IntegrationTestsReport",
-            "files": "test-results.xml",
-            "file_format": "JUNITXML",
-            "file_type": "test",
-        }
+    def integration_tests(self, name="IntegrationTests", permissions=[]):
 
         return self.codebuild.create_step(
-            name="IntegrationTests",
-            report_group=report_group,
+            name=name,
+            permissions=permissions,
             commands=['pytest --junitxml=test-results.xml -k "integration.py"'],
         )
 
-    def swagger(self):
+    def swagger(self, name="Swagger"):
         return self.codebuild.create_step(
-            name="Swagger",
+            name=name,
             permissions=self.s3_permissions,
             commands=[
                 "cdk synth",
@@ -97,10 +76,10 @@ class Steps:
             ],
         )
 
-    def redoc(self):
+    def redoc(self, name="Redoc", permissions=[]):
         return self.codebuild.create_step(
-            name="Redoc",
-            permissions=self.s3_permissions,
+            name=name,
+            permissions=self.s3_permissions + permissions,
             commands=[
                 "cdk synth",
                 "python generate_redoc.py",
@@ -108,17 +87,17 @@ class Steps:
             ],
         )
 
-    def diagram(self):
+    def diagram(self, name="Diagram", permissions=[]):
         return self.codebuild.create_step(
-            name="Diagram",
-            permissions=self.s3_permissions,
+            name=name,
+            permissions=self.s3_permissions + permissions,
             commands=[
                 f"python generate_diagram.py {self.context.stage}",
                 f"aws s3 cp diagram.html s3://{self.bucket}/diagram.html",
             ],
         )
 
-    def wikis(self, wikis=[]):
+    def wikis(self, wikis, name="Wikis", permissions=[]):
         commands = []
         for wiki in wikis:
             file_path = wiki["file_path"]
@@ -128,15 +107,15 @@ class Steps:
             commands.append(f"aws s3 cp {title}.html s3://{self.bucket}/{title.lower()}.html")
 
         return self.codebuild.create_step(
-            name="Wikis",
-            permissions=self.s3_permissions,
+            name=name,
+            permissions=self.s3_permissions + permissions,
             commands=commands,
         )
 
-    def tests_report(self):
+    def tests_report(self, name="TestsReport", permissions=[]):
         return self.codebuild.create_step(
-            name="TestsReport",
-            permissions=self.s3_permissions,
+            name=name,
+            permissions=self.s3_permissions + permissions,
             commands=[
                 "echo 'from additional_fixtures import *' >> conftest.py",
                 "pytest --html=tests.html --self-contained-html || echo 'skipping failure'",
@@ -144,13 +123,35 @@ class Steps:
             ],
         )
 
-    def coverage_report(self):
+    def coverage_report(self, name="CoverageReport", permissions=[]):
         return self.codebuild.create_step(
-            name="CoverageReport",
-            permissions=self.s3_permissions,
+            name=name,
+            permissions=self.s3_permissions + permissions,
             commands=[
                 "coverage run -m pytest || echo 'skipping failure'",
                 "coverage html",
                 f"aws s3 cp htmlcov/index.html s3://{self.bucket}/coverage.html",
             ],
+        )
+
+    def custom_step(
+        self,
+        name,
+        commands,
+        permissions=[],
+        docker_registry="public.ecr.aws/x8r4y7j7/lambda-forge:latest",
+        install_commands=[],
+        env={},
+        partial_build_spec={},
+        requirements="requirements.txt",
+    ):
+        return self.codebuild.create_step(
+            name=name,
+            commands=commands,
+            docker_registry=docker_registry,
+            install_commands=install_commands,
+            partial_build_spec=partial_build_spec,
+            permissions=permissions,
+            requirements=requirements,
+            env=env,
         )

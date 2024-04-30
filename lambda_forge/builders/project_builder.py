@@ -21,9 +21,7 @@ from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 from infra.stages.deploy import DeployStage
-from lambda_forge import context
-from infra.steps import Steps
-
+from lambda_forge import context, CodeBuildSteps
 
 @context(stage="Dev", resources="dev")
 class DevStack(cdk.Stack):
@@ -50,7 +48,7 @@ class DevStack(cdk.Stack):
             pipeline_name=f"{context.stage}-{context.name}-Pipeline",
         )
         
-        steps = Steps(self, context, source)
+        steps = CodeBuildSteps(self, context, source)
 
         # post
         swagger = steps.swagger()
@@ -67,8 +65,7 @@ from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 
 from infra.stages.deploy import DeployStage
-from lambda_forge import context
-from infra.steps import Steps
+from lambda_forge import context, CodeBuildSteps
 
 
 @context(stage="Staging", resources="staging")
@@ -96,18 +93,18 @@ class StagingStack(cdk.Stack):
             pipeline_name=f"{{context.stage}}-{{context.name}}-Pipeline",
         )
 
-        steps = Steps(self, context, source)
+        steps = CodeBuildSteps(self, context, source)
 
         # pre
-        unit_tests = steps.run_unit_tests()
-        coverage = steps.run_coverage()
+        unit_tests = steps.unit_tests()
+        coverage = steps.coverage()
         validate_docs = steps.validate_docs()
         validate_integration_tests = steps.validate_integration_tests()
 
         # post
         redoc = steps.redoc()
         swagger = steps.swagger()
-        integration_tests = steps.run_integration_tests()
+        integration_tests = steps.integration_tests()
         tests_report = steps.tests_report()
         coverage_report = steps.coverage_report()
 
@@ -137,8 +134,7 @@ from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 
 from infra.stages.deploy import DeployStage
-from lambda_forge import context
-from infra.steps import Steps
+from lambda_forge import context, CodeBuildSteps
 
 
 @context(stage="Prod", resources="prod")
@@ -166,11 +162,11 @@ class ProdStack(cdk.Stack):
             pipeline_name=f"{{context.stage}}-{{context.name}}-Pipeline",
         )
 
-        steps = Steps(self, context, source)
+        steps = CodeBuildSteps(self, context, source)
 
         # pre
-        unit_tests = steps.run_unit_tests()
-        integration_tests = steps.run_integration_tests()
+        unit_tests = steps.unit_tests()
+        integration_tests = steps.integration_tests()
 
         # post
         diagram = steps.diagram()

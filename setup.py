@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambda_forge",
-    version="1.0.440",
+    version="1.0.495",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -15,6 +15,10 @@ setup(
         "coverage==7.2.3",
         "python-dotenv==1.0.1",
         "b-aws-websocket-api==2.0.0",
+        "requests==2.31.0",
+        "AWSIoTPythonSDK==1.5.4",
+        "awslambdaric==2.0.11",
+        "pyfiglet==1.0.2",
     ],
     include_package_data=True,
     package_data={
@@ -24,6 +28,7 @@ setup(
             "scaffold/*",
             "scaffold/**/**",
             "scaffold/**/**/*",
+            "resources/*",
         ],
     },
     author="Guilherme Alves Pimenta",

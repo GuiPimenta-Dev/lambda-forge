@@ -6,8 +6,11 @@ from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
-from lambda_forge import layers
+from lambda_forge import layers, live_cli
+from lambda_forge.logs import Logger
+import pyfiglet
 
+logger = Logger()
 
 @click.group()
 def forge():
@@ -24,14 +27,18 @@ def forge():
 @click.argument("name")
 @click.option("--repo-owner", help="Owner of the repository", required=True)
 @click.option("--repo-name", help="Repository name", required=True)
-@click.option("--no-dev", help="Do not create a dev environment", is_flag=True, default=False)
+@click.option(
+    "--no-dev", help="Do not create a dev environment", is_flag=True, default=False
+)
 @click.option(
     "--no-staging",
     help="Do not create a staging environment",
     is_flag=True,
     default=False,
 )
-@click.option("--no-prod", help="Do not create a prod environment", is_flag=True, default=False)
+@click.option(
+    "--no-prod", help="Do not create a prod environment", is_flag=True, default=False
+)
 @click.option(
     "--no-docs",
     help="Do not create documentation for the api endpoints",
@@ -75,7 +82,9 @@ def project(
     """
 
     if no_docs is False and not bucket:
-        raise click.UsageError("You must provide a S3 bucket for the docs or use the flag --no-docs")
+        raise click.UsageError(
+            "You must provide a S3 bucket for the docs or use the flag --no-docs"
+        )
 
     create_project(
         name,
@@ -133,11 +142,15 @@ def create_project(
 @forge.command()
 @click.argument("name")
 @click.option("--description", required=True, help="Description for the endpoint")
-@click.option("--method", required=False, help="HTTP method for the endpoint", default="GET")
+@click.option(
+    "--method", required=False, help="HTTP method for the endpoint", default="GET"
+)
 @click.option("--belongs-to", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-@click.option("--websocket", help="Function is going to be used for websockets", is_flag=True)
+@click.option(
+    "--websocket", help="Function is going to be used for websockets", is_flag=True
+)
 @click.option(
     "--no-tests",
     help="Do not create unit tests and integration tests files",
@@ -150,7 +163,9 @@ def create_project(
     is_flag=True,
     default=False,
 )
-def function(name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public):
+def function(
+    name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public
+):
     """
     Creates a Lambda function with a predefined structure and API Gateway integration.
 
@@ -160,7 +175,17 @@ def function(name, description, method, belongs_to, endpoint, no_api, websocket,
     An HTTP method must be provided if an API Gateway endpoint is not skipped.
     """
     method = method.upper() if method else None
-    create_function(name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public)
+    create_function(
+        name,
+        description,
+        method,
+        belongs_to,
+        endpoint,
+        no_api,
+        websocket,
+        no_tests,
+        public,
+    )
 
 
 def create_function(
@@ -175,7 +200,9 @@ def create_function(
     public=False,
 ):
 
-    function_builder = FunctionBuilder.a_function(name, description).with_config(belongs)
+    function_builder = FunctionBuilder.a_function(name, description).with_config(
+        belongs
+    )
 
     if no_api is True:
         function_builder = function_builder.with_main()
@@ -190,7 +217,11 @@ def create_function(
     else:
         endpoint = endpoint or belongs or name
         if no_tests is True:
-            function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
+            function_builder = (
+                function_builder.with_endpoint(endpoint)
+                .with_api(http_method, public)
+                .with_main()
+            )
         else:
             function_builder = (
                 function_builder.with_endpoint(endpoint)
@@ -245,7 +276,17 @@ def create_authorizer(name, description, default, no_tests):
 
 
 AVALABLE_SERVICES = sorted(
-    ["sns", "dynamo_db", "s3", "event_bridge", "sqs", "secrets_manager", "cognito", "kms", "websockets"]
+    [
+        "sns",
+        "dynamo_db",
+        "s3",
+        "event_bridge",
+        "sqs",
+        "secrets_manager",
+        "cognito",
+        "kms",
+        "websockets",
+    ]
 )
 
 
@@ -321,6 +362,40 @@ def create_layer(name, description, install):
 
     if install:
         layers.install_all_layers()
+
+
+@forge.command()
+@click.argument("function_name")
+@click.option(
+    "--timeout",
+    help="Timeout in seconds for the function",
+    default=30,
+)
+# @click.option(
+#     "--urlpath",
+#     help="Endpoint URL path",
+#     default=None,
+# )
+@click.option(
+    "--recreate",
+    help="Recreate the Live function",
+    is_flag=True,
+    default=False,
+)
+def live(function_name, timeout, recreate):
+    urlpath = None
+    create_live_dev(function_name, timeout, urlpath, recreate)
+
+
+def create_live_dev(function_name, timeout, urlpath, recreate):
+    text = "Live Development"
+    ascii_art = pyfiglet.figlet_format(text, width=200)
+    logger.log(ascii_art, "green", 1)
+      
+    if urlpath is None:
+        urlpath = function_name.lower()
+
+    live_cli.run_live(function_name, timeout, urlpath, recreate)
 
 
 if __name__ == "__main__":

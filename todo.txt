@@ -1,1 +1,0 @@
- inherit from cdk.Stack to avoid poassing self from the stack, add support for env variables, changing builds, etc.  This class has to be more customizable
