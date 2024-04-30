@@ -368,9 +368,11 @@ def live(function_name, timeout):
 
 
 def create_live_dev(function_name, timeout):
+    print("\033[H\033[J", end="")
+    os.system("clear")
     text = "Live Development"
     ascii_art = pyfiglet.figlet_format(text, width=200)
-    logger.log(ascii_art, "green", 1)
+    logger.log(ascii_art, "rose", 1)
     live_cli.run_live(function_name, timeout)
 
 

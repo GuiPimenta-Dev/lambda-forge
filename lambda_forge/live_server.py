@@ -31,10 +31,12 @@ client_id = uuid.uuid4()
 mqtt_client = AWSIoTMQTTClient(str(client_id))
 mqtt_client.configureEndpoint(args.iot_endpoint, 443)
 mqtt_client.configureCredentials(ca, private, cert)
-mqtt_client.connect()
-
-logger.log(f"Connection Established", "white", 1, 1)
-
+try:
+    mqtt_client.connect()
+    logger.log(f"Connection Established", "white", 1)
+except:
+    logger.log(f"Connection Failed", "red", 1)
+    exit()
 
 def process(event, context):
     log_request(event)
@@ -51,7 +53,9 @@ def message_callback(client, userdata, message):
     deserialized_data = pickle.loads(decoded_bytes)
 
     if message.topic == topic_request:
-        response_payload = process(deserialized_data["event"], deserialized_data["context"])
+        response_payload = process(
+            deserialized_data["event"], deserialized_data["context"]
+        )
         mqtt_client.publish(topic_response, json.dumps(response_payload), 0)
         log_response(response_payload)
 
@@ -115,15 +119,21 @@ def log_request(event):
         "X-Forwarded-Port",
         "X-Forwarded-Proto",
     ]
-    filtered_headers = {key: value for key, value in event["headers"].items() if key not in keys_to_remove}
+    filtered_headers = {
+        key: value
+        for key, value in event["headers"].items()
+        if key not in keys_to_remove
+    }
     event["headers"] = filtered_headers or None
-    logger.log(f"Request: ", "green", 2, 1)
-    logger.log(f"{json.dumps(event, indent=4)}", "green")
+
+    logger.log("------------------------ + ------------------------", "black", 1)
+    logger.log(f"Request: ", "black", 1, 1)
+    logger.log(f"{json.dumps(event, indent=4)}", "black")
 
 
 def log_response(response):
-    logger.log(f"Response: ", "yellow", 1, 1)
-    logger.log(f"{json.dumps(response, indent=4)}", "yellow", 0, 2)
+    logger.log(f"Response: ", "black", 1, 1)
+    logger.log(f"{json.dumps(response, indent=4)}", "black")
 
 
 watchdog_thread = threading.Thread(target=watchdog)

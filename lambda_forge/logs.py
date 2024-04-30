@@ -16,6 +16,9 @@ class Logger:
         "cyan": "\033[96m",
         "white": "\033[97m",
         "gray": "\033[90m",
+        "light-gray" : "\033[37m",
+        "rose": "\033[38;2;244;94;172m", 
+        "black": "\033[38;2;0;0;0m",      
     }
 
     def start_spinner(self):
