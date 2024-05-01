@@ -1,0 +1,153 @@
+ Compiled source #
+###################
+*.swp
+
+# Packages #
+############
+# It's generally good practice to exclude package lock files to prevent conflicts between different environments
+package-lock.json
+
+# Python bytecode #
+###################
+__pycache__/
+*.py[cod]
+
+# Pytest cache #
+################
+.pytest_cache/
+
+# Virtual Environment #
+#######################
+.venv/
+venv/
+env/
+
+# Distribution / packaging #
+############################
+*.egg-info/
+dist/
+build/
+
+# PyInstaller #
+##############
+# Usually, you don't track these files but depends on the project
+# If you're using PyInstaller, uncomment the next line
+# *.spec
+
+# Installer logs #
+##################
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports #
+################################
+htmlcov/
+.coverage
+.coverage.*
+.coverage_e2e
+cov.xml
+coverage.xml
+nosetests.xml
+junit.xml
+
+# Translations #
+################
+*.mo
+*.pot
+
+# Django stuff: #
+#################
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff: #
+################
+instance/
+.webassets-cache
+
+# Scrapy stuff: #
+#################
+.scrapy
+
+# Sphinx documentation #
+########################
+docs/_build/
+
+# PyBuilder #
+#############
+target/
+
+# Jupyter Notebook #
+####################
+.ipynb_checkpoints
+
+# pyenv #
+#########
+.python-version
+
+# celery beat schedule file #
+#############################
+celerybeat-schedule
+
+# SageMath parsed files #
+#########################
+*.sage.py
+
+# dotenv #
+##########
+.env
+
+# Spyder project settings #
+###########################
+.spyderproject
+.spyproject
+
+# Rope project settings #
+#########################
+.ropeproject
+
+# mkdocs documentation #
+########################
+/site
+
+# mypy #
+########
+.mypy_cache/
+
+# Databases #
+#############
+*.db
+*.sql
+*.sqlite
+
+# Backup files #
+################
+*.bak
+
+# If you're using IntelliJ products (e.g., PyCharm), you might want to ignore these #
+#####################################################################################
+.idea/
+*.iml
+
+# Visual Studio Code #
+######################
+.vscode/
+
+# CDK asset staging directory #
+###############################
+.cdk.staging
+cdk.out
+
+# Misc #
+#######
+.DS_Store
+
+# Documentation files #
+#######################
+docs.yaml
+
+# Coverage reports #
+####################
+coverage.xml

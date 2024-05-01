@@ -35,6 +35,7 @@ class Layers:
         return self
 
     def with_custom_layers(self, name, description):
+        self.make_dir("layers")
         description = description if description else ""
         layers_lines = self.read_lines("infra/services/layers.py")
 

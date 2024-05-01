@@ -14,15 +14,15 @@ def run_live(function_name, timeout):
     data = json.load(open("cdk.json", "r"))
     region = data["context"]["region"]
     account = data["context"]["account"]
-    
+
     if not region:
         logger.log("Region Not Found", "red", 1, 1)
         exit()
-    
+
     if not account:
         logger.log("Account Not Found", "red", 1, 1)
         exit()
-    
+
     iot_client = boto3.client("iot", region_name=region)
 
     iot_endpoint = iot_client.describe_endpoint()["endpointAddress"]

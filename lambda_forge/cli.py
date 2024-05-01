@@ -29,17 +29,15 @@ def forge():
 @click.argument("name")
 @click.option("--repo-owner", help="Owner of the repository", required=True)
 @click.option("--repo-name", help="Repository name", required=True)
-@click.option("--no-dev", help="Do not create a dev environment", is_flag=True, default=False)
-@click.option(
-    "--no-staging",
-    help="Do not create a staging environment",
-    is_flag=True,
-    default=False,
-)
-@click.option("--no-prod", help="Do not create a prod environment", is_flag=True, default=False)
 @click.option(
     "--no-docs",
     help="Do not create documentation for the api endpoints",
+    is_flag=True,
+    default=False,
+)
+@click.option(
+    "--minimal",
+    help="Minimal pipeline configuration",
     is_flag=True,
     default=False,
 )
@@ -62,10 +60,8 @@ def project(
     name,
     repo_owner,
     repo_name,
-    no_dev,
-    no_staging,
-    no_prod,
     no_docs,
+    minimal,
     region,
     bucket,
     coverage,
@@ -79,17 +75,15 @@ def project(
     Requires specifying a S3 bucket if API documentation is enabled.
     """
 
-    if no_docs is False and not bucket:
+    if minimal is False and no_docs is False and not bucket:
         raise click.UsageError("You must provide a S3 bucket for the docs or use the flag --no-docs")
 
     create_project(
         name,
         repo_owner,
         repo_name,
-        no_dev,
-        no_staging,
-        no_prod,
         no_docs,
+        minimal,
         region,
         bucket,
         coverage,
@@ -100,34 +94,18 @@ def create_project(
     name,
     repo_owner,
     repo_name,
-    no_dev,
-    no_staging,
-    no_prod,
     no_docs,
+    minimal,
     region,
     bucket,
     coverage,
 ):
 
-    project_builder = ProjectBuilder.a_project(name, not no_docs)
-
-    if no_dev is False:
-        project_builder = project_builder.with_dev()
-
-    if no_staging is False:
-        project_builder = project_builder.with_staging()
-
-    if no_prod is False:
-        project_builder = project_builder.with_prod()
+    project_builder = ProjectBuilder.a_project(name, no_docs, minimal)
 
     project_builder = (
-        project_builder.with_app()
+        project_builder
         .with_cdk(repo_owner, repo_name, region, bucket, coverage)
-        .with_gitignore()
-        .with_pytest_ini()
-        .with_coveragerc()
-        .with_requirements()
-        .with_deploy_stage()
         .build()
     )
 
@@ -358,10 +336,10 @@ def create_layer(name, description, install):
 def live_server(function_name, timeout):
     """
     Starts a live development environment for the specified Lambda function.
-    
+
     This command creates a live development environment for the specified Lambda function,
     allowing you to test and debug the function in real-time with AWS IoT Core.
-    
+
     The 'function_name' parameter must match the name of an existing Lambda function in the project.
     """
     create_live_dev(function_name, timeout)
@@ -374,6 +352,16 @@ def create_live_dev(function_name, timeout):
     ascii_art = pyfiglet.figlet_format(text, width=200)
     logger.log(ascii_art, "rose", 1)
     live_cli.run_live(function_name, timeout)
+
+
+@forge.command()
+def doc():
+    """
+    Creates a new doc template for the project.
+
+    This command generates a new doc template for the project, including Swagger, Redoc, Architecture Diagram, Tests Report, and Coverage Report.
+    """
+    DocsBuilder.a_doc().with_config().with_lambda_stack().build()
 
 
 if __name__ == "__main__":

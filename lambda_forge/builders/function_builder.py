@@ -143,6 +143,7 @@ def test_lambda_handler():
         return self
 
     def build(self):
+        self.make_dir("functions")
         if self.belongs:
             folder_path = self.join("functions", self.belongs, self.function_name)
             self.make_dir(folder_path)
