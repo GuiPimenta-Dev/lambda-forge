@@ -103,6 +103,7 @@ class Stub:
         return zip_file_path
 
     def __create_certificates(self):
+        self.logger.change_spinner_legend("Creating Certificates")
         cert_generator = CertificateGenerator()
         cert, private, ca = cert_generator.generate_certificate()
         return cert, private, ca
@@ -186,7 +187,7 @@ class Stub:
             StatementId=f"ApiGatewayAccess-{parent_id}",
             Action="lambda:InvokeFunction",
             Principal="apigateway.amazonaws.com",
-            SourceArn=f"arn:aws:execute-api:{self.region}:{self.account}:{root_id}/*/*{current_path}",
+            SourceArn=f"arn:aws:execute-api:{self.region}:{self.account}:{root_id}/*/*",
         )
 
     def delete_api_gateway_resources(self, function_name):
