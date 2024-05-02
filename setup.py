@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="lambda_forge",
-    version="1.0.579",
+    version="1.0.604",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -19,6 +19,7 @@ setup(
         "AWSIoTPythonSDK==1.5.4",
         "awslambdaric==2.0.11",
         "pyfiglet==1.0.2",
+        "inquirerpy==0.3.4",
     ],
     include_package_data=True,
     package_data={
@@ -26,6 +27,8 @@ setup(
             "builders/*",
             "builders/**/*",
             "scaffold/*",
+            "scaffold/.gitignore",
+            "scaffold/.coveragerc",
             "scaffold/**/**",
             "scaffold/**/**/*",
             "resources/*",

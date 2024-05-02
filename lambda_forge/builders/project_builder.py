@@ -12,8 +12,7 @@ class ProjectBuilder(FileService):
         self.no_docs = no_docs
         self.minimal = minimal
 
-
-    def with_cdk(self, repo_owner, repo_name, region, bucket, coverage):
+    def with_cdk(self, repo_owner, repo_name, account, region, bucket, coverage):
         cdk = {
             "app": "python3 app.py",
             "watch": {
@@ -50,7 +49,7 @@ class ProjectBuilder(FileService):
                 "@aws-cdk/aws-route53-patters:useCertificate": True,
                 "@aws-cdk/customresources:installLatestAwsSdkDefault": False,
                 "region": region,
-                "account": "",
+                "account": account,
                 "name": self.name.title().replace("_", "-").replace(" ", "-"),
                 "repo": {"owner": repo_owner, "name": repo_name},
                 "bucket": bucket,
@@ -62,12 +61,11 @@ class ProjectBuilder(FileService):
         if self.minimal is False:
             cdk["context"]["dev"] = {"arns": {}}
             cdk["context"]["staging"] = {"arns": {}}
-        
+
         cdk["context"]["prod"] = {"arns": {}}
 
         self.cdk = json.dumps(cdk, indent=2)
         return self
-
 
     def build(self):
         self.copy_folders("lambda_forge", "scaffold", "")
@@ -86,5 +84,5 @@ class ProjectBuilder(FileService):
                 self.copy_file("lambda_forge", "stacks/default/prod_stack.py", "infra/stacks/prod_stack.py")
                 self.copy_file("lambda_forge", "stacks/default/dev_stack.py", "infra/stacks/dev_stack.py")
                 self.copy_file("lambda_forge", "stacks/default/staging_stack.py", "infra/stacks/staging_stack.py")
-                
+
         self.make_file("", "cdk.json", self.cdk)

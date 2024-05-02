@@ -28,8 +28,12 @@ def run_live(function_name, timeout):
     iot_endpoint = iot_client.describe_endpoint()["endpointAddress"]
     iot_endpoint = iot_endpoint.replace(".iot.", "-ats.iot.")
 
-    with open(os.devnull, "w") as devnull:
-        subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT)
+    try:
+        with open(os.devnull, "w") as devnull:
+            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+    except Exception as e:
+        logger.log(str(e), "red", 1, 1)
+        exit()
 
     data = json.load(open("cdk.json", "r"))
     functions = data["context"]["functions"]

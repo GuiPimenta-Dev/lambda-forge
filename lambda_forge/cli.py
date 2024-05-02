@@ -1,4 +1,5 @@
 import os
+import re
 import click
 
 from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
@@ -10,6 +11,8 @@ from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge import layers, live_cli
 from lambda_forge.logs import Logger
 import pyfiglet
+from InquirerPy import inquirer
+
 
 logger = Logger()
 
@@ -26,9 +29,9 @@ def forge():
 
 
 @forge.command()
-@click.argument("name")
-@click.option("--repo-owner", help="Owner of the repository", required=True)
-@click.option("--repo-name", help="Repository name", required=True)
+@click.option("--name", help="Project name")
+@click.option("--repo-owner", help="Owner of the repository")
+@click.option("--repo-name", help="Repository name")
 @click.option(
     "--no-docs",
     help="Do not create documentation for the api endpoints",
@@ -37,14 +40,19 @@ def forge():
 )
 @click.option(
     "--minimal",
-    help="Minimal pipeline configuration",
+    help="Minimal project configuration",
     is_flag=True,
     default=False,
 )
 @click.option(
+    "--account",
+    help="AWS account to deploy the project",
+    default="",
+)
+@click.option(
     "--region",
     help="AWS region to deploy the project",
-    default="us-east-2",
+    default="",
 )
 @click.option(
     "--bucket",
@@ -62,6 +70,7 @@ def project(
     repo_name,
     no_docs,
     minimal,
+    account,
     region,
     bucket,
     coverage,
@@ -75,8 +84,44 @@ def project(
     Requires specifying a S3 bucket if API documentation is enabled.
     """
 
-    if minimal is False and no_docs is False and not bucket:
-        raise click.UsageError("You must provide a S3 bucket for the docs or use the flag --no-docs")
+    if not name:
+        name = click.prompt("Project Name", type=str)
+
+    if not repo_owner:
+        repo_owner = click.prompt("Repository Owner", type=str)
+
+    if not repo_name:
+        repo_name = click.prompt("Repository Name", type=str)
+
+    if not account:
+        while True:
+            account_id = click.prompt("Enter AWS Account ID", type=str)
+            if re.match(r'^\d{12}$', account_id):
+                break
+            else:
+                logger.log("Invalid Account ID. Must be a 12-digit number.", "red")
+
+        
+    if not region:
+        region = click.prompt("AWS Region", type=str, default="us-east-2")
+
+    if not bucket and not no_docs and not minimal:
+        options = ["Default", "Default - No Docs", "Minimal"]
+
+        choice = inquirer.select(
+            message="Select a Project Template:",
+            choices=options,
+            default="Default",
+            validate=lambda result: result != None,
+        ).execute()
+
+        if choice == options[0]:
+            bucket = click.prompt("S3 Bucket Name", type=str)
+        elif choice == options[1]:
+            no_docs = True
+        elif choice == options[2]:
+            minimal = True
+            no_docs = True
 
     create_project(
         name,
@@ -84,6 +129,7 @@ def project(
         repo_name,
         no_docs,
         minimal,
+        account,
         region,
         bucket,
         coverage,
@@ -96,6 +142,7 @@ def create_project(
     repo_name,
     no_docs,
     minimal,
+    account,
     region,
     bucket,
     coverage,
@@ -103,11 +150,7 @@ def create_project(
 
     project_builder = ProjectBuilder.a_project(name, no_docs, minimal)
 
-    project_builder = (
-        project_builder
-        .with_cdk(repo_owner, repo_name, region, bucket, coverage)
-        .build()
-    )
+    project_builder = project_builder.with_cdk(repo_owner, repo_name, account, region, bucket, coverage).build()
 
     if not no_docs:
         DocsBuilder.a_doc().with_config().with_lambda_stack().build()
