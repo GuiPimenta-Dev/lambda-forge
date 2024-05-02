@@ -11,8 +11,7 @@ from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge import layers, live_cli
 from lambda_forge.logs import Logger
 import pyfiglet
-from InquirerPy import inquirer
-
+from InquirerPy import inquirer, get_style
 
 logger = Logger()
 
@@ -84,39 +83,76 @@ def project(
     Requires specifying a S3 bucket if API documentation is enabled.
     """
 
+    print("\033[H\033[J", end="")
+    os.system("clear")
+    text = "New Project"
+    ascii_art = pyfiglet.figlet_format(text, width=200)
+    logger.log(ascii_art, "rose", 1)
+
     if not name:
-        name = click.prompt("Project Name", type=str)
+        click.echo()
+        style = click.style('Project Name', fg=(37, 171, 190))
+        name = click.prompt(style, type=str)
 
     if not repo_owner:
-        repo_owner = click.prompt("Repository Owner", type=str)
+        click.echo()
+        style = click.style('Repository Owner', fg=(37, 171, 190))
+        repo_owner = click.prompt(style, type=str)
 
     if not repo_name:
-        repo_name = click.prompt("Repository Name", type=str)
+        click.echo()
+        style = click.style('Repository Name', fg=(37, 171, 190))
+        repo_name = click.prompt(style, type=str)
 
-    if not account:
+    if account:
+        click.echo()
+        if not re.match(r"^\d{12}$", account):
+            logger.log("Invalid Account ID. Must be a 12-digit number.", "red")
+            return
+    else:
         while True:
-            account_id = click.prompt("Enter AWS Account ID", type=str)
-            if re.match(r'^\d{12}$', account_id):
+            click.echo()
+            style = click.style('AWS Account ID', fg=(37, 171, 190))
+            account = click.prompt(style, type=str)
+            if re.match(r"^\d{12}$", account):
                 break
             else:
+                click.echo()
                 logger.log("Invalid Account ID. Must be a 12-digit number.", "red")
 
-        
+
     if not region:
-        region = click.prompt("AWS Region", type=str, default="us-east-2")
+        click.echo()
+        style = click.style('AWS Region', fg=(37, 171, 190))
+        region = click.prompt(style, type=str, default="us-east-2")
 
     if not bucket and not no_docs and not minimal:
-        options = ["Default", "Default - No Docs", "Minimal"]
+        click.echo()
 
+        options = ["Multi-Stage", "Multi-Stage / No Docs", "Minimal"]
+        style = get_style(
+            {
+                "questionmark": "#25ABBE",
+                "input": "#25ABBE",
+                "pointer": "#25ABBE",
+                "question": "#25ABBE",
+                "answered_question": "#25ABBE",
+                "pointer": "#25ABBE",
+                "answer": "white",
+                "answermark": "#25ABBE",
+            },
+            style_override=True,
+        )
         choice = inquirer.select(
             message="Select a Project Template:",
+            style=style,
             choices=options,
-            default="Default",
-            validate=lambda result: result != None,
         ).execute()
 
         if choice == options[0]:
-            bucket = click.prompt("S3 Bucket Name", type=str)
+            click.echo()
+            style = click.style('S3 Bucket', fg=(37, 171, 190))
+            bucket = click.prompt(style, type=str)
         elif choice == options[1]:
             no_docs = True
         elif choice == options[2]:
