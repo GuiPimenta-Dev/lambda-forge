@@ -91,17 +91,17 @@ def project(
 
     if not name:
         click.echo()
-        style = click.style('Project Name', fg=(37, 171, 190))
+        style = click.style("Project Name", fg=(37, 171, 190))
         name = click.prompt(style, type=str)
 
     if not repo_owner:
         click.echo()
-        style = click.style('Repository Owner', fg=(37, 171, 190))
+        style = click.style("Repository Owner", fg=(37, 171, 190))
         repo_owner = click.prompt(style, type=str)
 
     if not repo_name:
         click.echo()
-        style = click.style('Repository Name', fg=(37, 171, 190))
+        style = click.style("Repository Name", fg=(37, 171, 190))
         repo_name = click.prompt(style, type=str)
 
     if account:
@@ -112,7 +112,7 @@ def project(
     else:
         while True:
             click.echo()
-            style = click.style('AWS Account ID', fg=(37, 171, 190))
+            style = click.style("AWS Account ID", fg=(37, 171, 190))
             account = click.prompt(style, type=str)
             if re.match(r"^\d{12}$", account):
                 break
@@ -120,10 +120,9 @@ def project(
                 click.echo()
                 logger.log("Invalid Account ID. Must be a 12-digit number.", "red")
 
-
     if not region:
         click.echo()
-        style = click.style('AWS Region', fg=(37, 171, 190))
+        style = click.style("AWS Region", fg=(37, 171, 190))
         region = click.prompt(style, type=str, default="us-east-2")
 
     if not bucket and not no_docs and not minimal:
@@ -149,10 +148,11 @@ def project(
             choices=options,
         ).execute()
 
+        click.echo()
         if choice == options[0]:
-            click.echo()
-            style = click.style('S3 Bucket', fg=(37, 171, 190))
+            style = click.style("S3 Bucket", fg=(37, 171, 190))
             bucket = click.prompt(style, type=str)
+            click.echo()
         elif choice == options[1]:
             no_docs = True
         elif choice == options[2]:
@@ -405,6 +405,13 @@ def create_layer(name, description, install):
         layers.install_all_layers()
 
 
+AVAILABLE_TRIGGERS = sorted(
+    [
+        "api_gateway",
+    ]
+)
+
+
 @forge.command()
 @click.argument("function_name")
 @click.option(
@@ -412,7 +419,13 @@ def create_layer(name, description, install):
     help="Timeout in seconds for the function",
     default=30,
 )
-def live_server(function_name, timeout):
+@click.option(
+    "--trigger",
+    help="Start the trigger for the function",
+    type=click.Choice(AVAILABLE_TRIGGERS),
+    default="api_gateway",
+)
+def live_server(function_name, timeout, trigger):
     """
     Starts a live development environment for the specified Lambda function.
 
@@ -421,16 +434,16 @@ def live_server(function_name, timeout):
 
     The 'function_name' parameter must match the name of an existing Lambda function in the project.
     """
-    create_live_dev(function_name, timeout)
+    create_live_dev(function_name, timeout, trigger)
 
 
-def create_live_dev(function_name, timeout):
+def create_live_dev(function_name, timeout, trigger):
     print("\033[H\033[J", end="")
     os.system("clear")
     text = "Live Development"
     ascii_art = pyfiglet.figlet_format(text, width=200)
     logger.log(ascii_art, "rose", 1)
-    live_cli.run_live(function_name, timeout)
+    live_cli.run_live(function_name, timeout, trigger)
 
 
 @forge.command()

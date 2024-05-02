@@ -44,5 +44,5 @@
 import click
 
 click.echo()
-style = click.style('Repository Name', fg=(0, 255, 255))
+style = click.style("Repository Name", fg=(0, 255, 255))
 repo_name = click.prompt(style, type=str)

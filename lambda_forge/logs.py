@@ -21,8 +21,9 @@ class Logger:
         "black": "\033[38;2;0;0;0m",
     }
 
-    def start_spinner(self):
+    def start_spinner(self, legend):
         self.spinner["running"] = True
+        self.spinner["legend"] = legend
         spinner_thread = threading.Thread(target=self.spinner_task)
         spinner_thread.start()
 

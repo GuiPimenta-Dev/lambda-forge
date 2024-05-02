@@ -3,14 +3,15 @@ import os
 import subprocess
 
 import boto3
+from lambda_forge.live_apigtw import LiveApiGtw
 from lambda_forge.logs import Logger
-from lambda_forge.stub import Stub
+from lambda_forge.live_lambda import LiveLambda
 
 
 logger = Logger()
 
 
-def run_live(function_name, timeout):
+def run_live(function_name, timeout, trigger):
     data = json.load(open("cdk.json", "r"))
     region = data["context"]["region"]
     account = data["context"]["account"]
@@ -24,7 +25,6 @@ def run_live(function_name, timeout):
         exit()
 
     iot_client = boto3.client("iot", region_name=region)
-
     iot_endpoint = iot_client.describe_endpoint()["endpointAddress"]
     iot_endpoint = iot_endpoint.replace(".iot.", "-ats.iot.")
 
@@ -48,11 +48,13 @@ def run_live(function_name, timeout):
     for function in functions:
         if function["name"] == function_name:
             urlpath = function.get("endpoint", function["name"].lower())
-            stub = Stub(function["name"], region, timeout, iot_endpoint, account, urlpath)
-            stub.delete_api_gateway_resources(stub_name)
-            stub_url = stub.create_stub()
+            live_lambda = LiveLambda(function["name"], region, timeout, iot_endpoint, account, urlpath)
+            function_arn = live_lambda.create_lambda()
 
-            logger.log(f"\rEndpoint URL: {stub_url}", "cyan")
+            if trigger == "api_gateway":
+                live_apigtw = LiveApiGtw(account, region, urlpath, logger)
+                endpoint = live_apigtw.create_endpoint(function_arn, stub_name)
+                logger.log(f"\rEndpoint URL: {endpoint}", "cyan")
 
             current_dir = os.path.dirname(os.path.abspath(__file__))
             subprocess.run(
