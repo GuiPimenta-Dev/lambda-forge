@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import click
@@ -9,6 +10,7 @@ from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge import layers, live_cli
+from lambda_forge.live_sns import LiveSNS
 from lambda_forge.logs import Logger
 import pyfiglet
 from InquirerPy import inquirer, get_style
@@ -405,11 +407,7 @@ def create_layer(name, description, install):
         layers.install_all_layers()
 
 
-AVAILABLE_TRIGGERS = sorted(
-    [
-        "api_gateway",
-    ]
-)
+AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns"])
 
 
 @forge.command()
@@ -444,6 +442,36 @@ def create_live_dev(function_name, timeout, trigger):
     ascii_art = pyfiglet.figlet_format(text, width=200)
     logger.log(ascii_art, "rose", 1)
     live_cli.run_live(function_name, timeout, trigger)
+
+
+@forge.command()
+@click.argument("service", type=click.Choice(AVALABLE_SERVICES))
+def trigger(service):
+    """
+    Triggers the specified AWS service integration.
+
+    This command triggers the specified AWS service integration, allowing you to test the service's functionality within the Lambda project.
+
+    The 'service' parameter must match the name of an existing AWS service integration in the project.
+    """
+    print("\033[H\033[J", end="")
+    os.system("clear")
+    text = f"Trigger {service.upper()}"
+    ascii_art = pyfiglet.figlet_format(text, width=200)
+    logger.log(ascii_art, "rose", 1)
+
+    data = json.load(open("cdk.json", "r"))
+    region = data["context"].get("region")
+
+    if not region:
+        logger.log("Region Not Found", "red", 1, 1)
+        exit()
+
+    while True:
+        click.echo()
+
+        if service == "sns":
+            LiveSNS(region, logger).publish()
 
 
 @forge.command()

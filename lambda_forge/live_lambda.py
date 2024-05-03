@@ -5,14 +5,11 @@ import time
 import boto3
 import tempfile
 import zipfile
-from lambda_forge.live_apigtw import LiveApiGtw
-from lambda_forge.logs import Logger
-
 from lambda_forge.certificates import CertificateGenerator
 
 
 class LiveLambda:
-    def __init__(self, function_name, region, timeout, iot_endpoint, account, urlpath) -> None:
+    def __init__(self, function_name, region, timeout, iot_endpoint, account, urlpath, logger) -> None:
         self.function_name = function_name
         self.region = region
         self.timeout = timeout
@@ -21,12 +18,11 @@ class LiveLambda:
         self.urlpath = urlpath.strip("/")
         self.iam_client = boto3.client("iam", region_name=self.region)
         self.lambda_client = boto3.client("lambda", region_name=self.region)
-        self.logger = Logger()
+        self.logger = logger
 
     def create_lambda(self):
         stub_name = f"{self.function_name}-Live"
         self.__delete_lambda(stub_name)
-        self.logger.start_spinner(f"Creating Function {stub_name}")
         role = self.__create_role()
         zip_file_name = self.__zip_lambda()
         layer_arn = self.__create_layer()
@@ -50,7 +46,6 @@ class LiveLambda:
                 },
                 Layers=[layer_arn],
             )
-            self.logger.stop_spinner()
             function_arn = response["FunctionArn"]
             return function_arn
 
@@ -68,7 +63,7 @@ class LiveLambda:
         zip_file_name = f"{self.function_name}.zip"
         zip_file_path = os.path.join(temp_dir, zip_file_name)
         with zipfile.ZipFile(zip_file_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            for root, dirs, files in os.walk(temp_dir):
+            for root, _, files in os.walk(temp_dir):
                 for file in files:
                     zipf.write(
                         os.path.join(root, file),

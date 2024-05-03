@@ -9,6 +9,8 @@ from lambda_forge.certificates import CertificateGenerator
 import argparse
 import importlib
 import threading
+from lambda_forge.live_apigtw import LiveApiGtw
+from lambda_forge.live_sns import LiveSNS
 from lambda_forge.logs import Logger
 
 logger = Logger()
@@ -17,6 +19,7 @@ parser = argparse.ArgumentParser(description="Process some integers.")
 parser.add_argument("function_name", type=str)
 parser.add_argument("file_path", type=str)
 parser.add_argument("iot_endpoint", type=str)
+parser.add_argument("trigger", type=str)
 
 args = parser.parse_args()
 
@@ -81,45 +84,8 @@ def watchdog():
 
 def log_request(event):
     event = event.copy()
-    event.pop("multiValueHeaders", None)
-    event.pop("resource", None)
-    event.pop("path", None)
-    event.pop("multiValueQueryStringParameters", None)
-    event.pop("stageVariables", None)
-    event.pop("requestContext", None)
-    event.pop("isBase64Encoded", None)
-    keys_to_remove = [
-        "Accept",
-        "Accept-Encoding",
-        "Accept-Language",
-        "cache-control",
-        "CloudFront-Forwarded-Proto",
-        "CloudFront-Is-Desktop-Viewer",
-        "CloudFront-Is-Mobile-Viewer",
-        "CloudFront-Is-SmartTV-Viewer",
-        "CloudFront-Is-Tablet-Viewer",
-        "CloudFront-Viewer-ASN",
-        "CloudFront-Viewer-Country",
-        "Host",
-        "priority",
-        "sec-ch-ua",
-        "sec-ch-ua-mobile",
-        "sec-ch-ua-platform",
-        "sec-fetch-dest",
-        "sec-fetch-mode",
-        "sec-fetch-site",
-        "sec-fetch-user",
-        "upgrade-insecure-requests",
-        "User-Agent",
-        "Via",
-        "X-Amz-Cf-Id",
-        "X-Amzn-Trace-Id",
-        "X-Forwarded-For",
-        "X-Forwarded-Port",
-        "X-Forwarded-Proto",
-    ]
-    filtered_headers = {key: value for key, value in event["headers"].items() if key not in keys_to_remove}
-    event["headers"] = filtered_headers or None
+    if args.trigger == "api_gateway":
+        event = LiveApiGtw.parse_logs(event)
 
     logger.log("------------------------ + ------------------------", "black", 1)
     logger.log(f"Request: ", "black", 1, 1)
