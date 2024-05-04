@@ -87,14 +87,17 @@ def log_request(event):
     if args.trigger == "api_gateway":
         event = LiveApiGtw.parse_logs(event)
 
-    logger.log("------------------------ + ------------------------", "black", 1)
-    logger.log(f"Request: ", "black", 1, 1)
-    logger.log(f"{json.dumps(event, indent=4)}", "black")
+    if args.trigger == "sns":
+        event = LiveSNS.parse_logs(event)
+
+    logger.log("------------------------ + ------------------------", "gray", 1)
+    logger.log(f"Request: ", "white", 1, 1)
+    logger.log(f"{json.dumps(event, indent=4)}", "white")
 
 
 def log_response(response):
-    logger.log(f"Response: ", "black", 1, 1)
-    logger.log(f"{json.dumps(response, indent=4)}", "black")
+    logger.log(f"Response: ", "white", 1, 1)
+    logger.log(f"{json.dumps(response, indent=4)}", "white")
 
 
 watchdog_thread = threading.Thread(target=watchdog)

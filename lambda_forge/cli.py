@@ -445,8 +445,18 @@ def create_live_dev(function_name, timeout, trigger):
 
 
 @forge.command()
-@click.argument("service", type=click.Choice(AVALABLE_SERVICES))
-def trigger(service):
+@click.argument("service", type=click.Choice(AVAILABLE_TRIGGERS))
+@click.option(
+    "--sns-subject",
+    help="SNS Subject",
+    default={},
+)
+@click.option(
+    "--sns-msg-attributes",
+    help="SNS Message Attributes",
+    default={},
+)
+def trigger(service, sns_subject, sns_msg_attributes):
     """
     Triggers the specified AWS service integration.
 
@@ -469,9 +479,8 @@ def trigger(service):
 
     while True:
         click.echo()
-
         if service == "sns":
-            LiveSNS(region, logger).publish()
+            LiveSNS(region, logger).publish(sns_subject, sns_msg_attributes)
 
 
 @forge.command()
