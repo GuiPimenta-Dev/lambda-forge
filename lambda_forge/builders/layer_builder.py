@@ -1,6 +1,5 @@
 from lambda_forge.builders.file_service import FileService
 
-
 class LayerBuilder(FileService):
     @staticmethod
     def a_layer():
@@ -32,6 +31,20 @@ class Layers:
                 "self.layers = Layers(scope)",
             )
 
+        return self
+
+    def with_external_layers(self, name, arn):
+        self.make_dir("layers")
+        layers_lines = self.read_lines("infra/services/layers.py")
+
+        layers_lines.append(f"\n")
+        layers_lines.append(f"        self.{name}_layer = _lambda.LayerVersion.from_layer_version_arn(\n")
+        layers_lines.append(f"            scope,\n")
+        layers_lines.append(f"            id='{name.title().replace('_','')}Layer',\n")
+        layers_lines.append(f"            layer_version_arn='{arn}',\n")
+        layers_lines.append("         )\n")
+
+        self.write_lines("infra/services/layers.py", layers_lines)
         return self
 
     def with_custom_layers(self, name, description):

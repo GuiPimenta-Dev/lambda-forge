@@ -21,16 +21,17 @@ class Logger:
         "black": "\033[38;2;0;0;0m",
     }
 
-    def start_spinner(self, legend):
+    def start_spinner(self, legend, color="white"):
         self.spinner["running"] = True
         self.spinner["legend"] = legend
-        spinner_thread = threading.Thread(target=self.spinner_task)
+        color = self.colors[color]
+        spinner_thread = threading.Thread(target=self.spinner_task, args=(color,))
         spinner_thread.start()
 
-    def spinner_task(self):
+    def spinner_task(self, color="white"):
         spinner_symbols = itertools.cycle(["-", "\\", "|", "/"])
         while self.spinner["running"]:
-            sys.stdout.write(f"\r{next(spinner_symbols)}   {self.spinner['legend']}")
+            sys.stdout.write(f"\r{color}{next(spinner_symbols)}   {self.spinner['legend']}\033[0m")
             sys.stdout.flush()
             time.sleep(0.1)
 

@@ -375,15 +375,24 @@ def create_service(service):
     help="Name of the custom layer to create",
 )
 @click.option(
+    "--external",
+    help="Name of the external layer to create",
+)
+@click.option(
     "--description",
     help="Layer description",
+)
+@click.option(
+    "--requirements",
+    help="Requirements file to install the lib",
+    default="requirements.txt"
 )
 @click.option(
     "--install",
     help="Install all custom layers locally",
     is_flag=True,
 )
-def layer(custom, description, install):
+def layer(custom, external, description, requirements, install):
     """
     Creates and installs a new Lambda layer.
 
@@ -392,23 +401,41 @@ def layer(custom, description, install):
 
     This command facilitates layer management within the Lambda project structure.
     """
-    create_layer(custom, description, install)
+    create_layer(custom, external, description, requirements, install)
 
 
-def create_layer(name, description, install):
+def create_layer(custom, external, description, requirements, install):
     layer_builder = LayerBuilder.a_layer().with_layers()
-    if name:
-        layer_builder.with_custom_layers(name, description)
-        layers.create_and_install_package(name)
+    print()
+    
+    if custom:
+        layer_builder.with_custom_layers(custom, description)
+        layers.create_and_install_package(custom)
+        logger.log(f"{custom.title()} layer created", "gray", 0, 1)
 
+    if external:
+        logger.start_spinner(f"Creating Layer {external}...", "gray")
+        cdk = open("cdk.json", "r").read()
+        region = json.loads(cdk)["context"].get("region")
+        if not region:
+            logger.log("Region not found", "red", 0, 1)
+            exit()
+            
+        layer_arn = layers.deploy_external_layer(external, region)
+        layer_builder.with_external_layers(external, layer_arn)
+        installed_version = layers.install_external_layer(external)
+        layers.update_requirements_txt(requirements, f"{external}=={installed_version}")
+        logger.stop_spinner()
+        logger.log(f"\r{external.title()} layer ARN: {layer_arn}", "gray", 0, 1)
+        
     layer_builder.build()
 
     if install:
         layers.install_all_layers()
+        logger.log(f"The layers have been installed", "gray", 0, 1)
 
 
 AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns"])
-
 
 @forge.command()
 @click.argument("function_name")
