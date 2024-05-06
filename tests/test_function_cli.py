@@ -1,9 +1,10 @@
-import pytest
-from click.testing import CliRunner
 from pprint import pprint
 
-from lambda_forge.cli import project, function
-from tests.conftest import read_file_lines, list_files_related_to, list_files
+import pytest
+from click.testing import CliRunner
+
+from lambda_forge.cli import function, project
+from tests.conftest import list_files, list_files_related_to, read_file_lines
 
 runner = CliRunner()
 

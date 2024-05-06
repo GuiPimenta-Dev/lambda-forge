@@ -1,8 +1,9 @@
 import json
+import os
+
 import boto3
 import click
 import pyfiglet
-import os
 
 
 class LiveSNS:
@@ -64,9 +65,7 @@ class LiveSNS:
             "message_attributes": {"Author": {"StringValue": "Daniel", "DataType": "String"}},
         }
         logger.log(json.dumps(payload, indent=4), "gray", 1, 1)
-        
-    
-    
+
     @staticmethod
     def parse_logs(event):
         event = event["Records"][0]["Sns"]

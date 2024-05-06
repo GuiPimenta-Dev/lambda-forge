@@ -1,14 +1,16 @@
+import argparse
+import base64
+import importlib
 import json
 import os
-import time
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
-import uuid
-import base64
 import pickle
-from lambda_forge.certificates import CertificateGenerator
-import argparse
-import importlib
 import threading
+import time
+import uuid
+
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+
+from lambda_forge.certificates import CertificateGenerator
 from lambda_forge.live_apigtw import LiveApiGtw
 from lambda_forge.live_sns import LiveSNS
 from lambda_forge.logs import Logger

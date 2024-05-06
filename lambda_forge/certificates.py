@@ -1,8 +1,9 @@
-import os
 import json
+import os
+import tempfile
+
 import boto3
 import requests
-import tempfile
 from botocore.exceptions import ClientError
 
 

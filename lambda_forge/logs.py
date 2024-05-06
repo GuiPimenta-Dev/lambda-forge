@@ -1,7 +1,8 @@
 import itertools
 import sys
-import time
 import threading
+import time
+
 import pyfiglet
 
 

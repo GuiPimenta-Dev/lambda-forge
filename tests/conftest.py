@@ -1,7 +1,8 @@
 import contextlib
-import pytest
-import shutil
 import os
+import shutil
+
+import pytest
 
 
 @pytest.fixture(scope="function", autouse=True)

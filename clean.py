@@ -1,6 +1,6 @@
 import contextlib
-import shutil
 import os
+import shutil
 
 
 def clean_project_structure():

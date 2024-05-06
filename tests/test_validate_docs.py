@@ -1,7 +1,8 @@
+from dataclasses import dataclass
+
 import pytest
 
 from lambda_forge.validate_docs import validate_docs
-from dataclasses import dataclass
 
 
 class NotDataclass:

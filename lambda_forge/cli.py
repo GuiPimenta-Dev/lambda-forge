@@ -1,19 +1,20 @@
 import json
 import os
 import re
-import click
 
+import click
+import pyfiglet
+from InquirerPy import get_style, inquirer
+
+from lambda_forge import layers, live_cli
 from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
 from lambda_forge.builders.docs_builder import DocsBuilder
 from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
-from lambda_forge import layers, live_cli
 from lambda_forge.live_sns import LiveSNS
 from lambda_forge.logs import Logger
-import pyfiglet
-from InquirerPy import inquirer, get_style
 
 logger = Logger()
 
@@ -382,11 +383,7 @@ def create_service(service):
     "--description",
     help="Layer description",
 )
-@click.option(
-    "--requirements",
-    help="Requirements file to install the lib",
-    default="requirements.txt"
-)
+@click.option("--requirements", help="Requirements file to install the lib", default="requirements.txt")
 @click.option(
     "--install",
     help="Install all custom layers locally",
@@ -407,7 +404,7 @@ def layer(custom, external, description, requirements, install):
 def create_layer(custom, external, description, requirements, install):
     layer_builder = LayerBuilder.a_layer().with_layers()
     print()
-    
+
     if custom:
         layer_builder.with_custom_layers(custom, description)
         layers.create_and_install_package(custom)
@@ -420,14 +417,14 @@ def create_layer(custom, external, description, requirements, install):
         if not region:
             logger.log("Region not found", "red", 0, 1)
             exit()
-            
+
         layer_arn = layers.deploy_external_layer(external, region)
         layer_builder.with_external_layers(external, layer_arn)
         installed_version = layers.install_external_layer(external)
         layers.update_requirements_txt(requirements, f"{external}=={installed_version}")
         logger.stop_spinner()
         logger.log(f"\r{external.title()} layer ARN: {layer_arn}", "gray", 0, 1)
-        
+
     layer_builder.build()
 
     if install:
@@ -436,6 +433,7 @@ def create_layer(custom, external, description, requirements, install):
 
 
 AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns"])
+
 
 @forge.command()
 @click.argument("function_name")

@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="lambda_forge",
-    version="1.0.716",
+    version="1.0.723",
     packages=find_packages(),
     license="MIT",
     install_requires=[

@@ -1,9 +1,10 @@
+import base64
 import json
 import os
-import time
-from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 import pickle
-import base64
+import time
+
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 
 def lambda_handler(event, context):

@@ -1,48 +1,46 @@
 from aws_cdk import Duration
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
+
 from lambda_forge import track
-from lambda_forge.interfaces import IAPIGateway
 
 
-class APIGateway(IAPIGateway):
-    def __init__(self, scope, context) -> None:
-        self.endpoints = {}
-        self.context = context
-        self.scope = scope
-        self.authorizers = {}
-        self.default_authorizer = None
+class APIGateway:
+    def __init__(
+        self,
+        scope,
+        context,
+        description=None,
+        public_by_default=False,
+        binary_media_types=["multipart/form-data"],
+        minimum_compression_size=0,
+        default_cors_preflight_options={
+            "allow_origins": ["*"],
+            "allow_methods": apigateway.Cors.ALL_METHODS,
+            "allow_credentials": True,
+        },
+    ) -> None:
+        self.__context = context
+        self.public_by_default = public_by_default
+        self.__scope = scope
+        self.__authorizers = {}
+        self.__default_authorizer = None
         self.api = apigateway.RestApi(
             scope,
-            id=f"{self.context.stage}-{self.context.name}-Rest",
-            description=f"{self.context.stage} {self.context.name} Rest API",
-            deploy_options={"stage_name": self.context.stage.lower()},
+            id=f"{self.__context.stage}-{self.__context.name}-API-Gateway",
+            description=description,
+            deploy_options={"stage_name": self.__context.stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
-            binary_media_types=["multipart/form-data"],
-            minimum_compression_size=0,
-            default_cors_preflight_options={
-                "allow_origins": ["*"],
-                "allow_headers": [
-                    "Content-Type",
-                    "applicationId",
-                    "applicationid",
-                    "Access-Control-Allow-Credentials",
-                    "Access-Control-Allow-Origin",
-                    "X-Amz-Date",
-                    "Authorization",
-                    "X-Api-Key",
-                    "X-Amz-Security-Token",
-                    "X-Amz-User-Agent",
-                ],
-                "allow_methods": apigateway.Cors.ALL_METHODS,
-                "allow_credentials": True,
-            },
+            binary_media_types=binary_media_types,
+            minimum_compression_size=minimum_compression_size,
+            default_cors_preflight_options=default_cors_preflight_options,
         )
 
     @track
-    def create_endpoint(self, method, path, function, public=False, authorizer=None):
-        resource = self.create_resource(path)
-        authorizer = self.get_authorizer(public, authorizer)
+    def create_endpoint(self, method, path, function, public=None, authorizer=None):
+        public = public or self.public_by_default
+        resource = self.__create_resource(path)
+        authorizer = self.__get_authorizer(public, authorizer)
 
         resource.add_method(
             method,
@@ -51,46 +49,39 @@ class APIGateway(IAPIGateway):
         )
 
     def create_authorizer(self, function, name, default=False):
-        if self.authorizers.get(name) is not None:
+        if self.__authorizers.get(name) is not None:
             raise Exception(f"Authorizer {name} already set")
 
-        if self.default_authorizer is not None and default is True:
+        if self.__default_authorizer is not None and default is True:
             raise Exception("Default authorizer already set")
 
         if default:
-            self.default_authorizer = name
+            self.__default_authorizer = name
 
         function.add_environment(
             "API_ARN",
-            f"arn:aws:execute-api:{self.context.region}:{self.context.account}:{self.api.rest_api_id}/*",
+            f"arn:aws:execute-api:{self.__context.region}:{self.__context.account}:{self.api.rest_api_id}/*",
         )
         authorizer = apigateway.RequestAuthorizer(
-            self.scope,
+            self.__scope,
             id=f"{name}-Authorizer",
             handler=function,
             identity_sources=[apigateway.IdentitySource.context("identity.sourceIp")],
             results_cache_ttl=Duration.seconds(0),
         )
 
-        self.authorizers[name] = authorizer
-
-    def create_resource(self, endpoint):
-        resources = list(filter(None, endpoint.split("/")))
-        resource = self.api.root.get_resource(resources[0]) or self.api.root.add_resource(resources[0])
-        for subresource in resources[1:]:
-            resource = resource.get_resource(subresource) or resource.add_resource(subresource)
-        return resource
+        self.__authorizers[name] = authorizer
 
     def create_docs(self, endpoint, artifact, authorizer=None, public=False, stages=None):
 
-        if stages and self.context.stage not in stages:
+        if stages and self.__context.stage not in stages:
             return
 
         s3_integration_role = iam.Role(
-            self.scope,
+            self.__scope,
             f"{endpoint.replace('/','').title()}-API-Gateway-S3",
             assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            role_name=f"{self.context.stage}-{self.context.name}-{endpoint.replace('/','').title()}-S3",
+            role_name=f"{self.__context.stage}-{self.__context.name}-{endpoint.replace('/','').title()}-S3",
         )
 
         s3_integration_role.add_to_policy(
@@ -105,18 +96,18 @@ class APIGateway(IAPIGateway):
             )
         )
 
-        docs_resource = self.create_resource(endpoint)
+        docs_resource = self.__create_resource(endpoint)
 
-        if authorizer and authorizer not in self.authorizers:
+        if authorizer and authorizer not in self.__authorizers:
             raise Exception(f"Authorizer {authorizer} not found")
 
-        authorizer = self.get_authorizer(public, authorizer)
+        authorizer = self.__get_authorizer(public, authorizer)
 
         docs_resource.add_method(
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}/{artifact.lower()}.html",
+                path=f"{self.__context.bucket}/{self.__context.name}/{self.__context.stage.lower()}/{artifact.lower()}.html",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,
@@ -141,15 +132,22 @@ class APIGateway(IAPIGateway):
             ],
         )
 
-    def get_authorizer(self, public, authorizer):
+    def __create_resource(self, endpoint):
+        resources = list(filter(None, endpoint.split("/")))
+        resource = self.api.root.get_resource(resources[0]) or self.api.root.add_resource(resources[0])
+        for subresource in resources[1:]:
+            resource = resource.get_resource(subresource) or resource.add_resource(subresource)
+        return resource
+
+    def __get_authorizer(self, public, authorizer):
         if public:
             authorizer = None
         else:
-            authorizer_name = authorizer or self.default_authorizer
+            authorizer_name = authorizer or self.__default_authorizer
             if not authorizer_name:
                 raise ValueError("No default authorizer set and no authorizer provided.")
 
-            authorizer = self.authorizers.get(authorizer_name)
+            authorizer = self.__authorizers.get(authorizer_name)
             if authorizer is None:
                 raise ValueError(f"Authorizer '{authorizer_name}' not found.")
 

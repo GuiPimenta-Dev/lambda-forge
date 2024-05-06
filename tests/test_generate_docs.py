@@ -1,8 +1,9 @@
+from dataclasses import dataclass
+from typing import List, Literal, Optional
+
 import pytest
 
 from lambda_forge.generate_docs import generate_docs
-from dataclasses import dataclass
-from typing import List, Literal, Optional
 
 
 @dataclass
