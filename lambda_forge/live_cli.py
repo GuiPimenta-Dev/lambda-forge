@@ -30,6 +30,7 @@ def run_live(function_name, timeout, trigger):
     iot_endpoint = iot_endpoint.replace(".iot.", "-ats.iot.")
 
     try:
+        subprocess.run(["export", "TRACK=true"], check=True)
         with open(os.devnull, "w") as devnull:
             subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
     except Exception as e:

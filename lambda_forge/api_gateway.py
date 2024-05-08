@@ -5,36 +5,20 @@ from aws_cdk import aws_iam as iam
 from lambda_forge import track
 
 
-class APIGateway:
+class REST:
     def __init__(
         self,
         scope,
         context,
-        description=None,
+        api,
         public_by_default=False,
-        binary_media_types=["multipart/form-data"],
-        minimum_compression_size=0,
-        default_cors_preflight_options={
-            "allow_origins": ["*"],
-            "allow_methods": apigateway.Cors.ALL_METHODS,
-            "allow_credentials": True,
-        },
     ) -> None:
         self.__context = context
         self.public_by_default = public_by_default
         self.__scope = scope
         self.__authorizers = {}
         self.__default_authorizer = None
-        self.api = apigateway.RestApi(
-            scope,
-            id=f"{self.__context.stage}-{self.__context.name}-API-Gateway",
-            description=description,
-            deploy_options={"stage_name": self.__context.stage.lower()},
-            endpoint_types=[apigateway.EndpointType.REGIONAL],
-            binary_media_types=binary_media_types,
-            minimum_compression_size=minimum_compression_size,
-            default_cors_preflight_options=default_cors_preflight_options,
-        )
+        self.api = api
 
     @track
     def create_endpoint(self, method, path, function, public=None, authorizer=None):
@@ -72,7 +56,9 @@ class APIGateway:
 
         self.__authorizers[name] = authorizer
 
-    def create_docs(self, endpoint, artifact, authorizer=None, public=False, stages=None):
+    def create_docs(
+        self, endpoint, artifact, authorizer=None, public=False, stages=None
+    ):
 
         if stages and self.__context.stage not in stages:
             return
@@ -134,9 +120,13 @@ class APIGateway:
 
     def __create_resource(self, endpoint):
         resources = list(filter(None, endpoint.split("/")))
-        resource = self.api.root.get_resource(resources[0]) or self.api.root.add_resource(resources[0])
+        resource = self.api.root.get_resource(
+            resources[0]
+        ) or self.api.root.add_resource(resources[0])
         for subresource in resources[1:]:
-            resource = resource.get_resource(subresource) or resource.add_resource(subresource)
+            resource = resource.get_resource(subresource) or resource.add_resource(
+                subresource
+            )
         return resource
 
     def __get_authorizer(self, public, authorizer):
@@ -145,7 +135,9 @@ class APIGateway:
         else:
             authorizer_name = authorizer or self.__default_authorizer
             if not authorizer_name:
-                raise ValueError("No default authorizer set and no authorizer provided.")
+                raise ValueError(
+                    "No default authorizer set and no authorizer provided."
+                )
 
             authorizer = self.__authorizers.get(authorizer_name)
             if authorizer is None:

@@ -1,22 +1,10 @@
 from aws_cdk import pipelines
 from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
-from aws_cdk import aws_codebuild as codebuild
 
 
 class CodePipeline:
-    def __init__(
-        self,
-        scope: Construct,
-        context,
-        branch,
-        install_commands=[],
-        commands=[],
-        registry="public.ecr.aws/x8r4y7j7/lambda-forge:latest",
-    ) -> None:
-        
-        if "cdk synth" not in commands:
-            commands.append("cdk synth")
+    def __init__(self, scope: Construct, context, branch, install_commands=[], commands=[]) -> None:
 
         self.source = CodePipelineSource.git_hub(f"{context.repo['owner']}/{context.repo['name']}", branch)
 
@@ -26,18 +14,15 @@ class CodePipeline:
             synth=pipelines.ShellStep(
                 "Synth",
                 input=self.source,
-                install_commands=[*install_commands],
-                commands=[*commands],
+                install_commands=[
+                    "pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/",
+                    "pip install aws-cdk-lib",
+                    "npm install -g aws-cdk",
+                    *install_commands,
+                ],
+                commands=["cdk synth", *commands],
             ),
             pipeline_name=f"{context.stage}-{context.name}-Pipeline",
-            code_build_defaults=pipelines.CodeBuildOptions(
-                build_environment=codebuild.BuildEnvironment(
-                    build_image=codebuild.LinuxBuildImage.from_docker_registry(registry),
-                    privileged=True,
-                    compute_type=codebuild.ComputeType.SMALL,
-                ),
-                cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
-            ),
         )
 
     def add_stage(self, stage, pre=[], post=[]):

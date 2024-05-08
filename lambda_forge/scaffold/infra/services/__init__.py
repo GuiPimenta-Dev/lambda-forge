@@ -1,4 +1,5 @@
-from lambda_forge.services import APIGateway, Lambda
+from infra.services.api_gateway import APIGateway
+from infra.services.aws_lambda import Lambda
 
 
 class Services:
