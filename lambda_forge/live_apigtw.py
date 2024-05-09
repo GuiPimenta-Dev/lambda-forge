@@ -23,9 +23,7 @@ class LiveApiGtw:
                 break
 
         if not rest_api:
-            rest_api = self.api_client.create_rest_api(
-                name=name, description="API Gateway for running Lambda Functions Live with AWS IoT"
-            )
+            rest_api = self.api_client.create_rest_api(name=name, description="API Gateway for running Lambda Functions Live with AWS IoT")
         return rest_api
 
     def create_endpoint(self, function_arn, stub_name):
@@ -49,9 +47,7 @@ class LiveApiGtw:
             else:
                 parent_id = existing_resource["id"]
 
-        self.api_client.put_method(
-            restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY", authorizationType="NONE"
-        )
+        self.api_client.put_method(restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY", authorizationType="NONE")
 
         self.api_client.put_integration(
             restApiId=self.root_id,
@@ -80,9 +76,7 @@ class LiveApiGtw:
         linked_resources = []
         for resource in resources:
             for method in resource.get("resourceMethods", {}).keys():
-                integration = self.api_client.get_integration(
-                    restApiId=self.root_id, resourceId=resource["id"], httpMethod=method
-                )
+                integration = self.api_client.get_integration(restApiId=self.root_id, resourceId=resource["id"], httpMethod=method)
                 if integration.get("uri", "").endswith(f"functions/{function_arn}/invocations"):
                     linked_resources.append(resource)
 

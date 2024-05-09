@@ -7,6 +7,7 @@ import boto3
 from lambda_forge.live_apigtw import LiveApiGtw
 from lambda_forge.live_lambda import LiveLambda
 from lambda_forge.live_sns import LiveSNS
+from lambda_forge.live_sqs import LiveSQS
 from lambda_forge.printer import Printer
 
 printer = Printer()
@@ -30,11 +31,9 @@ def run_live(function_name, timeout, trigger):
     iot_endpoint = iot_endpoint.replace(".iot.", "-ats.iot.")
 
     try:
-       os.environ['TRACK_FUNCTIONS'] = 'true'
-       with open(os.devnull, "w") as devnull:
-            subprocess.run(
-                ["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True
-            )
+        os.environ["TRACK_FUNCTIONS"] = "true"
+        with open(os.devnull, "w") as devnull:
+            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
     except Exception as e:
         printer.print(str(e), "red", 1, 1)
         exit()
@@ -74,6 +73,11 @@ def run_live(function_name, timeout, trigger):
                 live_sns = LiveSNS(region, printer)
                 topic_arn = live_sns.subscribe(function_arn, stub_name)
                 printer.print(f"\rTopic ARN: {topic_arn}", "cyan")
+
+            if trigger == "sqs":
+                live_sqs = LiveSQS(region, printer)
+                queue_url = live_sqs.subscribe(function_arn, stub_name)
+                printer.print(f"\rQueue URL: {queue_url}", "cyan")
 
             printer.stop_spinner()
             current_dir = os.path.dirname(os.path.abspath(__file__))

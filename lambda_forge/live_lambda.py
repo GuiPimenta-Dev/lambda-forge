@@ -81,7 +81,7 @@ class LiveLambda:
         return cert, private, ca
 
     def __create_role(self):
-        assume_role_policy_document = assume_role_policy_document = {
+        assume_role_policy_document = {
             "Version": "2012-10-17",
             "Statement": [
                 {"Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"},

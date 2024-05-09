@@ -13,6 +13,7 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from lambda_forge.certificates import CertificateGenerator
 from lambda_forge.live_apigtw import LiveApiGtw
 from lambda_forge.live_sns import LiveSNS
+from lambda_forge.live_sqs import LiveSQS
 from lambda_forge.printer import Printer
 
 printer = Printer()
@@ -91,6 +92,9 @@ def log_request(event):
 
     if args.trigger == "sns":
         event = LiveSNS.parse_logs(event)
+    
+    if args.trigger == "sqs":
+        event = LiveSQS.parse_logs(event)
 
     printer.print("------------------------ + ------------------------", "gray", 1)
     printer.print(f"Request: ", "gray", 1, 1)

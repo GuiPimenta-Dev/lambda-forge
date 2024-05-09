@@ -14,6 +14,7 @@ from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge.live_sns import LiveSNS
+from lambda_forge.live_sqs import LiveSQS
 from lambda_forge.printer import Printer
 
 printer = Printer()
@@ -263,13 +264,7 @@ def create_function(
         if no_tests is True:
             function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
         else:
-            function_builder = (
-                function_builder.with_endpoint(endpoint)
-                .with_api(http_method, public)
-                .with_integration(http_method)
-                .with_unit()
-                .with_main()
-            )
+            function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_integration(http_method).with_unit().with_main()
 
     function_builder.with_lambda_stack().build()
 
@@ -302,12 +297,7 @@ def authorizer(name, description, default, no_tests):
 
 
 def create_authorizer(name, description, default, no_tests):
-    authorizer_builder = (
-        AuthorizerBuilder.an_authorizer(name, description, "authorizers")
-        .with_config(default)
-        .with_main()
-        .with_lambda_stack()
-    )
+    authorizer_builder = AuthorizerBuilder.an_authorizer(name, description, "authorizers").with_config(default).with_main().with_lambda_stack()
 
     if no_tests is False:
         authorizer_builder = authorizer_builder.with_unit()
@@ -432,7 +422,7 @@ def create_layer(custom, external, description, requirements, install):
         printer.print(f"The layers have been installed", "gray", 0, 1)
 
 
-AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns"])
+AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns", "sqs"])
 
 
 @forge.command()
@@ -497,6 +487,9 @@ def trigger(service, sns_subject, sns_msg_attributes):
         click.echo()
         if service == "sns":
             LiveSNS(region, printer).publish(sns_subject, sns_msg_attributes)
+        
+        if service == "sqs":
+            LiveSQS(region, printer).publish()
 
 
 @forge.command()

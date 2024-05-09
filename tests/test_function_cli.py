@@ -30,10 +30,7 @@ def start_project():
 def test_it_should_raise_an_error_if_no_api_is_false_and_not_http_method_and_authorizer_is_false():
 
     result = runner.invoke(function, ["function_name", "--description", "description"])
-    assert (
-        result.output
-        == "Usage: function [OPTIONS] NAME\nTry 'function --help' for help.\n\nError: You must provide a method for the API Gateway endpoint or use the flag --no-api\n"
-    )
+    assert result.output == "Usage: function [OPTIONS] NAME\nTry 'function --help' for help.\n\nError: You must provide a method for the API Gateway endpoint or use the flag --no-api\n"
 
 
 def test_it_should_create_the_correct_folders_for_when_creating_a_function_with_no_api():

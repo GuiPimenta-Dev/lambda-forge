@@ -9,7 +9,7 @@ class LiveSNS:
         self.sns = boto3.client("sns", region_name=region)
         self.printer = printer
         self.lambda_client = boto3.client("lambda", region_name=region)
-        self.topic_arn = self.sns.create_topic(Name="Live-Server-Topic")["TopicArn"]
+        self.topic_arn = self.sns.create_topic(Name="Live-Topic")["TopicArn"]
 
     def subscribe(self, function_arn, stub_name):
         self.printer.change_spinner_legend("Subscribing to SNS Topic")
@@ -43,9 +43,7 @@ class LiveSNS:
 
         message = click.prompt(click.style("Message", fg=(37, 171, 190)), type=str)
         try:
-            self.sns.publish(
-                TopicArn=self.topic_arn, Message=message, Subject=subject, MessageAttributes=message_attributes
-            )
+            self.sns.publish(TopicArn=self.topic_arn, Message=message, Subject=subject, MessageAttributes=message_attributes)
         except:
             self.log_failure(self.printer)
 

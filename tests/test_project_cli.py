@@ -16,10 +16,7 @@ def test_it_should_raise_an_error_when_bucket_is_none_and_no_doc_is_false():
 
     result = runner.invoke(project, ["project_name", "--repo-owner", "owner", "--repo-name", "repo"])
 
-    assert (
-        result.output
-        == "Usage: project [OPTIONS] NAME\nTry 'project --help' for help.\n\nError: You must provide a S3 bucket for the docs or use the flag --no-docs\n"
-    )
+    assert result.output == "Usage: project [OPTIONS] NAME\nTry 'project --help' for help.\n\nError: You must provide a S3 bucket for the docs or use the flag --no-docs\n"
 
 
 def test_it_should_not_create_dev_stack_when_no_dev_is_true():
