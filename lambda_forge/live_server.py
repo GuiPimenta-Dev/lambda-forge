@@ -92,7 +92,7 @@ def log_request(event):
 
     if args.trigger == "sns":
         event = LiveSNS.parse_logs(event)
-    
+
     if args.trigger == "sqs":
         event = LiveSQS.parse_logs(event)
 

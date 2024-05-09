@@ -422,7 +422,7 @@ def create_layer(custom, external, description, requirements, install):
         printer.print(f"The layers have been installed", "gray", 0, 1)
 
 
-AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns", "sqs"])
+AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns", "sqs", "s3"])
 
 
 @forge.command()
@@ -457,17 +457,7 @@ def create_live_dev(function_name, timeout, trigger):
 
 @forge.command()
 @click.argument("service", type=click.Choice(AVAILABLE_TRIGGERS))
-@click.option(
-    "--sns-subject",
-    help="SNS Subject",
-    default={},
-)
-@click.option(
-    "--sns-msg-attributes",
-    help="SNS Message Attributes",
-    default={},
-)
-def trigger(service, sns_subject, sns_msg_attributes):
+def trigger(service):
     """
     Triggers the specified AWS service integration.
 
@@ -486,8 +476,8 @@ def trigger(service, sns_subject, sns_msg_attributes):
     while True:
         click.echo()
         if service == "sns":
-            LiveSNS(region, printer).publish(sns_subject, sns_msg_attributes)
-        
+            LiveSNS(region, printer).publish()
+
         if service == "sqs":
             LiveSQS(region, printer).publish()
 

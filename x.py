@@ -1,82 +1,73 @@
 import json
-import time
+import uuid
 import boto3
 import click
 
 from lambda_forge.live_iam import LiveIAM
-from lambda_forge.printer import Printer
 
 
-class LiveSQS:
+class LiveS3:
     def __init__(self, region, printer):
-        self.sqs = boto3.client("sqs", region_name=region)
         self.iam = LiveIAM(region)
-        self.iam_client = boto3.client('iam', region_name=region)
         self.printer = printer
+        self.s3_client = boto3.client("s3", region_name=region)
         self.lambda_client = boto3.client("lambda", region_name=region)
-        self.queue_url = self.sqs.create_queue(QueueName="Live-Queue")["QueueUrl"]
+        self.region = region
 
     def subscribe(self, function_arn, stub_name):
-        self.printer.change_spinner_legend("Setting up Lambda Trigger for SQS Queue")
+        # self.printer.change_spinner_legend("Setting up Lambda Trigger for S3 Bucket")
 
-        try:
-            response = self.sqs.get_queue_attributes(QueueUrl=self.queue_url, AttributeNames=["QueueArn"])
-            queue_arn = response["Attributes"]["QueueArn"]
+        existing_buckets = self.s3_client.list_buckets()["Buckets"]
+        self.bucket_name = None
+        for existing_bucket in existing_buckets:
+            name = existing_bucket["Name"]
+            if "live-s3-" in name:
+                self.bucket_name = existing_bucket["Name"]
+                break
 
-            policy = {"Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": "sqs:*", "Resource": "*"}]}
-            
-            self.iam = self.iam.attach_policy_to_lambda(policy, function_arn)
-            
-            self.sqs.set_queue_attributes(
-                QueueUrl=self.queue_url,
-                Attributes={'VisibilityTimeout': "900"}
-            )
-       
-            self.lambda_client.create_event_source_mapping(
-                EventSourceArn=queue_arn,
-                FunctionName=function_arn,
-            )
-            self.printer.print("Successfully subscribed Lambda to SQS Queue.", "green")
-            return queue_arn
-        except Exception as e:
-            self.printer.print(f"Error setting up Lambda trigger: {str(e)}", "red")
-            return None
+        if not self.bucket_name:
+            self.bucket_name = f"live-s3-" + str(uuid.uuid4())
+            self.s3_client.create_bucket(Bucket=self.bucket_name, CreateBucketConfiguration={"LocationConstraint": self.region})
 
-    def publish(self, subject, msg_attributes):
-        self.printer.show_banner("SQS")
-        self.printer.print(f"Subject: {subject}", "white", 1)
-        self.printer.print(f"Message Attributes: {msg_attributes}", "white", 1, 1)
+        s3_arn = f"arn:aws:s3:::{self.bucket_name}"
 
-        message_attributes = {}
-        if msg_attributes:
-            try:
-                message_attributes = json.loads(msg_attributes)
-                if not isinstance(message_attributes, dict):
-                    self.print_failure(self.printer)
-                    exit()
-            except:
-                self.print_failure(self.printer)
-                exit()
+        response = self.lambda_client.add_permission(
+            FunctionName=stub_name,
+            StatementId=str(uuid.uuid4()),
+            Action="lambda:InvokeFunction",
+            Principal="s3.amazonaws.com",
+            SourceArn=s3_arn,
+        )
 
-        message = click.prompt(click.style("Message", fg=(37, 171, 190)), type=str)
-        try:
-            self.sqs.send_message(QueueUrl=self.queue_url, MessageBody=message, MessageAttributes=message_attributes)
-        except:
-            self.print_failure(self.printer)
+        self.s3_client.put_bucket_notification_configuration(
+            Bucket=self.bucket_name,
+            NotificationConfiguration={
+                "LambdaFunctionConfigurations": [
+                    {
+                        "LambdaFunctionArn": function_arn,
+                        "Events": [
+                            "s3:ObjectCreated:*",
+                            "s3:ObjectRemoved:*",
+                            "s3:ObjectRestore:*",
+                        ],
+                    }
+                ]
+            },
+        )
 
-    @staticmethod
-    def print_failure(printer):
-        printer.print("Failed to Publish Message!", "red")
-        printer.print("Example of a Valid Payload: ", "gray", 1)
-        payload = {
-            "message": "Hello World!",
-            "subject": "Hello World!",
-            "message_attributes": {"Author": {"StringValue": "Daniel", "DataType": "String"}},
-        }
-        printer.print(json.dumps(payload, indent=4), "gray", 1, 1)
+        return s3_arn
+
+    def publish(self):
+        self.printer.show_banner("S3")
+        metadata = click.prompt(click.style("Metadata", fg=(37, 171, 190)), type=str)
+        file_path = click.prompt(click.style("File Path", fg=(37, 171, 190)), type=str)
+        filename = file_path.split("/")[-1]
+
+        with open(file_path, "rb") as file:
+            self.s3_client.put_object(Bucket=self.bucket_name, Key=filename, Body=file, Metadata=metadata)
 
     @staticmethod
-    def parse_prints(event):
+    def parse_logs(event):
         record = event["Records"][0]
         message_body = record["body"]
         message_attributes = record.get("messageAttributes", {})
@@ -91,4 +82,4 @@ class LiveSQS:
         }
 
 
-
+s3 = LiveS3("us-east-2", "printer").subscribe("arn:aws:lambda:us-east-2:211125768252:function:Vixi-Live", "Vixi-Live")

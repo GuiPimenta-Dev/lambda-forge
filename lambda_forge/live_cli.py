@@ -6,6 +6,7 @@ import boto3
 
 from lambda_forge.live_apigtw import LiveApiGtw
 from lambda_forge.live_lambda import LiveLambda
+from lambda_forge.live_s3 import LiveS3
 from lambda_forge.live_sns import LiveSNS
 from lambda_forge.live_sqs import LiveSQS
 from lambda_forge.printer import Printer
@@ -78,6 +79,11 @@ def run_live(function_name, timeout, trigger):
                 live_sqs = LiveSQS(region, printer)
                 queue_url = live_sqs.subscribe(function_arn, stub_name)
                 printer.print(f"\rQueue URL: {queue_url}", "cyan")
+
+            if trigger == "s3":
+                live_s3 = LiveS3(region, printer)
+                bucket_arn = live_s3.subscribe(function_arn, stub_name)
+                printer.print(f"\rBucket ARN: {bucket_arn}", "cyan")
 
             printer.stop_spinner()
             current_dir = os.path.dirname(os.path.abspath(__file__))
