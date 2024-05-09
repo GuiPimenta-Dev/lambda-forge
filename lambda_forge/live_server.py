@@ -13,9 +13,9 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from lambda_forge.certificates import CertificateGenerator
 from lambda_forge.live_apigtw import LiveApiGtw
 from lambda_forge.live_sns import LiveSNS
-from lambda_forge.logs import Logger
+from lambda_forge.printer import Printer
 
-logger = Logger()
+printer = Printer()
 
 parser = argparse.ArgumentParser(description="Process some integers.")
 parser.add_argument("function_name", type=str)
@@ -38,9 +38,9 @@ mqtt_client.configureEndpoint(args.iot_endpoint, 443)
 mqtt_client.configureCredentials(ca, private, cert)
 try:
     mqtt_client.connect()
-    logger.log(f"Connection Established", "white", 1)
+    printer.print(f"Connection Established", "white", 1)
 except:
-    logger.log(f"Connection Failed", "red", 1)
+    printer.print(f"Connection Failed", "red", 1)
     exit()
 
 
@@ -92,14 +92,14 @@ def log_request(event):
     if args.trigger == "sns":
         event = LiveSNS.parse_logs(event)
 
-    logger.log("------------------------ + ------------------------", "gray", 1)
-    logger.log(f"Request: ", "white", 1, 1)
-    logger.log(f"{json.dumps(event, indent=4)}", "white")
+    printer.print("------------------------ + ------------------------", "gray", 1)
+    printer.print(f"Request: ", "white", 1, 1)
+    printer.print(f"{json.dumps(event, indent=4)}", "white")
 
 
 def log_response(response):
-    logger.log(f"Response: ", "white", 1, 1)
-    logger.log(f"{json.dumps(response, indent=4)}", "white")
+    printer.print(f"Response: ", "white", 1, 1)
+    printer.print(f"{json.dumps(response, indent=4)}", "white")
 
 
 watchdog_thread = threading.Thread(target=watchdog)

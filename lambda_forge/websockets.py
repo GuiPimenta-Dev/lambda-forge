@@ -11,7 +11,7 @@ class WSS:
     def __init__(self, scope, context, name, wss) -> None:
         self.scope = scope
         self.context = context
-        self.name = name 
+        self.name = name
         self.websocket = wss
 
         self.stage = WsStage(

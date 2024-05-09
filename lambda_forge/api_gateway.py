@@ -1,7 +1,7 @@
 from aws_cdk import Duration
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
-
+from aws_cdk import CfnOutput
 from lambda_forge import track
 
 
@@ -19,6 +19,10 @@ class REST:
         self.__authorizers = {}
         self.__default_authorizer = None
         self.api = api
+        CfnOutput(scope, "API-GATEWAY-BASE-URL",
+            value=api.url,
+            description="The base URL of the API Gateway"
+        )
 
     @track
     def create_endpoint(self, method, path, function, public=None, authorizer=None):
@@ -56,9 +60,7 @@ class REST:
 
         self.__authorizers[name] = authorizer
 
-    def create_docs(
-        self, endpoint, artifact, authorizer=None, public=False, stages=None
-    ):
+    def create_docs(self, endpoint, artifact, authorizer=None, public=False, stages=None):
 
         if stages and self.__context.stage not in stages:
             return
@@ -120,13 +122,9 @@ class REST:
 
     def __create_resource(self, endpoint):
         resources = list(filter(None, endpoint.split("/")))
-        resource = self.api.root.get_resource(
-            resources[0]
-        ) or self.api.root.add_resource(resources[0])
+        resource = self.api.root.get_resource(resources[0]) or self.api.root.add_resource(resources[0])
         for subresource in resources[1:]:
-            resource = resource.get_resource(subresource) or resource.add_resource(
-                subresource
-            )
+            resource = resource.get_resource(subresource) or resource.add_resource(subresource)
         return resource
 
     def __get_authorizer(self, public, authorizer):
@@ -135,9 +133,7 @@ class REST:
         else:
             authorizer_name = authorizer or self.__default_authorizer
             if not authorizer_name:
-                raise ValueError(
-                    "No default authorizer set and no authorizer provided."
-                )
+                raise ValueError("No default authorizer set and no authorizer provided.")
 
             authorizer = self.__authorizers.get(authorizer_name)
             if authorizer is None:

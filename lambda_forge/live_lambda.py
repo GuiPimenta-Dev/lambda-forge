@@ -11,7 +11,7 @@ from lambda_forge.certificates import CertificateGenerator
 
 
 class LiveLambda:
-    def __init__(self, function_name, region, timeout, iot_endpoint, account, urlpath, logger) -> None:
+    def __init__(self, function_name, region, timeout, iot_endpoint, account, urlpath, printer) -> None:
         self.function_name = function_name
         self.region = region
         self.timeout = timeout
@@ -20,7 +20,7 @@ class LiveLambda:
         self.urlpath = urlpath.strip("/")
         self.iam_client = boto3.client("iam", region_name=self.region)
         self.lambda_client = boto3.client("lambda", region_name=self.region)
-        self.logger = logger
+        self.printer = printer
 
     def create_lambda(self):
         stub_name = f"{self.function_name}-Live"
@@ -29,7 +29,7 @@ class LiveLambda:
         zip_file_name = self.__zip_lambda()
         layer_arn = self.__create_layer()
         with open(zip_file_name, "rb") as zip_file:
-            self.logger.change_spinner_legend("Deploying Lambda Function")
+            self.printer.change_spinner_legend("Deploying Lambda Function")
             response = self.lambda_client.create_function(
                 FunctionName=stub_name,
                 Description="Lambda Stub for Live Development with AWS IoT Core",
@@ -75,7 +75,7 @@ class LiveLambda:
         return zip_file_path
 
     def __create_certificates(self):
-        self.logger.change_spinner_legend("Creating Certificates")
+        self.printer.change_spinner_legend("Creating Certificates")
         cert_generator = CertificateGenerator()
         cert, private, ca = cert_generator.generate_certificate()
         return cert, private, ca
@@ -93,7 +93,7 @@ class LiveLambda:
             role = self.iam_client.get_role(RoleName=role_name)
 
         except:
-            self.logger.change_spinner_legend("Creating Role")
+            self.printer.change_spinner_legend("Creating Role")
             role = self.iam_client.create_role(
                 RoleName=role_name,
                 AssumeRolePolicyDocument=json.dumps(assume_role_policy_document),
@@ -107,7 +107,7 @@ class LiveLambda:
         return role
 
     def __create_layer(self):
-        self.logger.change_spinner_legend("Creating Layer")
+        self.printer.change_spinner_legend("Creating Layer")
         current_dir = os.path.dirname(os.path.abspath(__file__))
         layer_response = self.lambda_client.publish_layer_version(
             LayerName="awsiot-layer",

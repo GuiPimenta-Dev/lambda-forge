@@ -1,9 +1,9 @@
 import json
-import os
 import re
+import subprocess
+import time
 
 import click
-import pyfiglet
 from InquirerPy import get_style, inquirer
 
 from lambda_forge import layers, live_cli
@@ -14,9 +14,9 @@ from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge.live_sns import LiveSNS
-from lambda_forge.logs import Logger
+from lambda_forge.printer import Printer
 
-logger = Logger()
+printer = Printer()
 
 
 @click.group()
@@ -86,11 +86,7 @@ def project(
     Requires specifying a S3 bucket if API documentation is enabled.
     """
 
-    print("\033[H\033[J", end="")
-    os.system("clear")
-    text = "New Project"
-    ascii_art = pyfiglet.figlet_format(text, width=200)
-    logger.log(ascii_art, "rose", 1)
+    printer.show_banner("New Project")
 
     if not name:
         click.echo()
@@ -110,7 +106,7 @@ def project(
     if account:
         click.echo()
         if not re.match(r"^\d{12}$", account):
-            logger.log("Invalid Account ID. Must be a 12-digit number.", "red")
+            printer.print("Invalid Account ID. Must be a 12-digit number.", "red")
             return
     else:
         while True:
@@ -121,7 +117,7 @@ def project(
                 break
             else:
                 click.echo()
-                logger.log("Invalid Account ID. Must be a 12-digit number.", "red")
+                printer.print("Invalid Account ID. Must be a 12-digit number.", "red")
 
     if not region:
         click.echo()
@@ -189,7 +185,9 @@ def create_project(
 
     project_builder = ProjectBuilder.a_project(name, no_docs, minimal)
 
-    project_builder = project_builder.with_cdk(repo_owner, repo_name, account, region, bucket, coverage).build()
+    project_builder = project_builder.with_cdk(
+        repo_owner, repo_name, account, region, bucket, coverage
+    ).build()
 
     if not no_docs:
         DocsBuilder.a_doc().with_config().with_lambda_stack().build()
@@ -198,11 +196,15 @@ def create_project(
 @forge.command()
 @click.argument("name")
 @click.option("--description", required=True, help="Description for the endpoint")
-@click.option("--method", required=False, help="HTTP method for the endpoint", default="GET")
+@click.option(
+    "--method", required=False, help="HTTP method for the endpoint", default="GET"
+)
 @click.option("--belongs-to", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-@click.option("--websocket", help="Function is going to be used for websockets", is_flag=True)
+@click.option(
+    "--websocket", help="Function is going to be used for websockets", is_flag=True
+)
 @click.option(
     "--no-tests",
     help="Do not create unit tests and integration tests files",
@@ -215,7 +217,9 @@ def create_project(
     is_flag=True,
     default=False,
 )
-def function(name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public):
+def function(
+    name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public
+):
     """
     Creates a Lambda function with a predefined structure and API Gateway integration.
 
@@ -250,7 +254,9 @@ def create_function(
     public=False,
 ):
 
-    function_builder = FunctionBuilder.a_function(name, description).with_config(belongs)
+    function_builder = FunctionBuilder.a_function(name, description).with_config(
+        belongs
+    )
 
     if no_api is True:
         function_builder = function_builder.with_main()
@@ -265,7 +271,11 @@ def create_function(
     else:
         endpoint = endpoint or belongs or name
         if no_tests is True:
-            function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
+            function_builder = (
+                function_builder.with_endpoint(endpoint)
+                .with_api(http_method, public)
+                .with_main()
+            )
         else:
             function_builder = (
                 function_builder.with_endpoint(endpoint)
@@ -383,7 +393,11 @@ def create_service(service):
     "--description",
     help="Layer description",
 )
-@click.option("--requirements", help="Requirements file to install the lib", default="requirements.txt")
+@click.option(
+    "--requirements",
+    help="Requirements file to install the lib",
+    default="requirements.txt",
+)
 @click.option(
     "--install",
     help="Install all custom layers locally",
@@ -408,28 +422,28 @@ def create_layer(custom, external, description, requirements, install):
     if custom:
         layer_builder.with_custom_layers(custom, description)
         layers.create_and_install_package(custom)
-        logger.log(f"{custom.title()} layer created", "gray", 0, 1)
+        printer.print(f"{custom.title()} layer created", "gray", 0, 1)
 
     if external:
-        logger.start_spinner(f"Creating Layer {external}...", "gray")
+        printer.start_spinner(f"Creating Layer {external}...", "gray")
         cdk = open("cdk.json", "r").read()
         region = json.loads(cdk)["context"].get("region")
         if not region:
-            logger.log("Region not found", "red", 0, 1)
+            printer.print("Region not found", "red", 0, 1)
             exit()
 
         layer_arn = layers.deploy_external_layer(external, region)
         layer_builder.with_external_layers(external, layer_arn)
         installed_version = layers.install_external_layer(external)
         layers.update_requirements_txt(requirements, f"{external}=={installed_version}")
-        logger.stop_spinner()
-        logger.log(f"\r{external.title()} layer ARN: {layer_arn}", "gray", 0, 1)
+        printer.stop_spinner()
+        printer.print(f"\r{external.title()} layer ARN: {layer_arn}", "gray", 0, 1)
 
     layer_builder.build()
 
     if install:
         layers.install_all_layers()
-        logger.log(f"The layers have been installed", "gray", 0, 1)
+        printer.print(f"The layers have been installed", "gray", 0, 1)
 
 
 AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns"])
@@ -448,7 +462,7 @@ AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns"])
     type=click.Choice(AVAILABLE_TRIGGERS),
     default="api_gateway",
 )
-def live_server(function_name, timeout, trigger):
+def live(function_name, timeout, trigger):
     """
     Starts a live development environment for the specified Lambda function.
 
@@ -461,11 +475,7 @@ def live_server(function_name, timeout, trigger):
 
 
 def create_live_dev(function_name, timeout, trigger):
-    print("\033[H\033[J", end="")
-    os.system("clear")
-    text = "Live Development"
-    ascii_art = pyfiglet.figlet_format(text, width=200)
-    logger.log(ascii_art, "rose", 1)
+    printer.show_banner("Live Development")
     live_cli.run_live(function_name, timeout, trigger)
 
 
@@ -489,23 +499,18 @@ def trigger(service, sns_subject, sns_msg_attributes):
 
     The 'service' parameter must match the name of an existing AWS service integration in the project.
     """
-    print("\033[H\033[J", end="")
-    os.system("clear")
-    text = f"Trigger {service.upper()}"
-    ascii_art = pyfiglet.figlet_format(text, width=200)
-    logger.log(ascii_art, "rose", 1)
 
     data = json.load(open("cdk.json", "r"))
     region = data["context"].get("region")
 
     if not region:
-        logger.log("Region Not Found", "red", 1, 1)
+        printer.print("Region Not Found", "red", 1, 1)
         exit()
 
     while True:
         click.echo()
         if service == "sns":
-            LiveSNS(region, logger).publish(sns_subject, sns_msg_attributes)
+            LiveSNS(region, printer).publish(sns_subject, sns_msg_attributes)
 
 
 @forge.command()
@@ -516,6 +521,74 @@ def doc():
     This command generates a new doc template for the project, including Swagger, Redoc, Architecture Diagram, Tests Report, and Coverage Report.
     """
     DocsBuilder.a_doc().with_config().with_lambda_stack().build()
+
+
+@forge.command()
+@click.option(
+    "--stack",
+    help="Stack to deploy",
+)
+@click.option("--all", help="Deploy all stacks", is_flag=True, default=False)
+def deploy(stack, all):
+    """
+    Deploys a stack to AWS
+
+    This command can deploys one stack or all of them altogether
+    """
+    if not stack and not all:
+        raise Exception("You must provide a stack to deploy")
+
+    result = subprocess.run(["cdk", "list"], capture_output=True, text=True)
+    stacks = result.stdout.splitlines()
+    printer.show_banner(f"Deployment")
+    printer.br()
+
+    if all:
+        for stack in stacks:
+            if "/" in str(stack):
+                continue
+            printer.start_spinner(f"Deploying Stack {stack}", "gray")
+            try:
+                subprocess.run(
+                    ["cdk", "deploy", stack, "--require-approval", "never"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+            except Exception as e:
+                printer.stop_spinner()
+                printer.print(f"\r{e}", "red")
+                exit()
+
+            printer.stop_spinner()
+            printer.print(f"\rStack {stack} Deployed", "green")
+
+    else:
+
+        stack_name = None
+        for item in stacks:
+            if stack in item:
+                stack_name = item
+                break
+
+        if not stack_name:
+            raise Exception(f"{stack_name} Not Found")
+
+        printer.start_spinner(f"Deploying Stack {stack_name}", "gray")
+        try:
+            subprocess.run(
+                ["cdk", "deploy", stack_name, "--require-approval", "never"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+        except Exception as e:
+            printer.stop_spinner()
+            printer.print(f"\r{e}", "red")
+            exit()
+
+        printer.stop_spinner()
+        printer.print(f"\rStack {stack_name} Deployed", "green")
 
 
 if __name__ == "__main__":

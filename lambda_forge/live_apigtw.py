@@ -2,12 +2,12 @@ import boto3
 
 
 class LiveApiGtw:
-    def __init__(self, account, region, urlpath, logger) -> None:
+    def __init__(self, account, region, urlpath, printer) -> None:
         self.stage = "live"
         self.account = account
         self.region = region
         self.urlpath = urlpath.strip("/")
-        self.logger = logger
+        self.printer = printer
         self.api_client = boto3.client("apigateway", region_name=self.region)
         self.lambda_client = boto3.client("lambda", region_name=self.region)
         self.root_id = self.__create_api()["id"]
@@ -29,7 +29,7 @@ class LiveApiGtw:
         return rest_api
 
     def create_endpoint(self, function_arn, stub_name):
-        self.logger.change_spinner_legend("Creating API Gateway Endpoint")
+        self.printer.change_spinner_legend("Creating API Gateway Endpoint")
         self.__delete_lambda_resources(function_arn)
 
         all_resources = self.api_client.get_resources(restApiId=self.root_id)["items"]

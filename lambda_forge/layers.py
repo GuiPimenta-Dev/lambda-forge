@@ -8,7 +8,7 @@ from pathlib import Path
 
 import boto3
 
-from lambda_forge.logs import Logger
+from lambda_forge.printer import Printer
 
 
 def create_and_install_package(package_name):
@@ -196,7 +196,7 @@ def install_external_layer(library_name):
 
 
 def update_requirements_txt(requirements_file, library):
-    logger = Logger()
+    printer = Printer()
     try:
         if library in open(requirements_file).read():
             return
@@ -204,4 +204,4 @@ def update_requirements_txt(requirements_file, library):
         with open(requirements_file, "a") as file:
             file.write(f"\n{library}")
     except Exception as e:
-        logger.log(f"Error occurred: {str(e)}", "red")
+        printer.print(f"Error occurred: {str(e)}", "red")
