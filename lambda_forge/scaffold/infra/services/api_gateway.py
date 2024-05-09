@@ -20,10 +20,10 @@ class APIGateway:
             },
         )
 
-        self.rest = REST(scope=scope, context=context, api=api)
+        self.rest = REST(scope=scope, api=api, context=context)
 
     @track
-    def create_endpoint(self, method, path, function, public=None, authorizer=None):
+    def create_endpoint(self, method, path, function, public=False, authorizer=None):
         self.rest.create_endpoint(method=method, path=path, function=function, public=public, authorizer=authorizer)
 
     def create_authorizer(self, function, name, default=False):

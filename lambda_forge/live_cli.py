@@ -30,9 +30,11 @@ def run_live(function_name, timeout, trigger):
     iot_endpoint = iot_endpoint.replace(".iot.", "-ats.iot.")
 
     try:
-        subprocess.run(["export", "TRACK_FUNCTIONS=true"], check=True)
-        with open(os.devnull, "w") as devnull:
-            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+       os.environ['TRACK_FUNCTIONS'] = 'true'
+       with open(os.devnull, "w") as devnull:
+            subprocess.run(
+                ["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True
+            )
     except Exception as e:
         printer.print(str(e), "red", 1, 1)
         exit()
@@ -52,7 +54,15 @@ def run_live(function_name, timeout, trigger):
 
             printer.start_spinner(f"Creating Function {stub_name}")
             urlpath = function.get("endpoint", function["name"].lower())
-            live_lambda = LiveLambda(function["name"], region, timeout, iot_endpoint, account, urlpath, printer)
+            live_lambda = LiveLambda(
+                function["name"],
+                region,
+                timeout,
+                iot_endpoint,
+                account,
+                urlpath,
+                printer,
+            )
             function_arn = live_lambda.create_lambda()
 
             if trigger == "api_gateway":
@@ -68,5 +78,12 @@ def run_live(function_name, timeout, trigger):
             printer.stop_spinner()
             current_dir = os.path.dirname(os.path.abspath(__file__))
             subprocess.run(
-                ["python", current_dir + "/live_server.py", function["name"], function["path"], iot_endpoint, trigger]
+                [
+                    "python",
+                    current_dir + "/live_server.py",
+                    function["name"],
+                    function["path"],
+                    iot_endpoint,
+                    trigger,
+                ]
             )

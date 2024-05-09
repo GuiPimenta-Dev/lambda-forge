@@ -93,13 +93,13 @@ def log_request(event):
         event = LiveSNS.parse_logs(event)
 
     printer.print("------------------------ + ------------------------", "gray", 1)
-    printer.print(f"Request: ", "white", 1, 1)
-    printer.print(f"{json.dumps(event, indent=4)}", "white")
+    printer.print(f"Request: ", "gray", 1, 1)
+    printer.print(f"{json.dumps(event, indent=4)}", "gray")
 
 
 def log_response(response):
-    printer.print(f"Response: ", "white", 1, 1)
-    printer.print(f"{json.dumps(response, indent=4)}", "white")
+    printer.print(f"Response: ", "gray", 1, 1)
+    printer.print(f"{json.dumps(response, indent=4)}", "gray")
 
 
 watchdog_thread = threading.Thread(target=watchdog)

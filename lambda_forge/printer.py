@@ -23,7 +23,7 @@ class Printer:
         "black": "\033[38;2;0;0;0m",
     }
 
-    def start_spinner(self, legend, color="white"):
+    def start_spinner(self, legend, color="gray"):
         if self.spinner["running"]:
             self.stop_spinner()
         self.spinner["running"] = True

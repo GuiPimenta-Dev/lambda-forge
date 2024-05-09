@@ -547,7 +547,7 @@ def deploy(stack, all):
                 exit()
 
             printer.stop_spinner()
-            printer.print(f"\rStack {stack} Deployed", "green")
+            printer.print(f"\rStack {stack} Deployed", "green", 0, 1)
 
     else:
 
@@ -574,7 +574,7 @@ def deploy(stack, all):
             exit()
 
         printer.stop_spinner()
-        printer.print(f"\rStack {stack_name} Deployed", "green")
+        printer.print(f"\rStack {stack_name} Deployed", "green", 0, 1)
 
 
 if __name__ == "__main__":
