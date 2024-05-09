@@ -1,8 +1,6 @@
 from aws_cdk import Duration
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
-from aws_cdk import CfnOutput
-from lambda_forge import track
 
 
 class REST:
@@ -19,12 +17,7 @@ class REST:
         self.__authorizers = {}
         self.__default_authorizer = None
         self.api = api
-        CfnOutput(scope, "API-GATEWAY-BASE-URL",
-            value=api.url,
-            description="The base URL of the API Gateway"
-        )
 
-    @track
     def create_endpoint(self, method, path, function, public=None, authorizer=None):
         public = public or self.public_by_default
         resource = self.__create_resource(path)

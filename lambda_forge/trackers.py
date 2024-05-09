@@ -52,7 +52,7 @@ def track(func):
     return wrapper
 
 
-def release(func):
+def reset(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         should_track = check_track_env_variable()

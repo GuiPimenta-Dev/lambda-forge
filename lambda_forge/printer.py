@@ -33,12 +33,11 @@ class Printer:
         spinner_thread.start()
         self.spinner["thread"] = spinner_thread
 
-
     def spinner_task(self, color="white"):
         spinner_symbols = itertools.cycle(["-", "\\", "|", "/"])
         while self.spinner["running"]:
             sys.stdout.write(f"\r{color}{next(spinner_symbols)}   {self.spinner['legend']}\033[0m")
-            sys.stdout.write('\033[?25l')            
+            sys.stdout.write("\033[?25l")
             sys.stdout.flush()
             time.sleep(0.1)
 
@@ -48,7 +47,7 @@ class Printer:
             self.spinner["thread"].join()
             sys.stdout.write("\r")
             sys.stdout.write(" " * (len(self.spinner["legend"]) + 4))
-            sys.stdout.write('\033[?25h')
+            sys.stdout.write("\033[?25h")
             sys.stdout.flush()
 
     def change_spinner_legend(self, legend):

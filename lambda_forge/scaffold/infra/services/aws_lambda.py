@@ -1,8 +1,8 @@
 from aws_cdk import Duration
 from aws_cdk.aws_lambda import Code, Function, Runtime
 
-from lambda_forge.trackers import track
 from lambda_forge import Path
+from lambda_forge.trackers import track
 
 
 class Lambda:
