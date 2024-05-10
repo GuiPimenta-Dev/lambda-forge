@@ -479,7 +479,7 @@ def trigger(service):
         click.echo()
         if service == "api_gateway":
             LiveApiGtw.publish(printer)
-        
+
         if service == "sns":
             LiveSNS(region, printer).publish()
 
@@ -488,7 +488,7 @@ def trigger(service):
 
         if service == "s3":
             LiveS3(region, printer).publish()
-        
+
         if service == "event_bridge":
             LiveEvent(region, printer).publish()
 

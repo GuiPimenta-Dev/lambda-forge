@@ -44,7 +44,7 @@ class SNS:
 
     def with_layers(self):
         f = """from aws_cdk import aws_lambda as _lambda
-from lambda_forge import Path
+from lambda_forge.path import Path
 
 
 class Layers:

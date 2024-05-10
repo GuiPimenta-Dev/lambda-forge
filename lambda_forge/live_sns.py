@@ -29,4 +29,3 @@ class LiveSNS:
         self.printer.show_banner("SNS")
         message = click.prompt(click.style("Message", fg=(37, 171, 190)), type=str)
         self.sns.publish(TopicArn=self.topic_arn, Message=message)
-

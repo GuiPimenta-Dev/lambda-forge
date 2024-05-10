@@ -1,8 +1,10 @@
+import ast
 import time
 import uuid
+
 import boto3
 import click
-import ast
+
 
 class LiveS3:
     def __init__(self, region, printer):
@@ -44,14 +46,7 @@ class LiveS3:
             }
 
             time.sleep(6)
-            self.lambda_client.add_permission(
-                FunctionName=function_arn,
-                StatementId=f"{bucket_name}-invoke",
-                Action="lambda:InvokeFunction",
-                Principal="s3.amazonaws.com",
-                SourceArn=f"arn:aws:s3:::{bucket_name}",
-                SourceAccount=account_id
-            )
+            self.lambda_client.add_permission(FunctionName=function_arn, StatementId=f"{bucket_name}-invoke", Action="lambda:InvokeFunction", Principal="s3.amazonaws.com", SourceArn=f"arn:aws:s3:::{bucket_name}", SourceAccount=account_id)
 
             # Set the notification configuration on the bucket
             self.s3_client.put_bucket_notification_configuration(
@@ -70,13 +65,13 @@ class LiveS3:
         metadata = click.prompt(click.style("Metadata", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
         file_path = click.prompt(click.style("File Path", fg=(37, 171, 190)), type=str)
         filename = file_path.split("/")[-1]
-        
+
         bucket_name = None
         existing_buckets = self.s3_client.list_buckets()["Buckets"]
         for bucket in existing_buckets:
             if bucket["Name"].startswith("live-s3-"):
-              bucket_name = bucket["Name"]
-              break
+                bucket_name = bucket["Name"]
+                break
 
         metadata = ast.literal_eval(metadata)
 

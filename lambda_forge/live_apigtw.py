@@ -2,6 +2,7 @@ import boto3
 import click
 import requests
 
+
 class LiveApiGtw:
     def __init__(self, account, region, urlpath, printer) -> None:
         self.stage = "live"
@@ -46,18 +47,12 @@ class LiveApiGtw:
         for part in urlpaths:
             current_path += f"/{part}"
             existing_resource = next(
-                (
-                    resource
-                    for resource in all_resources
-                    if resource["path"] == current_path
-                ),
+                (resource for resource in all_resources if resource["path"] == current_path),
                 None,
             )
 
             if not existing_resource:
-                resource = self.api_client.create_resource(
-                    restApiId=self.root_id, parentId=parent_id, pathPart=part
-                )
+                resource = self.api_client.create_resource(restApiId=self.root_id, parentId=parent_id, pathPart=part)
                 parent_id = resource["id"]
                 all_resources.append({"id": resource["id"], "path": current_path})
             else:
@@ -97,21 +92,13 @@ class LiveApiGtw:
         linked_resources = []
         for resource in resources:
             for method in resource.get("resourceMethods", {}).keys():
-                integration = self.api_client.get_integration(
-                    restApiId=self.root_id, resourceId=resource["id"], httpMethod=method
-                )
-                if integration.get("uri", "").endswith(
-                    f"functions/{function_arn}/invocations"
-                ):
+                integration = self.api_client.get_integration(restApiId=self.root_id, resourceId=resource["id"], httpMethod=method)
+                if integration.get("uri", "").endswith(f"functions/{function_arn}/invocations"):
                     linked_resources.append(resource)
 
-        for resource in sorted(
-            linked_resources, key=lambda x: x["path"].count("/"), reverse=True
-        ):
+        for resource in sorted(linked_resources, key=lambda x: x["path"].count("/"), reverse=True):
             try:
-                self.api_client.delete_resource(
-                    restApiId=self.root_id, resourceId=resource["id"]
-                )
+                self.api_client.delete_resource(restApiId=self.root_id, resourceId=resource["id"])
             except:
                 pass
 
@@ -152,11 +139,7 @@ class LiveApiGtw:
             "X-Forwarded-Port",
             "X-Forwarded-Proto",
         ]
-        filtered_headers = {
-            key: value
-            for key, value in event["headers"].items()
-            if key not in keys_to_remove
-        }
+        filtered_headers = {key: value for key, value in event["headers"].items() if key not in keys_to_remove}
         event["headers"] = filtered_headers or None
         return event
 
@@ -167,4 +150,4 @@ class LiveApiGtw:
         method = click.prompt(click.style("Method", fg=(37, 171, 190)), type=str, default="GET")
         headers = click.prompt(click.style("Headers", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
         body = click.prompt(click.style("Body", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
-        requests.request(method, url, headers=eval(headers), data=eval(body))
+        requests.request(method, url, headers=eval(headers), data=body)

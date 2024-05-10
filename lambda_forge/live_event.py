@@ -1,7 +1,8 @@
 import json
+import uuid
+
 import boto3
 import click
-import uuid
 
 
 class LiveEvent:
@@ -53,13 +54,7 @@ class LiveEvent:
         event = {
             "Source": "my.application",
             "DetailType": "UserAction",
-            "Detail": json.dumps(
-                {
-                    "message": click.prompt(
-                        click.style("Message", fg=(37, 171, 190)), type=str, default="", show_default=False
-                    )
-                }
-            ),
+            "Detail": json.dumps({"message": click.prompt(click.style("Message", fg=(37, 171, 190)), type=str, default="", show_default=False)}),
             "EventBusName": self.bus_name,
         }
         self.event_client.put_events(Entries=[event])
