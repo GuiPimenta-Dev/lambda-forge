@@ -1,6 +1,5 @@
 from aws_cdk import aws_iam as iam
 from aws_cdk.aws_lambda import CfnPermission
-from b_aws_websocket_api.ws_api import WsApi
 from b_aws_websocket_api.ws_deployment import WsDeployment
 from b_aws_websocket_api.ws_lambda_integration import WsLambdaIntegration
 from b_aws_websocket_api.ws_route import WsRoute
