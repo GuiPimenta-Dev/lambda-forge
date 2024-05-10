@@ -35,7 +35,7 @@ class LiveLambda:
                 Description="Lambda Stub for Live Development with AWS IoT Core",
                 Runtime="python3.9",
                 Role=role["Role"]["Arn"],
-                Handler="live.lambda_handler",
+                Handler="main.lambda_handler",
                 Code={"ZipFile": zip_file.read()},
                 Publish=True,
                 Timeout=900,
@@ -56,7 +56,7 @@ class LiveLambda:
         temp_dir = tempfile.mkdtemp()
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        live = current_dir + "/live.py"
+        live = current_dir + "live/main.py"
         files_to_copy = [live, cert, private, ca]
 
         for file_name in files_to_copy:

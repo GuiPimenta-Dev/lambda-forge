@@ -12,11 +12,7 @@ from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
-from lambda_forge.live_apigtw import LiveApiGtw
-from lambda_forge.live_event import LiveEvent
-from lambda_forge.live_s3 import LiveS3
-from lambda_forge.live_sns import LiveSNS
-from lambda_forge.live_sqs import LiveSQS
+from lambda_forge.live import LiveApiGtw, LiveEvent, LiveS3, LiveSNS, LiveSQS
 from lambda_forge.printer import Printer
 
 printer = Printer()
