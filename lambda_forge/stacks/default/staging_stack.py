@@ -7,7 +7,7 @@ from infra.stages.deploy import DeployStage
 
 from lambda_forge.constants import ECR
 from lambda_forge.context import context
-from lambda_forge.services import CodeBuildSteps
+from lambda_forge.steps import CodeBuildSteps
 
 
 @context(stage="Staging", resources="staging")
