@@ -5,6 +5,7 @@ import subprocess
 import boto3
 
 from lambda_forge.live_apigtw import LiveApiGtw
+from lambda_forge.live_event import LiveEvent
 from lambda_forge.live_lambda import LiveLambda
 from lambda_forge.live_s3 import LiveS3
 from lambda_forge.live_sns import LiveSNS
@@ -82,8 +83,14 @@ def run_live(function_name, timeout, trigger):
 
             if trigger == "s3":
                 live_s3 = LiveS3(region, printer)
-                bucket_arn = live_s3.subscribe(function_arn, account)
-                printer.print(f"\rBucket ARN: {bucket_arn}", "cyan")
+                bus_arn = live_s3.subscribe(function_arn, account)
+                printer.print(f"\rBucket ARN: {bus_arn}", "cyan")
+            
+            if trigger == "event_bridge":
+                live_event = LiveEvent(region, printer)
+                bus_arn = live_event.subscribe(function_arn, account)
+                printer.print(f"\rBus ARN: {bus_arn}", "cyan")
+                
 
             printer.stop_spinner()
             current_dir = os.path.dirname(os.path.abspath(__file__))

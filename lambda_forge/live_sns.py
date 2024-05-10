@@ -30,17 +30,3 @@ class LiveSNS:
         message = click.prompt(click.style("Message", fg=(37, 171, 190)), type=str)
         self.sns.publish(TopicArn=self.topic_arn, Message=message)
 
-    @staticmethod
-    def parse_logs(event):
-        event = event["Records"][0]["Sns"]
-        message = event["Message"]
-
-        return {
-            "Records": [
-                {
-                    "Sns": {
-                        "Message": message,
-                    }
-                }
-            ]
-        }

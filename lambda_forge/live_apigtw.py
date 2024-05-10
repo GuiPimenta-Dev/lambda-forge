@@ -13,7 +13,7 @@ class LiveApiGtw:
         self.root_id = self.__create_api()["id"]
 
     def __create_api(self):
-        name = "Live-Server-REST"
+        name = "Live-REST"
         existing_apis = self.api_client.get_rest_apis()
 
         rest_api = None
@@ -23,7 +23,10 @@ class LiveApiGtw:
                 break
 
         if not rest_api:
-            rest_api = self.api_client.create_rest_api(name=name, description="API Gateway for running Lambda Functions Live with AWS IoT")
+            rest_api = self.api_client.create_rest_api(
+                name=name,
+                description="API Gateway for running Lambda Functions Live with AWS IoT",
+            )
         return rest_api
 
     def create_endpoint(self, function_arn, stub_name):
@@ -31,23 +34,40 @@ class LiveApiGtw:
         self.__delete_lambda_resources(function_arn)
 
         all_resources = self.api_client.get_resources(restApiId=self.root_id)["items"]
-        parent_id = next((resource["id"] for resource in all_resources if resource["path"] == "/"), None)
+        parent_id = next(
+            (resource["id"] for resource in all_resources if resource["path"] == "/"),
+            None,
+        )
 
         urlpaths = self.urlpath.split("/")
         current_path = ""
 
         for part in urlpaths:
             current_path += f"/{part}"
-            existing_resource = next((resource for resource in all_resources if resource["path"] == current_path), None)
+            existing_resource = next(
+                (
+                    resource
+                    for resource in all_resources
+                    if resource["path"] == current_path
+                ),
+                None,
+            )
 
             if not existing_resource:
-                resource = self.api_client.create_resource(restApiId=self.root_id, parentId=parent_id, pathPart=part)
+                resource = self.api_client.create_resource(
+                    restApiId=self.root_id, parentId=parent_id, pathPart=part
+                )
                 parent_id = resource["id"]
                 all_resources.append({"id": resource["id"], "path": current_path})
             else:
                 parent_id = existing_resource["id"]
 
-        self.api_client.put_method(restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY", authorizationType="NONE")
+        self.api_client.put_method(
+            restApiId=self.root_id,
+            resourceId=parent_id,
+            httpMethod="ANY",
+            authorizationType="NONE",
+        )
 
         self.api_client.put_integration(
             restApiId=self.root_id,
@@ -76,13 +96,21 @@ class LiveApiGtw:
         linked_resources = []
         for resource in resources:
             for method in resource.get("resourceMethods", {}).keys():
-                integration = self.api_client.get_integration(restApiId=self.root_id, resourceId=resource["id"], httpMethod=method)
-                if integration.get("uri", "").endswith(f"functions/{function_arn}/invocations"):
+                integration = self.api_client.get_integration(
+                    restApiId=self.root_id, resourceId=resource["id"], httpMethod=method
+                )
+                if integration.get("uri", "").endswith(
+                    f"functions/{function_arn}/invocations"
+                ):
                     linked_resources.append(resource)
 
-        for resource in sorted(linked_resources, key=lambda x: x["path"].count("/"), reverse=True):
+        for resource in sorted(
+            linked_resources, key=lambda x: x["path"].count("/"), reverse=True
+        ):
             try:
-                self.api_client.delete_resource(restApiId=self.root_id, resourceId=resource["id"])
+                self.api_client.delete_resource(
+                    restApiId=self.root_id, resourceId=resource["id"]
+                )
             except:
                 pass
 
@@ -123,6 +151,10 @@ class LiveApiGtw:
             "X-Forwarded-Port",
             "X-Forwarded-Proto",
         ]
-        filtered_headers = {key: value for key, value in event["headers"].items() if key not in keys_to_remove}
+        filtered_headers = {
+            key: value
+            for key, value in event["headers"].items()
+            if key not in keys_to_remove
+        }
         event["headers"] = filtered_headers or None
         return event

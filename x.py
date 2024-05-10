@@ -1,73 +1,77 @@
+import json
 import boto3
+import click
 import uuid
 
+class LiveEvent:
+    def __init__(self, region, printer):
+        self.event_client = boto3.client("events", region_name=region)
+        self.lambda_client = boto3.client("lambda", region_name=region)
+        self.printer = printer
+        self.region = region
+        self.bus_name = "Live-Event"
+        self.ensure_bus_exists()
 
-def create_or_replace_bucket_with_trigger(lambda_arn):
-    s3 = boto3.client("s3")
-    lambda_client = boto3.client("lambda")
-    account_id = "211125768252"
+    def ensure_bus_exists(self):
+        buses = self.event_client.list_event_buses(NamePrefix=self.bus_name)
+        bus_exists = any(bus['Name'] == self.bus_name for bus in buses['EventBuses'])
+        
+        if bus_exists:
+            rules = self.event_client.list_rules(EventBusName=self.bus_name)
+            for rule in rules['Rules']:
+                targets = self.event_client.list_targets_by_rule(Rule=rule['Name'], EventBusName=self.bus_name)
+                target_ids = [target['Id'] for target in targets['Targets']]
+                if target_ids:
+                    self.event_client.remove_targets(Rule=rule['Name'], EventBusName=self.bus_name, Ids=target_ids)
+                self.event_client.delete_rule(Name=rule['Name'], EventBusName=self.bus_name)
+            self.event_client.delete_event_bus(Name=self.bus_name)
+        
+        self.event_client.create_event_bus(Name=self.bus_name)
 
-    # Create a unique bucket name
-    new_bucket_name = f"live-s3-{uuid.uuid4()}"
+    def subscribe(self, function_arn, account_id):
+        # self.printer.change_spinner_legend("Creating EventBridge rule")
+        
+        rule_name = f"Live-Rule"
+        # Add permission for EventBridge to invoke Lambda
+        self.lambda_client.add_permission(
+            FunctionName=function_arn,
+            StatementId=str(uuid.uuid4()),
+            Action="lambda:InvokeFunction",
+            Principal="events.amazonaws.com",
+            SourceArn=f"arn:aws:events:{self.region}:{account_id}:rule/{self.bus_name}/{rule_name}"
+        )
 
-    # Check for existing buckets and delete them if they match the naming pattern
-    existing_buckets = s3.list_buckets()["Buckets"]
-    for bucket in existing_buckets:
-        if bucket["Name"].startswith("live-s3-"):
-            # Check and empty the bucket before deletion
-            object_list = s3.list_objects(Bucket=bucket["Name"])
-            if "Contents" in object_list:
-                for obj in object_list["Contents"]:
-                    s3.delete_object(Bucket=bucket["Name"], Key=obj["Key"])
-            print(f"Deleting bucket {bucket['Name']}")
-            s3.delete_bucket(Bucket=bucket["Name"])
+        # Create or update rule to target Lambda
+        self.event_client.put_rule(
+            Name=rule_name,
+            EventBusName=self.bus_name,
+            EventPattern=json.dumps({"source": ["my.application"]}),
+            State="ENABLED"
+        )
+        self.event_client.put_targets(
+            Rule=rule_name,
+            EventBusName=self.bus_name,
+            Targets=[{
+                'Id': 'target1',
+                'Arn': function_arn
+            }]
+        )
 
-    # Create the new bucket
-    s3.create_bucket(
-        Bucket=new_bucket_name,
-        CreateBucketConfiguration={"LocationConstraint": "us-east-2"},
-    )
-    print(f"Created new bucket {new_bucket_name}")
+        return f"arn:aws:events:{self.region}:{account_id}:event-bus/{self.bus_name}"
 
-    # Set up the Lambda trigger
-    events = [
-        "s3:ObjectCreated:*",
-        "s3:ObjectRemoved:*",
-        "s3:ObjectRestore:*",
-        "s3:ReducedRedundancyLostObject",
-    ]
-
-    lambda_config = {
-        "LambdaFunctionArn": lambda_arn,
-        "Events": events,
-        "Filter": {
-            "Key": {
-                "FilterRules": [
-                    {"Name": "prefix", "Value": ""},
-                    {"Name": "suffix", "Value": ""},
-                ]
-            }
-        },
-    }
-
-    # Add permission for S3 to invoke the Lambda function
-    lambda_client.add_permission(
-        FunctionName=lambda_arn,
-        StatementId=f"{new_bucket_name}-invoke",
-        Action="lambda:InvokeFunction",
-        Principal="s3.amazonaws.com",
-        SourceArn=f"arn:aws:s3:::{new_bucket_name}",
-        SourceAccount=account_id
-    )
-
-    # Set the notification configuration on the bucket
-    s3.put_bucket_notification_configuration(
-        Bucket=new_bucket_name,
-        NotificationConfiguration={"LambdaFunctionConfigurations": [lambda_config]},
-    )
-    print(f"Trigger created for bucket {new_bucket_name} and lambda {lambda_arn}")
+    def publish(self):
+        # self.printer.show_banner("Event Bridge")
+        event = {
+            'Source': 'my.application',
+            'DetailType': 'UserAction',
+            'Detail': json.dumps({'message': click.prompt(click.style("Message", fg=(37, 171, 190)), type=str)}),
+            'EventBusName': self.bus_name
+        }
+        self.event_client.put_events(Entries=[event])
 
 
 # Example usage
-lambda_arn = "arn:aws:lambda:us-east-2:211125768252:function:HelloAres-Live"
-create_or_replace_bucket_with_trigger(lambda_arn)
+lambda_arn = "arn:aws:lambda:us-east-2:211125768252:function:HelloJhony-Live"
+e = LiveEvent("us-east-2", "qew")
+e.subscribe(lambda_arn, "211125768252")    
+e.publish()
