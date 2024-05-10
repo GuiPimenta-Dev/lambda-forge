@@ -5,7 +5,7 @@ import boto3
 import click
 
 
-class LiveEvent:
+class LiveEventBridge:
     def __init__(self, region, printer):
         self.event_client = boto3.client("events", region_name=region)
         self.lambda_client = boto3.client("lambda", region_name=region)

@@ -4,13 +4,8 @@ import subprocess
 
 import boto3
 
-from lambda_forge.live_apigtw import LiveApiGtw
-from lambda_forge.live_event import LiveEvent
-from lambda_forge.live_lambda import LiveLambda
-from lambda_forge.live_s3 import LiveS3
-from lambda_forge.live_sns import LiveSNS
-from lambda_forge.live_sqs import LiveSQS
 from lambda_forge.printer import Printer
+from . import LiveApiGtw, LiveEventBridge, LiveLambda, LiveS3, LiveSNS, LiveSQS
 
 printer = Printer()
 
@@ -87,7 +82,7 @@ def run_live(function_name, timeout, trigger):
                 printer.print(f"\rBucket ARN: {bus_arn}", "cyan")
 
             if trigger == "event_bridge":
-                live_event = LiveEvent(region, printer)
+                live_event = LiveEventBridge(region, printer)
                 bus_arn = live_event.subscribe(function_arn, account)
                 printer.print(f"\rBus ARN: {bus_arn}", "cyan")
 
