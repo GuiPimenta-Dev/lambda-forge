@@ -28,7 +28,7 @@ class StagingStack(cdk.Stack):
                 )
             ),
         )
-        
+
         steps = CodeBuildSteps(self, context, source=source)
 
         # pre
