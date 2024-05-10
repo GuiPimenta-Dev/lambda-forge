@@ -56,7 +56,7 @@ class LiveEvent:
             "Detail": json.dumps(
                 {
                     "message": click.prompt(
-                        click.style("Message", fg=(37, 171, 190)), type=str
+                        click.style("Message", fg=(37, 171, 190)), type=str, default="", show_default=False
                     )
                 }
             ),
