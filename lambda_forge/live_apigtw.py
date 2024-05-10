@@ -1,5 +1,6 @@
 import boto3
-
+import click
+import requests
 
 class LiveApiGtw:
     def __init__(self, account, region, urlpath, printer) -> None:
@@ -158,3 +159,12 @@ class LiveApiGtw:
         }
         event["headers"] = filtered_headers or None
         return event
+
+    @staticmethod
+    def publish(printer):
+        printer.show_banner("API Gateway")
+        url = click.prompt(click.style("URL", fg=(37, 171, 190)), type=str)
+        method = click.prompt(click.style("Method", fg=(37, 171, 190)), type=str, default="GET")
+        headers = click.prompt(click.style("Headers", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
+        body = click.prompt(click.style("Body", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
+        requests.request(method, url, headers=eval(headers), data=eval(body))
