@@ -82,7 +82,7 @@ def run_live(function_name, timeout, trigger):
 
             if trigger == "s3":
                 live_s3 = LiveS3(region, printer)
-                bucket_arn = live_s3.subscribe(function_arn, stub_name)
+                bucket_arn = live_s3.subscribe(function_arn, account)
                 printer.print(f"\rBucket ARN: {bucket_arn}", "cyan")
 
             printer.stop_spinner()

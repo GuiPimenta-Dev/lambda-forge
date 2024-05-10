@@ -27,7 +27,7 @@ class LiveSQS:
                 "Statement": [{"Effect": "Allow", "Action": "sqs:*", "Resource": "*"}],
             }
 
-            self.iam = self.iam.attach_policy_to_lambda(policy, function_arn)
+            self.iam = self.iam.attach_policy_to_lambda(policy, function_arn, "Live-SQS")
 
             self.sqs.set_queue_attributes(QueueUrl=self.queue_url, Attributes={"VisibilityTimeout": "900"})
 
@@ -44,23 +44,10 @@ class LiveSQS:
         self.printer.show_banner("SQS")
 
         message = click.prompt(click.style("Message", fg=(37, 171, 190)), type=str)
-        try:
-            self.sqs.send_message(
-                QueueUrl=self.queue_url,
-                MessageBody=message,
-            )
-        except:
-            self.print_failure(self.printer)
-
-    @staticmethod
-    def print_failure(printer):
-        printer.print("Failed to Publish Message!", "red")
-        printer.print("Example of a Valid Payload: ", "gray", 1)
-        payload = {
-            "message": "Hello World!",
-            "message_attributes": {"Author": {"StringValue": "Daniel", "DataType": "String"}},
-        }
-        printer.print(json.dumps(payload, indent=4), "gray", 1, 1)
+        self.sqs.send_message(
+            QueueUrl=self.queue_url,
+            MessageBody=message,
+        )
 
     def delete_triggers(self):
         response = self.lambda_client.list_event_source_mappings(EventSourceArn=self.queue_arn)

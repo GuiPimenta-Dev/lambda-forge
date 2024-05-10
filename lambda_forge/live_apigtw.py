@@ -93,12 +93,6 @@ class LiveApiGtw:
     @staticmethod
     def parse_logs(event):
         event.pop("multiValueHeaders", None)
-        event.pop("resource", None)
-        event.pop("path", None)
-        event.pop("multiValueQueryStringParameters", None)
-        event.pop("stageVariables", None)
-        event.pop("requestContext", None)
-        event.pop("isBase64Encoded", None)
         keys_to_remove = [
             "Accept",
             "Accept-Encoding",

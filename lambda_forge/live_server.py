@@ -90,12 +90,6 @@ def log_request(event):
     if args.trigger == "api_gateway":
         event = LiveApiGtw.parse_logs(event)
 
-    if args.trigger == "sns":
-        event = LiveSNS.parse_logs(event)
-
-    if args.trigger == "sqs":
-        event = LiveSQS.parse_logs(event)
-
     printer.print("------------------------ + ------------------------", "gray", 1)
     printer.print(f"Request: ", "gray", 1, 1)
     printer.print(f"{json.dumps(event, indent=4)}", "gray")

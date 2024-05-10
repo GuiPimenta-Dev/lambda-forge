@@ -1,7 +1,6 @@
 import json
 import re
 import subprocess
-import time
 
 import click
 from InquirerPy import get_style, inquirer
@@ -13,6 +12,7 @@ from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
+from lambda_forge.live_s3 import LiveS3
 from lambda_forge.live_sns import LiveSNS
 from lambda_forge.live_sqs import LiveSQS
 from lambda_forge.printer import Printer
@@ -480,6 +480,9 @@ def trigger(service):
 
         if service == "sqs":
             LiveSQS(region, printer).publish()
+
+        if service == "s3":
+            LiveS3(region, printer).publish()
 
 
 @forge.command()
