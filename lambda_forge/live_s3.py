@@ -67,7 +67,7 @@ class LiveS3:
 
     def publish(self):
         self.printer.show_banner("S3")
-        metadata = click.prompt(click.style("Metadata", fg=(37, 171, 190)), type=str)
+        metadata = click.prompt(click.style("Metadata", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
         file_path = click.prompt(click.style("File Path", fg=(37, 171, 190)), type=str)
         filename = file_path.split("/")[-1]
         
