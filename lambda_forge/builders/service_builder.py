@@ -16,21 +16,7 @@ from aws_cdk import aws_lambda_event_sources
 
 class SNS:
     def __init__(self, scope, context) -> None:
-        self.context = context
-
-        # self.sns_topic = Topic.from_topic_arn(
-        #     scope,
-        #     id="SNSTopic",
-        #     topic_arn=context.resources["arns"]["sns_topic_arn"],
-        # )
         ...
-
-    def create_trigger(self, topic, function, stages=None):
-        if stages and self.context.stage not in stages:
-            return
-
-        sns_subscription = aws_lambda_event_sources.SnsEventSource(topic)
-        function.add_event_source(sns_subscription)
 """
         file_exists = self.file_exists("infra/services/sns.py")
         if not file_exists:
@@ -49,12 +35,6 @@ from lambda_forge.path import Path
 
 class Layers:
     def __init__(self, scope) -> None:
-
-        # self.layer = _lambda.LayerVersion.from_layer_version_arn(
-        #     scope,
-        #     id="Layer",
-        #     layer_version_arn="",
-        # )
         ...
 """
         file_exists = self.file_exists("infra/services/layers.py")
@@ -74,22 +54,8 @@ from aws_cdk import aws_iam as iam
 
 class DynamoDB:
     def __init__(self, scope, context) -> None:
-
-        # self.dynamo = dynamo_db.Table.from_table_arn(
-        #     scope,
-        #     "Dynamo",
-        #     context.resources["arns"]["dynamo_arn"],
-        # )
         ...
 
-    @staticmethod
-    def add_query_permission(table, function):
-        function.add_to_role_policy(
-            iam.PolicyStatement(
-                actions=["dynamodb:Query"],
-                resources=[f"{table.table_arn}/index/*"],
-            )
-        )
 """
         file_exists = self.file_exists("infra/services/dynamo_db.py")
         if not file_exists:
@@ -107,12 +73,6 @@ class DynamoDB:
         
 class SecretsManager:
     def __init__(self, scope, context) -> None:
-
-        # self.secrets_manager = secrets_manager.Secret.from_secret_complete_arn(
-        #     scope,
-        #     id="SecretsManager",
-        #     secret_complete_arn=context.resources["arns"]["secrets_manager_arn"],
-        # )
         ...
 """
         file_exists = self.file_exists("infra/services/secrets_manager.py")
@@ -131,12 +91,6 @@ class SecretsManager:
 
 class Cognito:
     def __init__(self, scope, context) -> None:
-
-        # self.cognito = cognito.UserPool.from_user_pool_arn(
-        #     scope,
-        #     "Cognito",
-        #     user_pool_arn=context.resources["arns"]["cognito_arn"],
-        # )
         ...
 """
         file_exists = self.file_exists("infra/services/cognito.py")
@@ -156,21 +110,7 @@ from aws_cdk import aws_s3_notifications
 
 class S3:
     def __init__(self, scope, context) -> None:
-
-        # self.s3 = s3.Bucket.from_bucket_arn(
-        #     scope,
-        #     "S3",
-        #     bucket_arn=context.resources["arns"]["s3_arn"],
-        # )
         ...
-
-    def create_trigger(self, bucket, function, stages=None):
-        if stages and self.context.stage not in stages:
-            return
-
-        notifications = aws_s3_notifications.LambdaDestination(function)
-        bucket.add_event_notification(s3.EventType.OBJECT_CREATED, notifications)
-
 """
         file_exists = self.file_exists("infra/services/s3.py")
         if not file_exists:
@@ -185,12 +125,6 @@ class S3:
 
 class KMS:
     def __init__(self, scope, context) -> None:
-
-        # self.kms = kms.Key.from_key_arn(
-        #     scope,
-        #     "KMS",
-        #     key_arn=context.resources["arns"]["kms_arn"],
-        # )
         ...
     """
         file_exists = self.file_exists("infra/services/kms.py")
@@ -240,12 +174,6 @@ class Websockets:
 
 class SQS:
     def __init__(self, scope, context) -> None:
-
-        # self.sqs = sqs.Queue.from_queue_arn(
-        #     scope,
-        #     "SQS",
-        #     queue_arn=context.resources["arns"]["sqs_arn"],
-        # )
         ...
     """
         file_exists = self.file_exists("infra/services/sqs.py")
@@ -266,19 +194,7 @@ import aws_cdk.aws_events_targets as targets
 
 class EventBridge:
     def __init__(self, scope, context) -> None:
-        self.scope = scope
-        self.context = context
-        
-    def create_rule(self, name, expression, target, stages=None):
-        if stages is not None and self.context.stage not in stages:
-            return
-            
-        events.Rule(
-            self.scope,
-            name,
-            schedule=events.Schedule.expression(expression),
-            targets=[targets.LambdaFunction(handler=target)],
-        )
+        ...
 """
         file_exists = self.file_exists("infra/services/event_bridge.py")
         if not file_exists:

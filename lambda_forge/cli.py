@@ -5,15 +5,14 @@ import subprocess
 import click
 from InquirerPy import get_style, inquirer
 
-from lambda_forge import layers, live_cli
+from lambda_forge import layers
 from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
 from lambda_forge.builders.docs_builder import DocsBuilder
 from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
-from lambda_forge.live import (LiveApiGtw, LiveEventBridge, LiveS3, LiveSNS,
-                               LiveSQS)
+from lambda_forge.live import LiveApiGtw, LiveEventBridge, LiveS3, LiveSNS, LiveSQS, live_cli
 from lambda_forge.printer import Printer
 
 printer = Printer()
@@ -263,7 +262,13 @@ def create_function(
         if no_tests is True:
             function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
         else:
-            function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_integration(http_method).with_unit().with_main()
+            function_builder = (
+                function_builder.with_endpoint(endpoint)
+                .with_api(http_method, public)
+                .with_integration(http_method)
+                .with_unit()
+                .with_main()
+            )
 
     function_builder.with_lambda_stack().build()
 
@@ -296,7 +301,12 @@ def authorizer(name, description, default, no_tests):
 
 
 def create_authorizer(name, description, default, no_tests):
-    authorizer_builder = AuthorizerBuilder.an_authorizer(name, description, "authorizers").with_config(default).with_main().with_lambda_stack()
+    authorizer_builder = (
+        AuthorizerBuilder.an_authorizer(name, description, "authorizers")
+        .with_config(default)
+        .with_main()
+        .with_lambda_stack()
+    )
 
     if no_tests is False:
         authorizer_builder = authorizer_builder.with_unit()
@@ -425,19 +435,7 @@ AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns", "sqs", "s3", "event_bridge"])
 
 
 @forge.command()
-@click.argument("function_name")
-@click.option(
-    "--timeout",
-    help="Timeout in seconds for the function",
-    default=30,
-)
-@click.option(
-    "--trigger",
-    help="Start the trigger for the function",
-    type=click.Choice(AVAILABLE_TRIGGERS),
-    default="api_gateway",
-)
-def live(function_name, timeout, trigger):
+def live():
     """
     Starts a live development environment for the specified Lambda function.
 
@@ -446,12 +444,9 @@ def live(function_name, timeout, trigger):
 
     The 'function_name' parameter must match the name of an existing Lambda function in the project.
     """
-    create_live_dev(function_name, timeout, trigger)
-
-
-def create_live_dev(function_name, timeout, trigger):
     printer.show_banner("Live Development")
-    live_cli.run_live(function_name, timeout, trigger)
+    live_cli.run_live()
+
 
 
 @forge.command()

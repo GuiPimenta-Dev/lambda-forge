@@ -1,10 +1,10 @@
-import json
+import uuid
 
 import boto3
 import click
-from botocore.exceptions import ClientError
 
-from lambda_forge.live_iam import LiveIAM
+from lambda_forge.live.live_iam import LiveIAM
+
 
 
 class LiveSQS:
@@ -14,32 +14,34 @@ class LiveSQS:
         self.iam_client = boto3.client("iam", region_name=region)
         self.printer = printer
         self.lambda_client = boto3.client("lambda", region_name=region)
-        self.queue_url = self.sqs.create_queue(QueueName="Live-Queue")["QueueUrl"]
-        response = self.sqs.get_queue_attributes(QueueUrl=self.queue_url, AttributeNames=["QueueArn"])
-        self.queue_arn = response["Attributes"]["QueueArn"]
 
-    def subscribe(self, function_arn, stub_name):
-        self.printer.change_spinner_legend("Setting up Lambda Trigger for SQS Queue")
+    def create_queue(self, name):
+        queue_url = self.sqs.create_queue(QueueName=name)["QueueUrl"]
+        response = self.sqs.get_queue_attributes(QueueUrl=queue_url, AttributeNames=["QueueArn"])
+        return queue_url, response["Attributes"]["QueueArn"]
 
-        try:
+    def subscribe(self, function_arn, queue_url, queue_arn):
 
-            policy = {
-                "Version": "2012-10-17",
-                "Statement": [{"Effect": "Allow", "Action": "sqs:*", "Resource": "*"}],
-            }
+        policy = {
+            "Version": "2012-10-17",
+            "Statement": [{"Effect": "Allow", "Action": "sqs:*", "Resource": "*"}],
+        }
 
-            self.iam = self.iam.attach_policy_to_lambda(policy, function_arn, "Live-SQS")
+        self.iam = self.iam.attach_policy_to_lambda(policy, function_arn, str(uuid.uuid4()))
 
-            self.sqs.set_queue_attributes(QueueUrl=self.queue_url, Attributes={"VisibilityTimeout": "900"})
+        self.sqs.set_queue_attributes(QueueUrl=queue_url, Attributes={"VisibilityTimeout": "900"})
 
-            self.delete_triggers()
+        self.lambda_client.create_event_source_mapping(
+            EventSourceArn=queue_arn, FunctionName=function_arn, Enabled=True
+        )
 
-            self.lambda_client.create_event_source_mapping(EventSourceArn=self.queue_arn, FunctionName=function_arn, Enabled=True)
+        trigger = {
+            "Trigger": "SQS",
+            "URL": queue_url,
+        }
+        return trigger
 
-            return self.queue_arn
-        except Exception as e:
-            self.printer.print(f"Error setting up Lambda trigger: {str(e)}", "red")
-            return None
+
 
     def publish(self):
         self.printer.show_banner("SQS")
@@ -49,17 +51,3 @@ class LiveSQS:
             QueueUrl=self.queue_url,
             MessageBody=message,
         )
-
-    def delete_triggers(self):
-        response = self.lambda_client.list_event_source_mappings(EventSourceArn=self.queue_arn)
-
-        for mapping in response["EventSourceMappings"]:
-            mapping_id = mapping["UUID"]
-            self.lambda_client.delete_event_source_mapping(UUID=mapping_id)
-
-    @staticmethod
-    def parse_logs(event):
-        record = event["Records"][0]
-        message_body = record["body"]
-
-        return {"Records": [{"body": message_body}]}

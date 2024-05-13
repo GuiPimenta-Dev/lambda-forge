@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import time
+import uuid
 import zipfile
 
 import boto3
@@ -11,27 +12,25 @@ from lambda_forge.certificates import CertificateGenerator
 
 
 class LiveLambda:
-    def __init__(self, function_name, region, timeout, iot_endpoint, account, urlpath, printer) -> None:
+    def __init__(self, function_name, region, timeout, iot_endpoint, account, printer) -> None:
         self.function_name = function_name
         self.region = region
         self.timeout = timeout
         self.iot_endpoint = iot_endpoint
         self.account = account
-        self.urlpath = urlpath.strip("/")
         self.iam_client = boto3.client("iam", region_name=self.region)
         self.lambda_client = boto3.client("lambda", region_name=self.region)
         self.printer = printer
 
     def create_lambda(self):
-        stub_name = f"{self.function_name}-Live"
-        self.__delete_lambda(stub_name)
+        self.__delete_lambda(self.function_name)
         role = self.__create_role()
         zip_file_name = self.__zip_lambda()
         layer_arn = self.__create_layer()
         with open(zip_file_name, "rb") as zip_file:
-            self.printer.change_spinner_legend("Deploying Lambda Function")
+            self.printer.change_spinner_legend(f"Deploying {self.function_name}")
             response = self.lambda_client.create_function(
-                FunctionName=stub_name,
+                FunctionName=self.function_name,
                 Description="Lambda Stub for Live Development with AWS IoT Core",
                 Runtime="python3.9",
                 Role=role["Role"]["Arn"],
@@ -56,7 +55,7 @@ class LiveLambda:
         temp_dir = tempfile.mkdtemp()
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        live = current_dir + "live/main.py"
+        live = current_dir + "/main.py"
         files_to_copy = [live, cert, private, ca]
 
         for file_name in files_to_copy:
@@ -67,6 +66,8 @@ class LiveLambda:
         with zipfile.ZipFile(zip_file_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(temp_dir):
                 for file in files:
+                    if ".zip" in file:
+                        continue
                     zipf.write(
                         os.path.join(root, file),
                         os.path.relpath(os.path.join(root, file), temp_dir),
@@ -81,6 +82,8 @@ class LiveLambda:
         return cert, private, ca
 
     def __create_role(self):
+        self.printer.change_spinner_legend("Creating Role")
+
         assume_role_policy_document = {
             "Version": "2012-10-17",
             "Statement": [
@@ -107,19 +110,27 @@ class LiveLambda:
         return role
 
     def __create_layer(self):
-        self.printer.change_spinner_legend("Creating Layer")
         current_dir = os.path.dirname(os.path.abspath(__file__))
         layer_response = self.lambda_client.publish_layer_version(
             LayerName="awsiot-layer",
             Description="Layer containing AWS IoT dependencies",
-            Content={"ZipFile": open(current_dir + "/resources/awsiot.zip", "rb").read()},
+            Content={"ZipFile": open(current_dir + "/awsiot.zip", "rb").read()},
             CompatibleRuntimes=["python3.9"],
         )
         layer_arn = layer_response["LayerVersionArn"]
         return layer_arn
 
     def __delete_lambda(self, stub_name):
+        function_arn = f"arn:aws:lambda:{self.region}:{self.account}:function:{stub_name}"
         try:
-            self.lambda_client.delete_function(FunctionName=stub_name)
-        except Exception:
+            mappings = self.lambda_client.list_event_source_mappings(FunctionName=function_arn)
+            for mapping in mappings["EventSourceMappings"]:
+                self.lambda_client.delete_event_source_mapping(UUID=mapping["UUID"])
+
+        except Exception as e:
+            pass
+
+        try:
+            self.lambda_client.delete_function(FunctionName=function_arn)
+        except Exception as e:
             pass

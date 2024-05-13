@@ -1,5 +1,4 @@
 import ast
-import time
 import uuid
 
 import boto3
@@ -13,26 +12,15 @@ class LiveS3:
         self.lambda_client = boto3.client("lambda")
         self.region = region
 
-    def subscribe(self, function_arn, account_id):
+    def create_bucket(self, bucket_name):
+        self.s3_client.create_bucket(
+            Bucket=bucket_name,
+            CreateBucketConfiguration={"LocationConstraint": self.region},
+        )
+
+    def subscribe(self, function_arn, account_id, bucket_name):
 
         try:
-            self.printer.change_spinner_legend("Setting up Lambda Trigger for S3 Bucket")
-            bucket_name = f"live-s3-{uuid.uuid4()}"
-
-            existing_buckets = self.s3_client.list_buckets()["Buckets"]
-            for bucket in existing_buckets:
-                if bucket["Name"].startswith("live-s3-"):
-                    object_list = self.s3_client.list_objects(Bucket=bucket["Name"])
-                    if "Contents" in object_list:
-                        for obj in object_list["Contents"]:
-                            self.s3_client.delete_object(Bucket=bucket["Name"], Key=obj["Key"])
-                    self.s3_client.delete_bucket(Bucket=bucket["Name"])
-
-            self.s3_client.create_bucket(
-                Bucket=bucket_name,
-                CreateBucketConfiguration={"LocationConstraint": self.region},
-            )
-
             events = [
                 "s3:ObjectCreated:*",
                 "s3:ObjectRemoved:*",
@@ -44,9 +32,14 @@ class LiveS3:
                 "LambdaFunctionArn": function_arn,
                 "Events": events,
             }
-
-            time.sleep(6)
-            self.lambda_client.add_permission(FunctionName=function_arn, StatementId=f"{bucket_name}-invoke", Action="lambda:InvokeFunction", Principal="s3.amazonaws.com", SourceArn=f"arn:aws:s3:::{bucket_name}", SourceAccount=account_id)
+            self.lambda_client.add_permission(
+                FunctionName=function_arn,
+                StatementId=str(uuid.uuid4()),
+                Action="lambda:InvokeFunction",
+                Principal="s3.amazonaws.com",
+                SourceArn=f"arn:aws:s3:::{bucket_name}",
+                SourceAccount=account_id,
+            )
 
             # Set the notification configuration on the bucket
             self.s3_client.put_bucket_notification_configuration(
@@ -54,7 +47,8 @@ class LiveS3:
                 NotificationConfiguration={"LambdaFunctionConfigurations": [lambda_config]},
             )
 
-            return f"arn:aws:s3:::{bucket_name}"
+            trigger = {"Trigger": "S3", "ARN": f"arn:aws:s3:::{bucket_name}"}
+            return trigger
 
         except Exception as e:
             print(f"Error in subscribe method: {e}")

@@ -42,7 +42,9 @@ def validate_paths(endpoint, function_file):
     typed_args = list(path.__dataclass_fields__.keys())
     for parameter in path_parameters:
         if parameter not in typed_args:
-            raise Exception(f"Path parameter {parameter} is missing in Path on {transform_file_path(endpoint['path'])}.main")
+            raise Exception(
+                f"Path parameter {parameter} is missing in Path on {transform_file_path(endpoint['path'])}.main"
+            )
 
 
 def validate_docs(endpoints, loader=default_module_loader):

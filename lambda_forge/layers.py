@@ -1,5 +1,6 @@
 import importlib.metadata
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -147,7 +148,11 @@ def deploy_external_layer(lib, region):
 
     os.chdir(lib_dir)
 
-    subprocess.run(["pip", "install", lib, "-t", "."], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.run(
+        ["pip", "install", lib, "-t", "."],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     dist_info_dirs = [d for d in os.listdir(".") if d.endswith(".dist-info")]
     for d in dist_info_dirs:
         shutil.rmtree(d)
@@ -159,26 +164,28 @@ def deploy_external_layer(lib, region):
 
     s3_client = boto3.client("s3", region_name=region)
 
-    bucket_name = f"{lib}-layer-" + str(uuid.uuid4())
+    cleaned_lib = re.sub(r"[^a-zA-Z0-9]", "", lib)
+
+    bucket_name = f"{cleaned_lib}-layer-" + str(uuid.uuid4())
 
     existing_buckets = s3_client.list_buckets()["Buckets"]
     bucket = None
     for existing_bucket in existing_buckets:
         name = existing_bucket["Name"]
-        if f"{lib}-layer-" in name:
+        if f"{cleaned_lib}-layer-" in name:
             bucket = existing_bucket
             break
 
     if not bucket:
         bucket = s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": region})
 
-    s3_client.upload_file(lib_zip, bucket["Name"], lib_zip)
+    s3_client.upload_file(lib_zip, bucket["Name"], lib_zip.replace("_", "-"))
 
     lambda_client = boto3.client("lambda", region_name=region)
 
     response = lambda_client.publish_layer_version(
         LayerName=lib,
-        Content={"S3Bucket": bucket["Name"], "S3Key": lib_zip},
+        Content={"S3Bucket": bucket["Name"], "S3Key": lib_zip.replace("_", "-")},
     )
     arn = response["LayerVersionArn"]
     os.chdir(current_dir)

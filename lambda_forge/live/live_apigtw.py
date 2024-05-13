@@ -1,21 +1,22 @@
+import json
 import boto3
 import click
 import requests
 
 
 class LiveApiGtw:
-    def __init__(self, account, region, urlpath, printer) -> None:
+    def __init__(self, account, region, printer, project) -> None:
         self.stage = "live"
         self.account = account
         self.region = region
-        self.urlpath = urlpath.strip("/")
+        self.project = project
         self.printer = printer
         self.api_client = boto3.client("apigateway", region_name=self.region)
         self.lambda_client = boto3.client("lambda", region_name=self.region)
         self.root_id = self.__create_api()["id"]
 
     def __create_api(self):
-        name = "Live-REST"
+        name = f"Live-{self.project}-REST"
         existing_apis = self.api_client.get_rest_apis()
 
         rest_api = None
@@ -31,17 +32,23 @@ class LiveApiGtw:
             )
         return rest_api
 
-    def create_endpoint(self, function_arn, stub_name):
-        self.printer.change_spinner_legend("Creating API Gateway Endpoint")
-        self.__delete_lambda_resources(function_arn)
+    def get_urlpath(self, function_name):
+        data = json.load(open("cdk.json", "r"))
+        functions = data["context"]["functions"]
+        function_name = function_name.replace(f"Live-{self.project}-", "")
+        function = next((function for function in functions if function["name"] == function_name), None)
+        return function["endpoint"].strip("/").lower()
 
+    def create_trigger(self, function_arn, function_name):
+        self.printer.br()
+        urlpath = self.get_urlpath(function_name)
         all_resources = self.api_client.get_resources(restApiId=self.root_id)["items"]
         parent_id = next(
             (resource["id"] for resource in all_resources if resource["path"] == "/"),
             None,
         )
 
-        urlpaths = self.urlpath.split("/")
+        urlpaths = urlpath.split("/")
         current_path = ""
 
         for part in urlpaths:
@@ -57,6 +64,15 @@ class LiveApiGtw:
                 all_resources.append({"id": resource["id"], "path": current_path})
             else:
                 parent_id = existing_resource["id"]
+
+        try:
+            response = self.api_client.get_method(restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY")
+
+            # If the method exists, delete it
+            if response["httpMethod"] == "ANY":
+                self.api_client.delete_method(restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY")
+        except:
+            pass
 
         self.api_client.put_method(
             restApiId=self.root_id,
@@ -76,34 +92,23 @@ class LiveApiGtw:
 
         self.api_client.create_deployment(restApiId=self.root_id, stageName=self.stage)
 
-        self.lambda_client.add_permission(
-            FunctionName=stub_name,
-            StatementId=f"ApiGatewayAccess-{parent_id}",
-            Action="lambda:InvokeFunction",
-            Principal="apigateway.amazonaws.com",
-            SourceArn=f"arn:aws:execute-api:{self.region}:{self.account}:{self.root_id}/*/*",
-        )
+        try:
+            self.lambda_client.add_permission(
+                FunctionName=function_name,
+                StatementId=f"ApiGatewayAccess-{parent_id}",
+                Action="lambda:InvokeFunction",
+                Principal="apigateway.amazonaws.com",
+                SourceArn=f"arn:aws:execute-api:{self.region}:{self.account}:{self.root_id}/*/*",
+            )
+        except:
+            pass
 
-        endpoint = self.__get_endpoint_url()
-        return endpoint
+        endpoint = self.__get_endpoint_url(urlpath)
+        response = {"trigger": "API Gateway", "endpoint": endpoint, "method": "ANY"}
+        return response
 
-    def __delete_lambda_resources(self, function_arn):
-        resources = self.api_client.get_resources(restApiId=self.root_id)["items"]
-        linked_resources = []
-        for resource in resources:
-            for method in resource.get("resourceMethods", {}).keys():
-                integration = self.api_client.get_integration(restApiId=self.root_id, resourceId=resource["id"], httpMethod=method)
-                if integration.get("uri", "").endswith(f"functions/{function_arn}/invocations"):
-                    linked_resources.append(resource)
-
-        for resource in sorted(linked_resources, key=lambda x: x["path"].count("/"), reverse=True):
-            try:
-                self.api_client.delete_resource(restApiId=self.root_id, resourceId=resource["id"])
-            except:
-                pass
-
-    def __get_endpoint_url(self):
-        endpoint_url = f"https://{self.root_id}.execute-api.{self.region}.amazonaws.com/{self.stage}/{self.urlpath}"
+    def __get_endpoint_url(self, urlpath=None):
+        endpoint_url = f"https://{self.root_id}.execute-api.{self.region}.amazonaws.com/{self.stage}/{urlpath}"
         return endpoint_url
 
     @staticmethod

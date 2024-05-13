@@ -1,20 +1,25 @@
 import json
 import os
 import subprocess
+import time
+import click
 
-import boto3
+from InquirerPy import get_style, inquirer
 
 from lambda_forge.printer import Printer
 
-from . import LiveApiGtw, LiveEventBridge, LiveLambda, LiveS3, LiveSNS, LiveSQS
+from . import LiveApiGtw, LiveSNS, LiveSQS, LiveS3, LiveEventBridge, Live
 
 printer = Printer()
 
 
-def run_live(function_name, timeout, trigger):
+def run_live():
+    printer.show_banner("Live Development")
+
     data = json.load(open("cdk.json", "r"))
     region = data["context"]["region"]
     account = data["context"]["account"]
+    project = data["context"]["name"]
 
     if not region:
         printer.print("Region Not Found", "red", 1, 1)
@@ -24,78 +29,165 @@ def run_live(function_name, timeout, trigger):
         printer.print("Account Not Found", "red", 1, 1)
         exit()
 
-    iot_client = boto3.client("iot", region_name=region)
-    iot_endpoint = iot_client.describe_endpoint()["endpointAddress"]
-    iot_endpoint = iot_endpoint.replace(".iot.", "-ats.iot.")
+    if not project:
+        printer.print("Project Not Found", "red", 1, 1)
+        exit()
 
     try:
         os.environ["TRACK_FUNCTIONS"] = "true"
+        printer.start_spinner("Synthesizing CDK")
         with open(os.devnull, "w") as devnull:
             subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+            printer.stop_spinner()
+
     except Exception as e:
         printer.print(str(e), "red", 1, 1)
         exit()
 
     data = json.load(open("cdk.json", "r"))
     functions = data["context"]["functions"]
+    synth_function_names = [function["name"] for function in functions]
 
-    function_names = [function["name"] for function in functions]
-    if function_name not in function_names:
-        printer.print(f"Function {function_name} Not Found", "red", 1, 1)
-        exit()
+    live = Live(printer)
 
-    stub_name = f"{function_name}-Live"
+    style = get_style(
+        {
+            "questionmark": "#25ABBE",
+            "input": "#25ABBE",
+            "pointer": "#25ABBE",
+            "question": "#ffffff",
+            "answered_question": "#25ABBE",
+            "pointer": "#25ABBE",
+            "answer": "white",
+            "answermark": "#25ABBE",
+        },
+        style_override=True,
+    )
 
-    for function in functions:
-        if function["name"] == function_name:
+    while True:
+        live.intro()
 
-            printer.start_spinner(f"Creating Function {stub_name}")
-            urlpath = function.get("endpoint", function["name"].lower())
-            live_lambda = LiveLambda(
-                function["name"],
-                region,
-                timeout,
-                iot_endpoint,
-                account,
-                urlpath,
-                printer,
-            )
-            function_arn = live_lambda.create_lambda()
+        printer.br()
+        options = ["New Function", "Update Function", "Synth", "Abort"]
 
-            if trigger == "api_gateway":
-                live_apigtw = LiveApiGtw(account, region, urlpath, printer)
-                endpoint = live_apigtw.create_endpoint(function_arn, stub_name)
-                printer.print(f"\rEndpoint URL: {endpoint}", "cyan")
+        choice = inquirer.select(
+            message="Select an option: ",
+            style=style,
+            choices=options,
+        ).execute()
 
-            if trigger == "sns":
-                live_sns = LiveSNS(region, printer)
-                topic_arn = live_sns.subscribe(function_arn, stub_name)
-                printer.print(f"\rTopic ARN: {topic_arn}", "cyan")
+        if choice == "New Function":
+            printer.br()
+            function_name = input("Enter function name: ")
 
-            if trigger == "sqs":
-                live_sqs = LiveSQS(region, printer)
-                queue_url = live_sqs.subscribe(function_arn, stub_name)
-                printer.print(f"\rQueue URL: {queue_url}", "cyan")
+            if function_name not in synth_function_names:
+                printer.print(f"Function {function_name} Not Found", "red")
+                time.sleep(1)
+                continue
 
-            if trigger == "s3":
-                live_s3 = LiveS3(region, printer)
-                bus_arn = live_s3.subscribe(function_arn, account)
-                printer.print(f"\rBucket ARN: {bus_arn}", "cyan")
-
-            if trigger == "event_bridge":
-                live_event = LiveEventBridge(region, printer)
-                bus_arn = live_event.subscribe(function_arn, account)
-                printer.print(f"\rBus ARN: {bus_arn}", "cyan")
-
+            timeout = input("Enter timeout in seconds [30]: ")
+            if not timeout:
+                timeout = 30
+            path = functions[synth_function_names.index(function_name)]["path"]
+            printer.show_banner("Live Development")
+            printer.start_spinner(f"Creating Lambda Function Live-{project}-{function_name}")
+            live.create_lambda(f"Live-{project}-{function_name}", path, timeout)
             printer.stop_spinner()
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            subprocess.run(
-                [
-                    "python",
-                    current_dir + "/live_server.py",
-                    function["name"],
-                    function["path"],
-                    iot_endpoint,
-                    trigger,
-                ]
-            )
+
+        if choice == "Synth":
+            printer.br()
+            printer.start_spinner("Synthesizing CDK")
+            with open(os.devnull, "w") as devnull:
+                subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+                printer.stop_spinner()
+
+            data = json.load(open("cdk.json", "r"))
+            functions = data["context"]["functions"]
+            synth_function_names = [function["name"] for function in functions]
+
+        if choice == "Abort":
+            break
+
+        if choice == "Update Function":
+            printer.br()
+
+            if live.functions:
+                options = list(live.functions.keys())
+            else:
+                printer.print("No functions found", "red")
+                time.sleep(1)
+                continue
+
+            selected_function = inquirer.select(
+                message="Select a function: ",
+                style=style,
+                choices=options,
+            ).execute()
+
+            choice = inquirer.select(
+                message="Select an option: ",
+                style=style,
+                choices=["Create Trigger"],
+            ).execute()
+
+            if choice == "Create Trigger":
+                printer.br()
+
+                options = ["API Gateway", "SNS", "SQS", "S3", "Event Bridge"]
+                choice = inquirer.select(
+                    message="Select a trigger: ",
+                    style=style,
+                    choices=options,
+                ).execute()
+                function_arn = live.functions[selected_function]["arn"]
+
+                try:
+                    if choice == "API Gateway":
+                        printer.show_banner("Live Development")
+                        printer.start_spinner(f"Creating API Gateway Trigger")
+                        live_apigtw = LiveApiGtw(account, region, printer, project)
+                        trigger = live_apigtw.create_trigger(function_arn, selected_function)
+
+                    if choice == "SNS":
+                        live_sns = LiveSNS(region, account, printer)
+                        topic_name = click.prompt("SNS Topic Name", type=str)
+                        topic_name = f"Live-{project}-{topic_name.title()}"
+                        printer.show_banner("Live Development")
+                        printer.start_spinner(f"Creating {topic_name} Topic")
+                        topic_arn = live_sns.create_or_get_topic(topic_name)
+                        trigger = live_sns.create_trigger(function_arn, selected_function, topic_arn)
+
+                    if choice == "SQS":
+                        live_sqs = LiveSQS(region, printer)
+                        queue_name = click.prompt("SQS Queue Name", type=str)
+                        queue_name = f"Live-{project}-{queue_name.title()}"
+                        printer.show_banner("Live Development")
+                        printer.start_spinner(f"Creating {queue_name} Queue")
+                        queue_url, queue_arn = live_sqs.create_queue(queue_name)
+                        trigger = live_sqs.subscribe(function_arn, queue_url, queue_arn)
+
+                    if choice == "S3":
+                        live_s3 = LiveS3(region, printer)
+                        bucket_name = click.prompt("S3 Bucket Name", type=str)
+                        bucket_name = f"live-{project.lower()}-{bucket_name.lower()}"
+                        printer.show_banner("Live Development")
+                        printer.start_spinner(f"Creating {bucket_name} Bucket")
+                        live_s3.create_bucket(bucket_name)
+                        trigger = live_s3.subscribe(function_arn, account, bucket_name)
+
+                    if choice == "Event Bridge":
+                        live_event = LiveEventBridge(region, printer)
+                        bus_name = click.prompt("Event Bridge Bus Name", type=str)
+                        bus_name = f"Live-{project}-{bus_name.title()}"
+                        printer.show_banner("Live Development")
+                        printer.start_spinner(f"Creating {bus_name} Bus")
+                        live_event.create_bus(bus_name)
+                        trigger = live_event.subscribe(function_arn, account, bus_name)
+
+                    live.attach_trigger(selected_function, trigger)
+                    printer.stop_spinner()
+                except Exception as e:
+                    printer.stop_spinner()
+                    printer.print(str(e), "red", 1)
+                    time.sleep(7)
+                    continue

@@ -11,9 +11,6 @@ import uuid
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
 from lambda_forge.certificates import CertificateGenerator
-from lambda_forge.live_apigtw import LiveApiGtw
-from lambda_forge.live_sns import LiveSNS
-from lambda_forge.live_sqs import LiveSQS
 from lambda_forge.printer import Printer
 
 printer = Printer()
@@ -22,7 +19,6 @@ parser = argparse.ArgumentParser(description="Process some integers.")
 parser.add_argument("function_name", type=str)
 parser.add_argument("file_path", type=str)
 parser.add_argument("iot_endpoint", type=str)
-parser.add_argument("trigger", type=str)
 
 args = parser.parse_args()
 
@@ -39,7 +35,6 @@ mqtt_client.configureEndpoint(args.iot_endpoint, 443)
 mqtt_client.configureCredentials(ca, private, cert)
 try:
     mqtt_client.connect()
-    printer.print(f"Connection Established", "white", 1)
 except:
     printer.print(f"Connection Failed", "red", 1)
     exit()
@@ -50,7 +45,10 @@ def process(event, context):
     spec = importlib.util.spec_from_file_location("lambda_handler", main_file_path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    response = module.lambda_handler(event, context)
+    try:
+        response = module.lambda_handler(event, context)
+    except Exception as e:
+        response = {"statusCode": 500, "body": str(e)}
     return response
 
 
@@ -87,9 +85,6 @@ def watchdog():
 
 def log_request(event):
     event = event.copy()
-    if args.trigger == "api_gateway":
-        event = LiveApiGtw.parse_logs(event)
-
     printer.print("------------------------ + ------------------------", "gray", 1)
     printer.print(f"Request: ", "gray", 1, 1)
     printer.print(f"{json.dumps(event, indent=4)}", "gray")

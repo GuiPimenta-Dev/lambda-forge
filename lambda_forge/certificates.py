@@ -38,7 +38,9 @@ class CertificateGenerator:
         certificate_arn = response["certificateArn"]
 
         # Get CA certificate
-        ca_pem = requests.get(f"https://www.amazontrust.com/repository/AmazonRootCA1.pem?iot_endpoint={iot_endpoint}").text
+        ca_pem = requests.get(
+            f"https://www.amazontrust.com/repository/AmazonRootCA1.pem?iot_endpoint={iot_endpoint}"
+        ).text
 
         # Define file paths within the temporary directory
         certificate_file_path = os.path.join(self.temp_dir, "certificate.pem")

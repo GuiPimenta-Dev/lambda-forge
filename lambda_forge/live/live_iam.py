@@ -12,23 +12,9 @@ class LiveIAM:
     def attach_policy_to_lambda(self, policy_dict, function_arn, policy_name):
         response = self.lambda_client.get_function(FunctionName=function_arn)
         role_arn = response["Configuration"]["Role"]
-        role_name = role_arn.split("/")[-1]
-
-        policy_arn = None
-        try:
-            policies = self.iam_client.list_policies(Scope="Local")
-            for policy in policies["Policies"]:
-                if policy["PolicyName"] == policy_name:
-                    policy_arn = policy["Arn"]
-                    break
-        except Exception as e:
-            print(f"Error listing policies: {e}")
-
-        if policy_arn is None:
-            try:
-                policy_response = self.iam_client.create_policy(PolicyName=policy_name, PolicyDocument=json.dumps(policy_dict))
-                policy_arn = policy_response["Policy"]["Arn"]
-            except self.iam_client.exceptions.EntityAlreadyExistsException:
-                policy_arn = [p["Arn"] for p in self.iam_client.list_policies()["Policies"] if p["PolicyName"] == policy_name][0]
-
-        self.iam_client.attach_role_policy(RoleName=role_name, PolicyArn=policy_arn)
+        role_name = role_arn.split('/')[-1]
+        self.iam_client.put_role_policy(
+            RoleName=role_name,
+            PolicyName=policy_name,
+            PolicyDocument=json.dumps(policy_dict)
+        )
