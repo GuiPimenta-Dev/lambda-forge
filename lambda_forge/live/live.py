@@ -9,15 +9,16 @@ from lambda_forge.live.live_lambda import LiveLambda
 
 
 class Live:
-    def __init__(self, printer) -> None:
+    def __init__(self, printer, log_file) -> None:
         cdk = json.load(open("cdk.json", "r"))
         self.account = cdk["context"]["account"]
         self.region = cdk["context"]["region"]
         self.printer = printer
+        self.log_file = log_file
         self.functions = {}
 
     def intro(self):
-        self.printer.show_banner("Live Development")
+        self.printer.show_banner("Live Server")
         functions = []
         for function in self.functions:
             functions.append(
@@ -57,6 +58,7 @@ class Live:
                     function_name,
                     function_path,
                     iot_endpoint,
+                    self.log_file
                 ]
             )
 

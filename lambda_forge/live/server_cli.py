@@ -13,8 +13,8 @@ from . import LiveApiGtw, LiveSNS, LiveSQS, LiveS3, LiveEventBridge, Live
 printer = Printer()
 
 
-def run_live():
-    printer.show_banner("Live Development")
+def run_live(log_file):
+    printer.show_banner("Live Server")
 
     data = json.load(open("cdk.json", "r"))
     region = data["context"]["region"]
@@ -48,7 +48,7 @@ def run_live():
     functions = data["context"]["functions"]
     synth_function_names = [function["name"] for function in functions]
 
-    live = Live(printer)
+    live = Live(printer, log_file)
 
     style = get_style(
         {
@@ -89,7 +89,7 @@ def run_live():
             if not timeout:
                 timeout = 30
             path = functions[synth_function_names.index(function_name)]["path"]
-            printer.show_banner("Live Development")
+            printer.show_banner("Live Server")
             printer.start_spinner(f"Creating Lambda Function Live-{project}-{function_name}")
             live.create_lambda(f"Live-{project}-{function_name}", path, timeout)
             printer.stop_spinner()
@@ -143,7 +143,7 @@ def run_live():
 
                 try:
                     if choice == "API Gateway":
-                        printer.show_banner("Live Development")
+                        printer.show_banner("Live Server")
                         printer.start_spinner(f"Creating API Gateway Trigger")
                         live_apigtw = LiveApiGtw(account, region, printer, project)
                         trigger = live_apigtw.create_trigger(function_arn, selected_function)
@@ -152,7 +152,7 @@ def run_live():
                         live_sns = LiveSNS(region, account, printer)
                         topic_name = click.prompt("SNS Topic Name", type=str)
                         topic_name = f"Live-{project}-{topic_name.title()}"
-                        printer.show_banner("Live Development")
+                        printer.show_banner("Live Server")
                         printer.start_spinner(f"Creating {topic_name} Topic")
                         topic_arn = live_sns.create_or_get_topic(topic_name)
                         trigger = live_sns.create_trigger(function_arn, selected_function, topic_arn)
@@ -161,7 +161,7 @@ def run_live():
                         live_sqs = LiveSQS(region, printer)
                         queue_name = click.prompt("SQS Queue Name", type=str)
                         queue_name = f"Live-{project}-{queue_name.title()}"
-                        printer.show_banner("Live Development")
+                        printer.show_banner("Live Server")
                         printer.start_spinner(f"Creating {queue_name} Queue")
                         queue_url, queue_arn = live_sqs.create_queue(queue_name)
                         trigger = live_sqs.subscribe(function_arn, queue_url, queue_arn)
@@ -170,7 +170,7 @@ def run_live():
                         live_s3 = LiveS3(region, printer)
                         bucket_name = click.prompt("S3 Bucket Name", type=str)
                         bucket_name = f"live-{project.lower()}-{bucket_name.lower()}"
-                        printer.show_banner("Live Development")
+                        printer.show_banner("Live Server")
                         printer.start_spinner(f"Creating {bucket_name} Bucket")
                         live_s3.create_bucket(bucket_name)
                         trigger = live_s3.subscribe(function_arn, account, bucket_name)
@@ -179,7 +179,7 @@ def run_live():
                         live_event = LiveEventBridge(region, printer)
                         bus_name = click.prompt("Event Bridge Bus Name", type=str)
                         bus_name = f"Live-{project}-{bus_name.title()}"
-                        printer.show_banner("Live Development")
+                        printer.show_banner("Live Server")
                         printer.start_spinner(f"Creating {bus_name} Bus")
                         live_event.create_bus(bus_name)
                         trigger = live_event.subscribe(function_arn, account, bus_name)

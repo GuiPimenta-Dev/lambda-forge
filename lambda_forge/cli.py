@@ -12,7 +12,15 @@ from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
-from lambda_forge.live import LiveApiGtw, LiveEventBridge, LiveS3, LiveSNS, LiveSQS, live_cli
+from lambda_forge.live import (
+    LiveApiGtw,
+    LiveEventBridge,
+    LiveS3,
+    LiveSNS,
+    LiveSQS,
+    log_cli,
+    server_cli,
+)
 from lambda_forge.printer import Printer
 
 printer = Printer()
@@ -184,7 +192,9 @@ def create_project(
 
     project_builder = ProjectBuilder.a_project(name, no_docs, minimal)
 
-    project_builder = project_builder.with_cdk(repo_owner, repo_name, account, region, bucket, coverage).build()
+    project_builder = project_builder.with_cdk(
+        repo_owner, repo_name, account, region, bucket, coverage
+    ).build()
 
     if not no_docs:
         DocsBuilder.a_doc().with_config().with_lambda_stack().build()
@@ -193,11 +203,15 @@ def create_project(
 @forge.command()
 @click.argument("name")
 @click.option("--description", required=True, help="Description for the endpoint")
-@click.option("--method", required=False, help="HTTP method for the endpoint", default="GET")
+@click.option(
+    "--method", required=False, help="HTTP method for the endpoint", default="GET"
+)
 @click.option("--belongs-to", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-@click.option("--websocket", help="Function is going to be used for websockets", is_flag=True)
+@click.option(
+    "--websocket", help="Function is going to be used for websockets", is_flag=True
+)
 @click.option(
     "--no-tests",
     help="Do not create unit tests and integration tests files",
@@ -210,7 +224,9 @@ def create_project(
     is_flag=True,
     default=False,
 )
-def function(name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public):
+def function(
+    name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public
+):
     """
     Creates a Lambda function with a predefined structure and API Gateway integration.
 
@@ -245,7 +261,9 @@ def create_function(
     public=False,
 ):
 
-    function_builder = FunctionBuilder.a_function(name, description).with_config(belongs)
+    function_builder = FunctionBuilder.a_function(name, description).with_config(
+        belongs
+    )
 
     if no_api is True:
         function_builder = function_builder.with_main()
@@ -260,7 +278,11 @@ def create_function(
     else:
         endpoint = endpoint or belongs or name
         if no_tests is True:
-            function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
+            function_builder = (
+                function_builder.with_endpoint(endpoint)
+                .with_api(http_method, public)
+                .with_main()
+            )
         else:
             function_builder = (
                 function_builder.with_endpoint(endpoint)
@@ -432,10 +454,13 @@ def create_layer(custom, external, description, requirements, install):
 
 
 AVAILABLE_TRIGGERS = sorted(["api_gateway", "sns", "sqs", "s3", "event_bridge"])
+AVAILABLE_TYPES = ["server", "logs", "trigger"]
 
 
 @forge.command()
-def live():
+@click.argument("types", type=click.Choice(AVAILABLE_TYPES))
+@click.option("--log-file", help="Name of Log file", default="live_dev.log")
+def live(types, log_file):
     """
     Starts a live development environment for the specified Lambda function.
 
@@ -444,9 +469,11 @@ def live():
 
     The 'function_name' parameter must match the name of an existing Lambda function in the project.
     """
-    printer.show_banner("Live Development")
-    live_cli.run_live()
+    if types == "server":
+        server_cli.run_live(log_file)
 
+    if types == "logs":
+        log_cli.tail_f(log_file)
 
 
 @forge.command()

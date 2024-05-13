@@ -19,6 +19,7 @@ parser = argparse.ArgumentParser(description="Process some integers.")
 parser.add_argument("function_name", type=str)
 parser.add_argument("file_path", type=str)
 parser.add_argument("iot_endpoint", type=str)
+parser.add_argument("log_file", type=str)
 
 args = parser.parse_args()
 
@@ -41,7 +42,7 @@ except:
 
 
 def process(event, context):
-    log_request(event)
+    log(event)
     spec = importlib.util.spec_from_file_location("lambda_handler", main_file_path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -60,7 +61,7 @@ def message_callback(client, userdata, message):
     if message.topic == topic_request:
         response_payload = process(deserialized_data["event"], deserialized_data["context"])
         mqtt_client.publish(topic_response, json.dumps(response_payload), 0)
-        log_response(response_payload)
+        log(response_payload)
 
 
 mqtt_client.subscribe(topic_request, 1, message_callback)
@@ -83,16 +84,11 @@ def watchdog():
             last_modified = current_modified
 
 
-def log_request(event):
-    event = event.copy()
-    printer.print("------------------------ + ------------------------", "gray", 1)
-    printer.print(f"Request: ", "gray", 1, 1)
-    printer.print(f"{json.dumps(event, indent=4)}", "gray")
+def log(event):
+    with open(args.log_file, "a") as f:
+        f.write(f"{json.dumps(event)}\n")
 
 
-def log_response(response):
-    printer.print(f"Response: ", "gray", 1, 1)
-    printer.print(f"{json.dumps(response, indent=4)}", "gray")
 
 
 watchdog_thread = threading.Thread(target=watchdog)

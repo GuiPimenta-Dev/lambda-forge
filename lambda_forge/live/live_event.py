@@ -20,10 +20,7 @@ class LiveEventBridge:
             self.event_client.create_event_bus(Name=bus_name)
 
     def subscribe(self, function_arn, account_id, bus_name):
-        self.printer.change_spinner_legend("Creating EventBridge rule")
-
         rule_name = "Live-Rule"
-        # Add permission for EventBridge to invoke Lambda
         self.lambda_client.add_permission(
             FunctionName=function_arn,
             StatementId=str(uuid.uuid4()),
