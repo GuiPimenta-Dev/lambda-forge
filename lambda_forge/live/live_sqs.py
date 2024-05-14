@@ -6,7 +6,6 @@ import click
 from lambda_forge.live.live_iam import LiveIAM
 
 
-
 class LiveSQS:
     def __init__(self, region, printer):
         self.sqs = boto3.client("sqs", region_name=region)
@@ -41,13 +40,10 @@ class LiveSQS:
         }
         return trigger
 
-
-
     def publish(self):
-        self.printer.show_banner("SQS")
-
         message = click.prompt(click.style("Message", fg=(37, 171, 190)), type=str)
         self.sqs.send_message(
             QueueUrl=self.queue_url,
             MessageBody=message,
+            Subject="Message from Lambda Forge",
         )

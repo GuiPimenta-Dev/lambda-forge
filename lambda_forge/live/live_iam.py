@@ -12,9 +12,7 @@ class LiveIAM:
     def attach_policy_to_lambda(self, policy_dict, function_arn, policy_name):
         response = self.lambda_client.get_function(FunctionName=function_arn)
         role_arn = response["Configuration"]["Role"]
-        role_name = role_arn.split('/')[-1]
+        role_name = role_arn.split("/")[-1]
         self.iam_client.put_role_policy(
-            RoleName=role_name,
-            PolicyName=policy_name,
-            PolicyDocument=json.dumps(policy_dict)
+            RoleName=role_name, PolicyName=policy_name, PolicyDocument=json.dumps(policy_dict)
         )

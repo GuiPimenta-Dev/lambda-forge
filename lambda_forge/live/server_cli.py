@@ -68,7 +68,7 @@ def run_live(log_file):
         live.intro()
 
         printer.br()
-        options = ["New Function", "Update Function", "Synth", "Abort"]
+        options = ["New Function", "Create Trigger", "Synth"]
 
         choice = inquirer.select(
             message="Select an option: ",
@@ -78,12 +78,12 @@ def run_live(log_file):
 
         if choice == "New Function":
             printer.br()
-            function_name = input("Enter function name: ")
 
-            if function_name not in synth_function_names:
-                printer.print(f"Function {function_name} Not Found", "red")
-                time.sleep(1)
-                continue
+            function_name = inquirer.select(
+                message="Select a function: ",
+                style=style,
+                choices=synth_function_names,
+            ).execute()
 
             timeout = input("Enter timeout in seconds [30]: ")
             if not timeout:
@@ -105,10 +105,7 @@ def run_live(log_file):
             functions = data["context"]["functions"]
             synth_function_names = [function["name"] for function in functions]
 
-        if choice == "Abort":
-            break
-
-        if choice == "Update Function":
+        if choice == "Create Trigger":
             printer.br()
 
             if live.functions:
@@ -124,70 +121,64 @@ def run_live(log_file):
                 choices=options,
             ).execute()
 
+            printer.br()
+
+            options = ["API Gateway", "SNS", "SQS", "S3", "Event Bridge"]
             choice = inquirer.select(
-                message="Select an option: ",
+                message="Select a trigger: ",
                 style=style,
-                choices=["Create Trigger"],
+                choices=options,
             ).execute()
+            function_arn = live.functions[selected_function]["arn"]
 
-            if choice == "Create Trigger":
-                printer.br()
+            try:
+                if choice == "API Gateway":
+                    printer.show_banner("Live Server")
+                    printer.start_spinner(f"Creating API Gateway Trigger")
+                    live_apigtw = LiveApiGtw(account, region, printer, project)
+                    trigger = live_apigtw.create_trigger(function_arn, selected_function)
 
-                options = ["API Gateway", "SNS", "SQS", "S3", "Event Bridge"]
-                choice = inquirer.select(
-                    message="Select a trigger: ",
-                    style=style,
-                    choices=options,
-                ).execute()
-                function_arn = live.functions[selected_function]["arn"]
+                if choice == "SNS":
+                    live_sns = LiveSNS(region, account, printer)
+                    topic_name = click.prompt("SNS Topic Name", type=str)
+                    topic_name = f"Live-{project}-{topic_name.title()}"
+                    printer.show_banner("Live Server")
+                    printer.start_spinner(f"Creating {topic_name} Topic")
+                    topic_arn = live_sns.create_or_get_topic(topic_name)
+                    trigger = live_sns.create_trigger(function_arn, selected_function, topic_arn)
 
-                try:
-                    if choice == "API Gateway":
-                        printer.show_banner("Live Server")
-                        printer.start_spinner(f"Creating API Gateway Trigger")
-                        live_apigtw = LiveApiGtw(account, region, printer, project)
-                        trigger = live_apigtw.create_trigger(function_arn, selected_function)
+                if choice == "SQS":
+                    live_sqs = LiveSQS(region, printer)
+                    queue_name = click.prompt("SQS Queue Name", type=str)
+                    queue_name = f"Live-{project}-{queue_name.title()}"
+                    printer.show_banner("Live Server")
+                    printer.start_spinner(f"Creating {queue_name} Queue")
+                    queue_url, queue_arn = live_sqs.create_queue(queue_name)
+                    trigger = live_sqs.subscribe(function_arn, queue_url, queue_arn)
 
-                    if choice == "SNS":
-                        live_sns = LiveSNS(region, account, printer)
-                        topic_name = click.prompt("SNS Topic Name", type=str)
-                        topic_name = f"Live-{project}-{topic_name.title()}"
-                        printer.show_banner("Live Server")
-                        printer.start_spinner(f"Creating {topic_name} Topic")
-                        topic_arn = live_sns.create_or_get_topic(topic_name)
-                        trigger = live_sns.create_trigger(function_arn, selected_function, topic_arn)
+                if choice == "S3":
+                    live_s3 = LiveS3(region, printer)
+                    bucket_name = click.prompt("S3 Bucket Name", type=str)
+                    bucket_name = f"live-{project.lower()}-{bucket_name.lower()}"
+                    printer.show_banner("Live Server")
+                    printer.start_spinner(f"Creating {bucket_name} Bucket")
+                    live_s3.create_bucket(bucket_name)
+                    trigger = live_s3.subscribe(function_arn, account, bucket_name)
 
-                    if choice == "SQS":
-                        live_sqs = LiveSQS(region, printer)
-                        queue_name = click.prompt("SQS Queue Name", type=str)
-                        queue_name = f"Live-{project}-{queue_name.title()}"
-                        printer.show_banner("Live Server")
-                        printer.start_spinner(f"Creating {queue_name} Queue")
-                        queue_url, queue_arn = live_sqs.create_queue(queue_name)
-                        trigger = live_sqs.subscribe(function_arn, queue_url, queue_arn)
+                if choice == "Event Bridge":
+                    live_event = LiveEventBridge(region, printer)
+                    bus_name = click.prompt("Event Bridge Bus Name", type=str)
+                    bus_name = f"Live-{project}-{bus_name.title()}"
+                    printer.show_banner("Live Server")
+                    printer.start_spinner(f"Creating {bus_name} Bus")
+                    live_event.create_bus(bus_name)
+                    trigger = live_event.subscribe(function_arn, account, bus_name)
 
-                    if choice == "S3":
-                        live_s3 = LiveS3(region, printer)
-                        bucket_name = click.prompt("S3 Bucket Name", type=str)
-                        bucket_name = f"live-{project.lower()}-{bucket_name.lower()}"
-                        printer.show_banner("Live Server")
-                        printer.start_spinner(f"Creating {bucket_name} Bucket")
-                        live_s3.create_bucket(bucket_name)
-                        trigger = live_s3.subscribe(function_arn, account, bucket_name)
-
-                    if choice == "Event Bridge":
-                        live_event = LiveEventBridge(region, printer)
-                        bus_name = click.prompt("Event Bridge Bus Name", type=str)
-                        bus_name = f"Live-{project}-{bus_name.title()}"
-                        printer.show_banner("Live Server")
-                        printer.start_spinner(f"Creating {bus_name} Bus")
-                        live_event.create_bus(bus_name)
-                        trigger = live_event.subscribe(function_arn, account, bus_name)
-
-                    live.attach_trigger(selected_function, trigger)
-                    printer.stop_spinner()
-                except Exception as e:
-                    printer.stop_spinner()
-                    printer.print(str(e), "red", 1)
-                    time.sleep(7)
-                    continue
+                live.attach_trigger(selected_function, trigger)
+                printer.stop_spinner()
+                
+            except Exception as e:
+                printer.stop_spinner()
+                printer.print(str(e), "red", 1)
+                time.sleep(7)
+                continue

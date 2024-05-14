@@ -89,8 +89,6 @@ def log(event):
         f.write(f"{json.dumps(event)}\n")
 
 
-
-
 watchdog_thread = threading.Thread(target=watchdog)
 watchdog_thread.daemon = True
 watchdog_thread.start()

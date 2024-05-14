@@ -151,3 +151,7 @@ docs.yaml
 # Coverage reports #
 ####################
 coverage.xml
+
+# Log reports #
+####################
+*.log

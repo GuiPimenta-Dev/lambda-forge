@@ -58,7 +58,7 @@ class Live:
                     function_name,
                     function_path,
                     iot_endpoint,
-                    self.log_file
+                    self.log_file,
                 ]
             )
 

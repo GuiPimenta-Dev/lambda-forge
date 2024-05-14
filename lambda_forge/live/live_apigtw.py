@@ -36,11 +36,13 @@ class LiveApiGtw:
         data = json.load(open("cdk.json", "r"))
         functions = data["context"]["functions"]
         function_name = function_name.replace(f"Live-{self.project}-", "")
-        function = next((function for function in functions if function["name"] == function_name), None)
+        function = next(
+            (function for function in functions if function["name"] == function_name),
+            None,
+        )
         return function["endpoint"].strip("/").lower()
 
     def create_trigger(self, function_arn, function_name):
-        self.printer.br()
         urlpath = self.get_urlpath(function_name)
         all_resources = self.api_client.get_resources(restApiId=self.root_id)["items"]
         parent_id = next(
@@ -54,23 +56,33 @@ class LiveApiGtw:
         for part in urlpaths:
             current_path += f"/{part}"
             existing_resource = next(
-                (resource for resource in all_resources if resource["path"] == current_path),
+                (
+                    resource
+                    for resource in all_resources
+                    if resource["path"] == current_path
+                ),
                 None,
             )
 
             if not existing_resource:
-                resource = self.api_client.create_resource(restApiId=self.root_id, parentId=parent_id, pathPart=part)
+                resource = self.api_client.create_resource(
+                    restApiId=self.root_id, parentId=parent_id, pathPart=part
+                )
                 parent_id = resource["id"]
                 all_resources.append({"id": resource["id"], "path": current_path})
             else:
                 parent_id = existing_resource["id"]
 
         try:
-            response = self.api_client.get_method(restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY")
+            response = self.api_client.get_method(
+                restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY"
+            )
 
             # If the method exists, delete it
             if response["httpMethod"] == "ANY":
-                self.api_client.delete_method(restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY")
+                self.api_client.delete_method(
+                    restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY"
+                )
         except:
             pass
 
@@ -144,15 +156,10 @@ class LiveApiGtw:
             "X-Forwarded-Port",
             "X-Forwarded-Proto",
         ]
-        filtered_headers = {key: value for key, value in event["headers"].items() if key not in keys_to_remove}
+        filtered_headers = {
+            key: value
+            for key, value in event["headers"].items()
+            if key not in keys_to_remove
+        }
         event["headers"] = filtered_headers or None
         return event
-
-    @staticmethod
-    def publish(printer):
-        printer.show_banner("API Gateway")
-        url = click.prompt(click.style("URL", fg=(37, 171, 190)), type=str)
-        method = click.prompt(click.style("Method", fg=(37, 171, 190)), type=str, default="GET")
-        headers = click.prompt(click.style("Headers", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
-        body = click.prompt(click.style("Body", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
-        requests.request(method, url, headers=eval(headers), data=body)

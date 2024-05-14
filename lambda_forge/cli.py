@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import subprocess
 
@@ -12,15 +13,7 @@ from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
-from lambda_forge.live import (
-    LiveApiGtw,
-    LiveEventBridge,
-    LiveS3,
-    LiveSNS,
-    LiveSQS,
-    log_cli,
-    server_cli,
-)
+from lambda_forge.live import log_cli, server_cli, trigger_cli
 from lambda_forge.printer import Printer
 
 printer = Printer()
@@ -459,7 +452,7 @@ AVAILABLE_TYPES = ["server", "logs", "trigger"]
 
 @forge.command()
 @click.argument("types", type=click.Choice(AVAILABLE_TYPES))
-@click.option("--log-file", help="Name of Log file", default="live_dev.log")
+@click.option("--log-file", help="Name of Log file", default="live.log")
 def live(types, log_file):
     """
     Starts a live development environment for the specified Lambda function.
@@ -473,43 +466,12 @@ def live(types, log_file):
         server_cli.run_live(log_file)
 
     if types == "logs":
+        with open(log_file, "w") as f:
+            f.write("")
         log_cli.tail_f(log_file)
 
-
-@forge.command()
-@click.argument("service", type=click.Choice(AVAILABLE_TRIGGERS))
-def trigger(service):
-    """
-    Triggers the specified AWS service integration.
-
-    This command triggers the specified AWS service integration, allowing you to test the service's functionality within the Lambda project.
-
-    The 'service' parameter must match the name of an existing AWS service integration in the project.
-    """
-
-    data = json.load(open("cdk.json", "r"))
-    region = data["context"].get("region")
-
-    if not region:
-        printer.print("Region Not Found", "red", 1, 1)
-        exit()
-
-    while True:
-        click.echo()
-        if service == "api_gateway":
-            LiveApiGtw.publish(printer)
-
-        if service == "sns":
-            LiveSNS(region, printer).publish()
-
-        if service == "sqs":
-            LiveSQS(region, printer).publish()
-
-        if service == "s3":
-            LiveS3(region, printer).publish()
-
-        if service == "event_bridge":
-            LiveEventBridge(region, printer).publish()
+    if types == "trigger":
+        trigger_cli.run_trigger()
 
 
 @forge.command()

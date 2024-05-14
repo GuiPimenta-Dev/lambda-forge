@@ -13,10 +13,14 @@ class LiveS3:
         self.region = region
 
     def create_bucket(self, bucket_name):
-        self.s3_client.create_bucket(
-            Bucket=bucket_name,
-            CreateBucketConfiguration={"LocationConstraint": self.region},
-        )
+        try:
+            self.s3_client.head_bucket(Bucket=bucket_name)
+        except:
+            self.s3_client.create_bucket(
+                Bucket=bucket_name,
+                CreateBucketConfiguration={'LocationConstraint': self.region}
+            )
+                
 
     def subscribe(self, function_arn, account_id, bucket_name):
 
@@ -53,21 +57,3 @@ class LiveS3:
         except Exception as e:
             print(f"Error in subscribe method: {e}")
             raise e
-
-    def publish(self):
-        self.printer.show_banner("S3")
-        metadata = click.prompt(click.style("Metadata", fg=(37, 171, 190)), type=str, default="{}", show_default=False)
-        file_path = click.prompt(click.style("File Path", fg=(37, 171, 190)), type=str)
-        filename = file_path.split("/")[-1]
-
-        bucket_name = None
-        existing_buckets = self.s3_client.list_buckets()["Buckets"]
-        for bucket in existing_buckets:
-            if bucket["Name"].startswith("live-s3-"):
-                bucket_name = bucket["Name"]
-                break
-
-        metadata = ast.literal_eval(metadata)
-
-        with open(file_path, "rb") as file:
-            self.s3_client.put_object(Bucket=bucket_name, Key=filename, Body=file, Metadata=metadata)

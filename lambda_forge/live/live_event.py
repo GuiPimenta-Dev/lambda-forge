@@ -33,7 +33,7 @@ class LiveEventBridge:
         self.event_client.put_rule(
             Name=rule_name,
             EventBusName=bus_name,
-            EventPattern=json.dumps({"source": ["my.application"]}),
+            EventPattern=json.dumps({"source": ["event.bridge"]}),
             State="ENABLED",
         )
         self.event_client.put_targets(
@@ -44,19 +44,3 @@ class LiveEventBridge:
 
         trigger = {"Trigger": "Event Bridge", "ARN": f"arn:aws:events:{self.region}:{account_id}:event-bus/{bus_name}"}
         return trigger
-
-    def publish(self):
-        self.printer.show_banner("Event Bridge")
-        event = {
-            "Source": "my.application",
-            "DetailType": "UserAction",
-            "Detail": json.dumps(
-                {
-                    "message": click.prompt(
-                        click.style("Message", fg=(37, 171, 190)), type=str, default="", show_default=False
-                    )
-                }
-            ),
-            "EventBusName": self.bus_name,
-        }
-        self.event_client.put_events(Entries=[event])
