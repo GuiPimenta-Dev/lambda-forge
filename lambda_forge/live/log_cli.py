@@ -67,8 +67,12 @@ def print_service(event):
 
     else:
         header = create_cli_header("LAMBDA")
-        printer.print(header, "gray")
-        printer.print(event, "gray", 1)
+        color = "gray"        
+        if '"statusCode": 500' in event:
+            color = "red"
+            
+        printer.print(header, color)
+        printer.print(event, color, 1)
 
     printer.br(2)
 
