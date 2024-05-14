@@ -131,7 +131,7 @@ def run_live(log_file):
 
             printer.br()
 
-            options = ["API Gateway", "SNS", "SQS", "S3", "Event Bridge"]
+            options = sorted(["API Gateway", "SNS", "SQS", "S3", "Event Bridge"])
             choice = inquirer.select(
                 message="Select a trigger: ",
                 style=style,
