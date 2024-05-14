@@ -98,7 +98,7 @@ def run_live(log_file):
             printer.stop_spinner()
 
         if choice == "Synth":
-            printer.br()
+            printer.show_banner("Live Server")
             printer.start_spinner("Synthesizing CDK")
             with open(os.devnull, "w") as devnull:
                 subprocess.run(
