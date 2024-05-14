@@ -34,10 +34,11 @@ def run_live(log_file):
         exit()
 
     try:
-        os.environ["TRACK_FUNCTIONS"] = "true"
         printer.start_spinner("Synthesizing CDK")
         with open(os.devnull, "w") as devnull:
-            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+            subprocess.run(
+                ["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True
+            )
             printer.stop_spinner()
 
     except Exception as e:
@@ -90,7 +91,9 @@ def run_live(log_file):
                 timeout = 30
             path = functions[synth_function_names.index(function_name)]["path"]
             printer.show_banner("Live Server")
-            printer.start_spinner(f"Creating Lambda Function Live-{project}-{function_name}")
+            printer.start_spinner(
+                f"Creating Lambda Function Live-{project}-{function_name}"
+            )
             live.create_lambda(f"Live-{project}-{function_name}", path, timeout)
             printer.stop_spinner()
 
@@ -98,7 +101,12 @@ def run_live(log_file):
             printer.br()
             printer.start_spinner("Synthesizing CDK")
             with open(os.devnull, "w") as devnull:
-                subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+                subprocess.run(
+                    ["cdk", "synth"],
+                    stdout=devnull,
+                    stderr=subprocess.STDOUT,
+                    check=True,
+                )
                 printer.stop_spinner()
 
             data = json.load(open("cdk.json", "r"))
@@ -136,7 +144,9 @@ def run_live(log_file):
                     printer.show_banner("Live Server")
                     printer.start_spinner(f"Creating API Gateway Trigger")
                     live_apigtw = LiveApiGtw(account, region, printer, project)
-                    trigger = live_apigtw.create_trigger(function_arn, selected_function)
+                    trigger = live_apigtw.create_trigger(
+                        function_arn, selected_function
+                    )
 
                 if choice == "SNS":
                     live_sns = LiveSNS(region, account, printer)
@@ -145,7 +155,9 @@ def run_live(log_file):
                     printer.show_banner("Live Server")
                     printer.start_spinner(f"Creating {topic_name} Topic")
                     topic_arn = live_sns.create_or_get_topic(topic_name)
-                    trigger = live_sns.create_trigger(function_arn, selected_function, topic_arn)
+                    trigger = live_sns.create_trigger(
+                        function_arn, selected_function, topic_arn
+                    )
 
                 if choice == "SQS":
                     live_sqs = LiveSQS(region, printer)
@@ -176,7 +188,7 @@ def run_live(log_file):
 
                 live.attach_trigger(selected_function, trigger)
                 printer.stop_spinner()
-                
+
             except Exception as e:
                 printer.stop_spinner()
                 printer.print(str(e), "red", 1)

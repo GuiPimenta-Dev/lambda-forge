@@ -7,18 +7,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def check_track_env_variable():
-    track = os.getenv("TRACK_FUNCTIONS", "false")
-    return track.lower() == "true"
+
 
 
 def track(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        should_track = check_track_env_variable()
-        if not should_track:
-            return func(*args, **kwargs)
-
         cdk = json.load(open("cdk.json"))
         data = cdk["context"].get("functions", [])
         function_name = func.__name__
@@ -55,10 +49,6 @@ def track(func):
 def reset(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        should_track = check_track_env_variable()
-        if not should_track:
-            return func(*args, **kwargs)
-
         cdk = json.load(open("cdk.json"))
         cdk["context"]["functions"] = []
         with open("cdk.json", "w") as file:

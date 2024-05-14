@@ -29,7 +29,3 @@ RUN pip install --upgrade pip \
   && pip install pyyaml pytest-html coverage awscli boto3==1.33.2 botocore==1.33.2 \ 
   && pip install -r base-requirements.txt \ 
   && pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/ --upgrade
-
-# Set environment variables
-ENV TRACK_FUNCTIONS=true
-

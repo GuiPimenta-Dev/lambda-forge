@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lambda_forge",
-    version="1.0.925",
+    version="1.0.927",
     packages=find_packages(),
     license="MIT",
     install_requires=[
