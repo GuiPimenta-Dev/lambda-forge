@@ -40,8 +40,8 @@ def print_service(event):
         record = records["Records"][0]
         if "s3" in record:
             header = create_cli_header("S3")
-            printer.print(header, "green")
-            printer.print(event, "green", 1)
+            printer.print(header, "orange")
+            printer.print(event, "orange", 1)
         elif record.get("eventSource") == "aws:dynamodb":
             header = create_cli_header("DYNAMO")
             printer.print(header, "blue")
@@ -67,7 +67,7 @@ def print_service(event):
 
     else:
         header = create_cli_header("LAMBDA")
-        color = "gray"        
+        color = "green"        
         if '"statusCode": 500' in event:
             color = "red"
             
