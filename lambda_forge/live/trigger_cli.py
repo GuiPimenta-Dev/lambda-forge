@@ -140,5 +140,5 @@ def run_trigger():
 
         except Exception as e:
             printer.print(str(e), "red", 1, 1)
-            time.sleep(7)
+            time.sleep(4)
             continue

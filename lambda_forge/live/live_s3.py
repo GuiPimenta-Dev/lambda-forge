@@ -51,7 +51,7 @@ class LiveS3:
                 NotificationConfiguration={"LambdaFunctionConfigurations": [lambda_config]},
             )
 
-            trigger = {"Trigger": "S3", "ARN": f"arn:aws:s3:::{bucket_name}"}
+            trigger = {"Trigger": "S3", "Bucket": bucket_name}
             return trigger
 
         except Exception as e:

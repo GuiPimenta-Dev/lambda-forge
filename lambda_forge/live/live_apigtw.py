@@ -116,50 +116,11 @@ class LiveApiGtw:
             pass
 
         endpoint = self.__get_endpoint_url(urlpath)
-        response = {"trigger": "API Gateway", "endpoint": endpoint, "method": "ANY"}
+        response = {"trigger": "API Gateway", "url": endpoint}
         return response
 
     def __get_endpoint_url(self, urlpath=None):
         endpoint_url = f"https://{self.root_id}.execute-api.{self.region}.amazonaws.com/{self.stage}/{urlpath}"
         return endpoint_url
 
-    @staticmethod
-    def parse_logs(event):
-        event.pop("multiValueHeaders", None)
-        keys_to_remove = [
-            "Accept",
-            "Accept-Encoding",
-            "Accept-Language",
-            "cache-control",
-            "CloudFront-Forwarded-Proto",
-            "CloudFront-Is-Desktop-Viewer",
-            "CloudFront-Is-Mobile-Viewer",
-            "CloudFront-Is-SmartTV-Viewer",
-            "CloudFront-Is-Tablet-Viewer",
-            "CloudFront-Viewer-ASN",
-            "CloudFront-Viewer-Country",
-            "Host",
-            "priority",
-            "sec-ch-ua",
-            "sec-ch-ua-mobile",
-            "sec-ch-ua-platform",
-            "sec-fetch-dest",
-            "sec-fetch-mode",
-            "sec-fetch-site",
-            "sec-fetch-user",
-            "upgrade-insecure-requests",
-            "User-Agent",
-            "Via",
-            "X-Amz-Cf-Id",
-            "X-Amzn-Trace-Id",
-            "X-Forwarded-For",
-            "X-Forwarded-Port",
-            "X-Forwarded-Proto",
-        ]
-        filtered_headers = {
-            key: value
-            for key, value in event["headers"].items()
-            if key not in keys_to_remove
-        }
-        event["headers"] = filtered_headers or None
-        return event
+    
