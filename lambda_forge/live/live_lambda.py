@@ -82,8 +82,6 @@ class LiveLambda:
         return cert, private, ca
 
     def __create_role(self):
-        self.printer.change_spinner_legend("Creating Role")
-
         assume_role_policy_document = {
             "Version": "2012-10-17",
             "Statement": [

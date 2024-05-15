@@ -54,7 +54,7 @@ def print_service(event):
             header = create_cli_header("SNS")
             printer.print(header, "magenta")
             printer.print(event, "magenta", 1)
-            
+
     elif "event.bridge" in event:
         header = create_cli_header("Event Bridge")
         printer.print(header, "lime")
@@ -67,10 +67,10 @@ def print_service(event):
 
     else:
         header = create_cli_header("LAMBDA")
-        color = "green"        
+        color = "green"
         if '"statusCode": 500' in event:
             color = "red"
-            
+
         printer.print(header, color)
         printer.print(event, color, 1)
 

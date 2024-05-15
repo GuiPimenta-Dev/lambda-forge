@@ -35,8 +35,8 @@ class LiveSQS:
         )
 
         trigger = {
-            "Trigger": "SQS",
-            "URL": queue_url,
+            "trigger": "SQS",
+            "url": queue_url,
         }
         return trigger
 

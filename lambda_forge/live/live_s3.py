@@ -17,10 +17,8 @@ class LiveS3:
             self.s3_client.head_bucket(Bucket=bucket_name)
         except:
             self.s3_client.create_bucket(
-                Bucket=bucket_name,
-                CreateBucketConfiguration={'LocationConstraint': self.region}
+                Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": self.region}
             )
-                
 
     def subscribe(self, function_arn, account_id, bucket_name):
 
@@ -51,7 +49,7 @@ class LiveS3:
                 NotificationConfiguration={"LambdaFunctionConfigurations": [lambda_config]},
             )
 
-            trigger = {"Trigger": "S3", "Bucket": bucket_name}
+            trigger = {"trigger": "S3", "bucket": bucket_name}
             return trigger
 
         except Exception as e:

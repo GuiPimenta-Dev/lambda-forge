@@ -185,9 +185,7 @@ def create_project(
 
     project_builder = ProjectBuilder.a_project(name, no_docs, minimal)
 
-    project_builder = project_builder.with_cdk(
-        repo_owner, repo_name, account, region, bucket, coverage
-    ).build()
+    project_builder = project_builder.with_cdk(repo_owner, repo_name, account, region, bucket, coverage).build()
 
     if not no_docs:
         DocsBuilder.a_doc().with_config().with_lambda_stack().build()
@@ -196,15 +194,11 @@ def create_project(
 @forge.command()
 @click.argument("name")
 @click.option("--description", required=True, help="Description for the endpoint")
-@click.option(
-    "--method", required=False, help="HTTP method for the endpoint", default="GET"
-)
+@click.option("--method", required=False, help="HTTP method for the endpoint", default="GET")
 @click.option("--belongs-to", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-@click.option(
-    "--websocket", help="Function is going to be used for websockets", is_flag=True
-)
+@click.option("--websocket", help="Function is going to be used for websockets", is_flag=True)
 @click.option(
     "--no-tests",
     help="Do not create unit tests and integration tests files",
@@ -217,9 +211,7 @@ def create_project(
     is_flag=True,
     default=False,
 )
-def function(
-    name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public
-):
+def function(name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public):
     """
     Creates a Lambda function with a predefined structure and API Gateway integration.
 
@@ -254,9 +246,7 @@ def create_function(
     public=False,
 ):
 
-    function_builder = FunctionBuilder.a_function(name, description).with_config(
-        belongs
-    )
+    function_builder = FunctionBuilder.a_function(name, description).with_config(belongs)
 
     if no_api is True:
         function_builder = function_builder.with_main()
@@ -271,11 +261,7 @@ def create_function(
     else:
         endpoint = endpoint or belongs or name
         if no_tests is True:
-            function_builder = (
-                function_builder.with_endpoint(endpoint)
-                .with_api(http_method, public)
-                .with_main()
-            )
+            function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
         else:
             function_builder = (
                 function_builder.with_endpoint(endpoint)
@@ -453,7 +439,9 @@ AVAILABLE_TYPES = ["server", "logs", "trigger"]
 @forge.command()
 @click.argument("types", type=click.Choice(AVAILABLE_TYPES))
 @click.option("--log-file", help="Name of Log file", default="live.log")
-def live(types, log_file):
+@click.option("--input-file", help="Name of the input file", default="live_server.json")
+@click.option("--output-file", help="Name of the output file", default="live_server.json")
+def live(types, log_file, input_file, output_file):
     """
     Starts a live development environment for the specified Lambda function.
 
@@ -462,11 +450,12 @@ def live(types, log_file):
 
     The 'function_name' parameter must match the name of an existing Lambda function in the project.
     """
+
     if types == "server":
-        server_cli.run_live(log_file)
+        server_cli.run_live(log_file, input_file, output_file)
 
     if types == "logs":
-        with open(log_file, "w") as f:
+        with open(log_file, "a") as f:
             f.write("")
         log_cli.tail_f(log_file)
 

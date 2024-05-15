@@ -32,8 +32,8 @@ class LiveSNS:
         self.sns.subscribe(TopicArn=topic_arn, Protocol="lambda", Endpoint=function_arn)
 
         trigger = {
-            "Trigger": "SNS",
-            "Arn": topic_arn,
+            "trigger": "SNS",
+            "arn": topic_arn,
         }
         return trigger
 
