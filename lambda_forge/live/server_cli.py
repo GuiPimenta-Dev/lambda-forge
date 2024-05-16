@@ -62,10 +62,6 @@ def create_event_bridge_trigger(region, account, function_arn, bus_name):
 def run_live(log_file, input_file, output_file):
     printer.show_banner("Live Server")
 
-    if not os.path.exists(input_file):
-        with open(input_file, "w") as f:
-            json.dump([], f)
-
     data = json.load(open("cdk.json", "r"))
     region = data["context"]["region"]
     account = data["context"]["account"]
@@ -102,43 +98,50 @@ def run_live(log_file, input_file, output_file):
 
     live = Live(printer, log_file)
 
-    input_resources = json.load(open(input_file, "r"))
     updated_file = []
-    for input_data in input_resources:
-        strip_name = input_data["name"].replace(f"Live-{project}-", "")
-        if strip_name not in synth_function_names:
-            continue
-        path = functions[synth_function_names.index(strip_name)]["path"]
-        printer.start_spinner(f"Creating Lambda Function {input_data['name']}")
-        live.create_lambda(input_data["name"], path, input_data["timeout"])
-        time.sleep(4)
-        for input_trigger in input_data["triggers"]:
+    if input_file:
+        
+        if not os.path.exists(input_file):
+            with open(input_file, "w") as f:
+                json.dump([], f)
+        
+        input_resources = json.load(open(input_file, "r"))
+        
+        for input_data in input_resources:
+            strip_name = input_data["name"].replace(f"Live-{project}-", "")
+            if strip_name not in synth_function_names:
+                continue
+            path = functions[synth_function_names.index(strip_name)]["path"]
+            printer.start_spinner(f"Creating Lambda Function {input_data['name']}")
+            live.create_lambda(input_data["name"], path, input_data["timeout"])
+            time.sleep(4)
+            for input_trigger in input_data["triggers"]:
 
-            function_arn = f"arn:aws:lambda:{region}:{account}:function:{input_data['name']}"
+                function_arn = f"arn:aws:lambda:{region}:{account}:function:{input_data['name']}"
 
-            if input_trigger["trigger"] == "API Gateway":
-                trigger = create_api_gateway_trigger(account, region, project, function_arn, input_data["name"])
+                if input_trigger["trigger"] == "API Gateway":
+                    trigger = create_api_gateway_trigger(account, region, project, function_arn, input_data["name"])
 
-            if input_trigger["trigger"] == "SNS":
-                topic_name = input_trigger["arn"].split(":")[-1]
-                trigger = create_sns_trigger(account, region, function_arn, input_data["name"], topic_name)
+                if input_trigger["trigger"] == "SNS":
+                    topic_name = input_trigger["arn"].split(":")[-1]
+                    trigger = create_sns_trigger(account, region, function_arn, input_data["name"], topic_name)
 
-            if input_trigger["trigger"] == "SQS":
-                queue_name = input_trigger["url"].split("/")[-1]
-                trigger = create_sqs_trigger(region, function_arn, queue_name)
+                if input_trigger["trigger"] == "SQS":
+                    queue_name = input_trigger["url"].split("/")[-1]
+                    trigger = create_sqs_trigger(region, function_arn, queue_name)
 
-            if input_trigger["trigger"] == "S3":
-                trigger = create_s3_trigger(region, account, function_arn, input_trigger["bucket"])
+                if input_trigger["trigger"] == "S3":
+                    trigger = create_s3_trigger(region, account, function_arn, input_trigger["bucket"])
 
-            if input_trigger["trigger"] == "Event Bridge":
-                trigger = create_event_bridge_trigger(region, account, function_arn, input_trigger["bus"])
+                if input_trigger["trigger"] == "Event Bridge":
+                    trigger = create_event_bridge_trigger(region, account, function_arn, input_trigger["bus"])
 
-            live.attach_trigger(input_data["name"], trigger)
+                live.attach_trigger(input_data["name"], trigger)
 
-        printer.stop_spinner()
-        updated_file.append(input_data)
+            printer.stop_spinner()
+            updated_file.append(input_data)
 
-    json.dump(updated_file, open(input_file, "w"))
+        json.dump(updated_file, open(input_file, "w"))
 
     style = get_style(
         {
@@ -190,8 +193,9 @@ def run_live(log_file, input_file, output_file):
                     "triggers": [],
                 }
             )
-
-            json.dump(updated_file, open(input_file, "w"))
+            
+            if output_file:
+                json.dump(updated_file, open(output_file, "w"))
 
         if choice == "Synth":
             printer.show_banner("Live Server")
@@ -266,8 +270,9 @@ def run_live(log_file, input_file, output_file):
                     if i["name"] == selected_function:
                         i["triggers"].append(trigger)
                         break
-
-                json.dump(updated_file, open(input_file, "w"))
+                
+                if output_file:
+                    json.dump(updated_file, open(output_file, "w"))
 
             except Exception as e:
                 printer.stop_spinner()

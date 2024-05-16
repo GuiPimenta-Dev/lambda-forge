@@ -1,7 +1,9 @@
+import contextlib
 import json
 import os
 import re
 import subprocess
+import sys
 
 import click
 from InquirerPy import get_style, inquirer
@@ -438,9 +440,9 @@ AVAILABLE_TYPES = ["server", "logs", "trigger"]
 
 @forge.command()
 @click.argument("types", type=click.Choice(AVAILABLE_TYPES))
-@click.option("--log-file", help="Name of Log file", default="live.log")
-@click.option("--input-file", help="Name of the input file", default="live_server.json")
-@click.option("--output-file", help="Name of the output file", default="live_server.json")
+@click.option("-l", "--log-file", help="Name of Log file", default="live.log")
+@click.option("-i", "--input-file", help="Name of the input file", default=None)
+@click.option("-o", "--output-file", help="Name of the output file", default=None)
 def live(types, log_file, input_file, output_file):
     """
     Starts a live development environment for the specified Lambda function.

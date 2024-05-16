@@ -1,4 +1,6 @@
+import contextlib
 import json
+import sys
 import boto3
 import os
 import subprocess
@@ -63,6 +65,7 @@ class Live:
             )
 
         thread = Thread(target=target)
+        
         thread.start()
 
     def print_report(self, functions):
