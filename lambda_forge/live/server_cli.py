@@ -196,7 +196,7 @@ def run_live(log_file, input_file, output_file):
             
             if output_file:
                 json.dump(updated_file, open(output_file, "w"))
-
+        
         if choice == "Synth":
             printer.show_banner("Live Server")
             printer.start_spinner("Synthesizing CDK")
