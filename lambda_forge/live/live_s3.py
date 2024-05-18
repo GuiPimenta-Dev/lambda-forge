@@ -8,8 +8,8 @@ import click
 class LiveS3:
     def __init__(self, region, printer):
         self.printer = printer
-        self.s3_client = boto3.client("s3")
-        self.lambda_client = boto3.client("lambda")
+        self.s3_client = boto3.client("s3", region_name=region)
+        self.lambda_client = boto3.client("lambda", region_name=region)
         self.region = region
 
     def create_bucket(self, bucket_name):

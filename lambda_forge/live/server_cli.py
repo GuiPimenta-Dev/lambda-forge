@@ -101,36 +101,49 @@ def run_live(log_file, input_file, output_file):
     while True:
 
         for function in functions:
-            function_name = f"Live-{project}-{function['name']}"
-            printer.start_spinner(f"Creating Lambda Function {function_name}")
-            live.create_lambda(function_name, function["path"], function["timeout"])
-            time.sleep(4)
-            for function_trigger in function["triggers"]:
+            try:
+                function_name = f"Live-{project}-{function['name']}"
+                printer.start_spinner(f"Creating Lambda Function {function_name}")
+                live.create_lambda(function_name, function["path"], function["timeout"])
+                time.sleep(4)
+                for function_trigger in function["triggers"]:
 
-                function_arn = f"arn:aws:lambda:{region}:{account}:function:{function_name}"
+                    function_arn = f"arn:aws:lambda:{region}:{account}:function:{function_name}"
 
-                if function_trigger["service"] == "api_gateway":
-                    trigger = create_api_gateway_trigger(
-                        account, region, project, function_arn, function_name, function_trigger["trigger"]
-                    )
+                    if function_trigger["service"] == "api_gateway":
+                        trigger = create_api_gateway_trigger(
+                            account, region, project, function_arn, function_name, function_trigger["trigger"]
+                        )
 
-                if function_trigger["service"] == "sns":
-                    trigger = create_sns_trigger(
-                        account, region, function_arn, function_name, function_trigger["trigger"]
-                    )
+                    if function_trigger["service"] == "sns":
+                        trigger = create_sns_trigger(
+                            account, region, function_arn, function_name, function_trigger["trigger"]
+                        )
 
-                if function_trigger["service"] == "sqs":
-                    trigger = create_sqs_trigger(region, function_arn, function_trigger["trigger"])
+                    if function_trigger["service"] == "sqs":
+                        trigger = create_sqs_trigger(region, function_arn, function_trigger["trigger"])
 
-                if function_trigger["service"] == "s3":
-                    trigger = create_s3_trigger(region, account, function_arn, function_trigger["trigger"])
+                    if function_trigger["service"] == "s3":
+                        trigger = create_s3_trigger(
+                            region,
+                            account,
+                            function_arn,
+                            function_trigger["trigger"].replace("_", "-").replace(" ", "-").lower(),
+                        )
 
-                if function_trigger["service"] == "event_bridge":
-                    trigger = create_event_bridge_trigger(region, account, function_arn, function_trigger["trigger"])
+                    if function_trigger["service"] == "event_bridge":
+                        trigger = create_event_bridge_trigger(
+                            region, account, function_arn, function_trigger["trigger"]
+                        )
 
-                live.attach_trigger(function_name, trigger)
+                    live.attach_trigger(function_name, trigger)
 
-            printer.stop_spinner()
+                printer.stop_spinner()
+
+            except Exception as e:
+                printer.print(str(e), "red", 1, 1)
+                printer.stop_spinner()
+                exit()
 
         live.intro()
 

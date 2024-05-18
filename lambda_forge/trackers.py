@@ -3,7 +3,7 @@ import json
 from functools import wraps
 
 
-def invoke(service, resource_id, function, extra=[]):
+def invoke(service, resource, function, extra=[]):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -17,7 +17,7 @@ def invoke(service, resource_id, function, extra=[]):
             args_dict = bound_args.arguments
 
             # Extract values based on provided names
-            invoked_value = args_dict.get(resource_id)
+            invoked_value = args_dict.get(resource)
             function_value = args_dict.get(function)
             extra_values = {key: args_dict.get(key) for key in extra}
 
@@ -28,7 +28,7 @@ def invoke(service, resource_id, function, extra=[]):
             function_name = function_value._physical_name.split(f"{project}-")[1]
             for fc in functions:
                 if fc["name"] == function_name:
-                    fc["invocations"].append({"service": service, "resource_id": invoked_value, **extra_values})
+                    fc["invocations"].append({"service": service, "resource": invoked_value, **extra_values})
                     break
 
             cdk["context"]["functions"] = functions

@@ -17,19 +17,23 @@ from lambda_forge.trackers import trigger, invoke
 
 class SNS:
     def __init__(self, scope, resources) -> None:
-        self.topics = {
-            #  "topic_id": sns.Topic.from_topic_arn(scope, "SNS", topic_arn=resources["arns"]["sns_arn"])
-        }
+    
+        # self.sns_topic = Topic.from_topic_arn(
+        #     scope,
+        #     id="SNSTopic",
+        #     topic_arn=resources["arns"]["sns_topic_arn"],
+        # )
+        ...
 
-    @trigger(service="sns", trigger="topic_id", function="function")
-    def add_event_source(self, topic_id, function):
-        topic = self.topics.get(topic_id)
+    @trigger(service="sns", trigger="topic", function="function")
+    def add_event_source(self, topic, function):
+        topic = getattr(self, topic)
         sns_subscription = aws_lambda_event_sources.SnsEventSource(topic)
         function.add_event_source(sns_subscription)
     
-    @invoke(service="sns", resource_id="topic_id", function="function")
-    def grant_publish(self, topic_id, function):
-        topic = self.topics.get(topic_id)
+    @invoke(service="sns", resource="topic", function="function")
+    def grant_publish(self, topic, function):
+        topic = getattr(self, topic)
         topic.grant_publish(function)
 """
         file_exists = self.file_exists("infra/services/sns.py")
@@ -71,13 +75,17 @@ from lambda_forge.trackers import invoke
 
 class DynamoDB:
     def __init__(self, scope, resources: dict) -> None:
-        self.tables = {
-            # "table_id": dynamodb.Table.from_table_arn(scope, "Dynamo", resources["arns"]["dynamo_arn"])
-        }
+
+        # self.dynamo = dynamo_db.Table.from_table_arn(
+        #     scope,
+        #     "Dynamo",
+        #     context.resources["arns"]["dynamo_arn"],
+        # )
+        ...
         
-    @invoke(service="dynamodb", resource_id="table_id", function="function")
-    def grant_write_data(self, table_id, function):
-        table = self.tables.get(table_id)
+    @invoke(service="dynamodb", resource="table", function="function")
+    def grant_write_data(self, table, function):
+        table = getattr(self, table)
         table.grant_write_data(function)
 """
         file_exists = self.file_exists("infra/services/dynamodb.py")
@@ -146,13 +154,17 @@ from lambda_forge.trackers import trigger, invoke
 
 class S3:
     def __init__(self, scope, resources) -> None:
-        self.buckets = {
-            # "bucket_id": s3.Bucket.from_bucket_arn(scope, "S3", bucket_arn=resources["arns"]["s3_arn"])
-        }
+        
+        # self.s3 = s3.Bucket.from_bucket_arn(
+        #     scope,
+        #     "S3",
+        #     bucket_arn=context.resources["arns"]["s3_arn"],
+        # )
+        ...
 
-    @trigger(service="s3", trigger="bucket_id", function="function")
+    @trigger(service="s3", trigger="bucket", function="function")
     def add_event_notification(self, bucket, function):
-        bucket = self.buckets.get(bucket)
+        bucket = getattr(self, bucket)
         notifications = aws_s3_notifications.LambdaDestination(function)
         bucket.add_event_notification(s3.EventType.OBJECT_CREATED, notifications)
 """
@@ -195,19 +207,23 @@ from lambda_forge.trackers import trigger, invoke
 
 class SQS:
     def __init__(self, scope, resources) -> None:
-        self.queues = {
-            # "queue_id": sqs.Queue.from_queue_arn(scope, "SQS", queue_arn=resources["arns"]["sqs_arn"])
-        }
+        
+        # self.sqs = sqs.Queue.from_queue_arn(
+        #     scope,
+        #     "SQS",
+        #     queue_arn=context.resources["arns"]["sqs_arn"],
+        # )
+        ...
     
-    @trigger(service="sqs", trigger="queue_id", function="function")
-    def add_event_source(self, queue_id, function):
-        queue = self.queues.get(queue_id)
+    @trigger(service="sqs", trigger="queue", function="function")
+    def add_event_source(self, queue, function):
+        queue = getattr(self, queue)
         event_source = aws_lambda_event_sources.SqsEventSource(queue)
         function.add_event_source(event_source)
 
-    @invoke(service="sqs", resource_id="queue_id", function="function")
-    def grant_send_messages(self, queue_id, function):
-        queue = self.queues.get(queue_id)
+    @invoke(service="sqs", resource="queue", function="function")
+    def grant_send_messages(self, queue, function):
+        queue = getattr(self, queue)
         queue.grant_send_messages(function)
     """
         file_exists = self.file_exists("infra/services/sqs.py")
