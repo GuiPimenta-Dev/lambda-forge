@@ -2,7 +2,7 @@ from aws_cdk import Duration
 from aws_cdk.aws_lambda import Code, Function, Runtime
 
 from lambda_forge.path import Path
-from lambda_forge.trackers import track
+from lambda_forge.trackers import function
 
 
 class Lambda:
@@ -11,7 +11,7 @@ class Lambda:
         self.context = context
         self.functions = {}
 
-    @track
+    @function
     def create_function(
         self,
         name,
