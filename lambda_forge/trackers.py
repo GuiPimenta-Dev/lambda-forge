@@ -2,16 +2,12 @@ import inspect
 import json
 from functools import wraps
 
-from dotenv import load_dotenv
 
-load_dotenv()
-
-
-def invoke(service, resource_id, function, extra = []):
+def invoke(service, resource_id, function, extra=[]):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            
+
             # Get the signature of the function
             sig = inspect.signature(func)
             bound_args = sig.bind(*args, **kwargs)
@@ -32,15 +28,9 @@ def invoke(service, resource_id, function, extra = []):
             function_name = function_value._physical_name.split(f"{project}-")[1]
             for fc in functions:
                 if fc["name"] == function_name:
-                    fc["invocations"].append(
-                        {
-                            "service": service,
-                            "resource_id": invoked_value,
-                            **extra_values
-                        }
-                    )
+                    fc["invocations"].append({"service": service, "resource_id": invoked_value, **extra_values})
                     break
-            
+
             cdk["context"]["functions"] = functions
 
             with open("functions.json", "w") as file:
@@ -48,16 +38,17 @@ def invoke(service, resource_id, function, extra = []):
 
             # Call the original function with its arguments
             return func(*args, **kwargs)
-        
+
         return wrapper
-    
+
     return decorator
 
-def trigger(service, trigger, function, extra = []):
+
+def trigger(service, trigger, function, extra=[]):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            
+
             sig = inspect.signature(func)
             bound_args = sig.bind(*args, **kwargs)
             bound_args.apply_defaults()
@@ -77,24 +68,18 @@ def trigger(service, trigger, function, extra = []):
             function_name = function_value._physical_name.split(f"{project}-")[1]
             for fc in functions:
                 if fc["name"] == function_name:
-                    fc["triggers"].append(
-                        {
-                            "service": service,
-                            "trigger": trigger_value,
-                            **extra_values
-                        }
-                    )
+                    fc["triggers"].append({"service": service, "trigger": trigger_value, **extra_values})
                     break
-            
 
             with open("functions.json", "w") as file:
                 json.dump(functions, file, indent=4)
-                        
+
             return func(*args, **kwargs)
-        
+
         return wrapper
-    
+
     return decorator
+
 
 def function(func):
     @wraps(func)
@@ -103,7 +88,7 @@ def function(func):
         path = kwargs["path"]
         directory = kwargs.get("directory")
         path = f"{path}/{directory}" if directory else path
-        timeout = kwargs.get("timeout", 60)
+        timeout = int(kwargs.get("timeout", 1)) * 60
         name = kwargs["name"]
         functions.append(
             {
@@ -112,16 +97,17 @@ def function(func):
                 "description": kwargs["description"],
                 "timeout": timeout,
                 "triggers": [],
-                "invocations": []
+                "invocations": [],
             }
         )
-        
+
         with open("functions.json", "w") as file:
             json.dump(functions, file, indent=4)
 
         return func(*args, **kwargs)
-    
+
     return wrapper
+
 
 def reset(func):
     @wraps(func)

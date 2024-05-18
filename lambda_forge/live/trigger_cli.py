@@ -1,10 +1,12 @@
+import json
 import time
+
+import boto3
 import click
 import requests
-from lambda_forge.printer import Printer
-import json
 from InquirerPy import get_style, inquirer
-import boto3
+
+from lambda_forge.printer import Printer
 
 printer = Printer()
 

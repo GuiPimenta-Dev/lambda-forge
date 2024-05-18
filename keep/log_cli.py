@@ -42,14 +42,14 @@ def print_service(event):
         header = create_cli_header(function_name)
         if type_ == "stdout":
             color = "gray"
-            printer.print(header, color)            
+            printer.print(header, color)
             printer.print(str(records["response"]), color, 1)
 
         else:
             color = "green"
             if '"statusCode": 500' in event:
                 color = "red"
-            printer.print(header, color)            
+            printer.print(header, color)
             printer.print(json.dumps(records["response"], indent=2), color, 1)
 
     elif "Records" in event:

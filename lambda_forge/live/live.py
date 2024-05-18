@@ -1,10 +1,10 @@
-import contextlib
 import json
-import sys
-import boto3
 import os
 import subprocess
+import sys
 from threading import Thread
+
+import boto3
 from tabulate import tabulate
 
 from lambda_forge.live.live_lambda import LiveLambda
@@ -65,7 +65,7 @@ class Live:
             )
 
         thread = Thread(target=target)
-        
+
         thread.start()
 
     def print_report(self, functions):

@@ -1,6 +1,7 @@
 import argparse
 import base64
 import importlib
+import io
 import json
 import os
 import pickle
@@ -8,7 +9,6 @@ import sys
 import threading
 import time
 import uuid
-import io
 
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
@@ -71,10 +71,8 @@ def message_callback(client, userdata, message):
 
             try:
                 # Call the process function
-                response_payload = process(
-                    deserialized_data["event"], deserialized_data["context"]
-                )
-                
+                response_payload = process(deserialized_data["event"], deserialized_data["context"])
+
             except Exception as e:
                 # Log the exception
                 log(
@@ -142,7 +140,6 @@ def watchdog():
         if current_modified != last_modified:
             reload_lambda_handler()
             last_modified = current_modified
-
 
 
 def log(event):

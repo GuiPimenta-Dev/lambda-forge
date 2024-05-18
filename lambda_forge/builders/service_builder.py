@@ -56,13 +56,11 @@ class Layers:
         #     layer_version_arn="",
         # )
         ...
-"""     
+"""
         file_exists = self.file_exists("infra/services/layers.py")
         if not file_exists:
             self.make_file("infra/services", "layers.py", f)
-            self.update_services(
-                "from infra.services.layers import Layers", "self.layers = Layers(scope)"
-            )
+            self.update_services("from infra.services.layers import Layers", "self.layers = Layers(scope)")
 
         return self
 
@@ -110,9 +108,9 @@ class SecretsManager:
         if not file_exists:
             self.make_file("infra/services", "secrets_manager.py", f)
             self.update_services(
-            "from infra.services.secrets_manager import SecretsManager",
-            "self.secrets_manager = SecretsManager(scope, context.resources)",
-        )
+                "from infra.services.secrets_manager import SecretsManager",
+                "self.secrets_manager = SecretsManager(scope, context.resources)",
+            )
 
         return self
 
@@ -161,9 +159,7 @@ class S3:
         file_exists = self.file_exists("infra/services/s3.py")
         if not file_exists:
             self.make_file("infra/services", "s3.py", f)
-            self.update_services(
-                "from infra.services.s3 import S3", "self.s3 = S3(scope, context.resources)"
-            )
+            self.update_services("from infra.services.s3 import S3", "self.s3 = S3(scope, context.resources)")
 
         return self
 
@@ -223,7 +219,6 @@ class SQS:
             )
 
         return self
-
 
     def with_event_bridge(self):
         f = """

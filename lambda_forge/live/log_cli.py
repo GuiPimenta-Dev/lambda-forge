@@ -36,7 +36,23 @@ def create_cli_header(title):
 def print_service(event):
     records = json.loads(event)
     event = json.dumps(json.loads(event), indent=2)
-    if "Records" in event:
+    if "function_name" in records:
+        function_name = records["function_name"]
+        type_ = records["type"]
+        header = create_cli_header(function_name)
+        if type_ == "stdout":
+            color = "gray"
+            printer.print(header, color)
+            printer.print(str(records["response"]), color, 1)
+
+        else:
+            color = "green"
+            if '"statusCode": 500' in event:
+                color = "red"
+            printer.print(header, color)
+            printer.print(json.dumps(records["response"], indent=2), color, 1)
+
+    elif "Records" in event:
         record = records["Records"][0]
         if "s3" in record:
             header = create_cli_header("S3")
@@ -64,15 +80,6 @@ def print_service(event):
         header = create_cli_header("API GATEWAY")
         printer.print(header, "yellow")
         printer.print(event, "yellow", 1)
-
-    else:
-        header = create_cli_header("LAMBDA")
-        color = "green"
-        if '"statusCode": 500' in event:
-            color = "red"
-
-        printer.print(header, color)
-        printer.print(event, color, 1)
 
     printer.br(2)
 

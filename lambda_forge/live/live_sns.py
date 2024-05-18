@@ -1,6 +1,7 @@
+import uuid
+
 import boto3
 import click
-import uuid
 
 
 class LiveSNS:

@@ -1,16 +1,14 @@
-import json
 import boto3
-import click
-import requests
 
 
 class LiveApiGtw:
-    def __init__(self, account, region, printer, project) -> None:
+    def __init__(self, account, region, printer, project, endpoint) -> None:
         self.stage = "live"
         self.account = account
         self.region = region
         self.project = project
         self.printer = printer
+        self.urlpath = endpoint.strip("/").lower()
         self.api_client = boto3.client("apigateway", region_name=self.region)
         self.lambda_client = boto3.client("lambda", region_name=self.region)
         self.root_id = self.__create_api()["id"]
@@ -32,25 +30,14 @@ class LiveApiGtw:
             )
         return rest_api
 
-    def get_urlpath(self, function_name):
-        data = json.load(open("cdk.json", "r"))
-        functions = data["context"]["functions"]
-        function_name = function_name.replace(f"Live-{self.project}-", "")
-        function = next(
-            (function for function in functions if function["name"] == function_name),
-            None,
-        )
-        return function["endpoint"].strip("/").lower()
-
     def create_trigger(self, function_arn, function_name):
-        urlpath = self.get_urlpath(function_name)
         all_resources = self.api_client.get_resources(restApiId=self.root_id)["items"]
         parent_id = next(
             (resource["id"] for resource in all_resources if resource["path"] == "/"),
             None,
         )
 
-        urlpaths = urlpath.split("/")
+        urlpaths = self.urlpath.split("/")
         current_path = ""
 
         for part in urlpaths:
@@ -105,10 +92,10 @@ class LiveApiGtw:
         except:
             pass
 
-        endpoint = self.__get_endpoint_url(urlpath)
+        endpoint = self.__get_endpoint_url()
         response = {"trigger": "API Gateway", "url": endpoint}
         return response
 
-    def __get_endpoint_url(self, urlpath=None):
-        endpoint_url = f"https://{self.root_id}.execute-api.{self.region}.amazonaws.com/{self.stage}/{urlpath}"
+    def __get_endpoint_url(self):
+        endpoint_url = f"https://{self.root_id}.execute-api.{self.region}.amazonaws.com/{self.stage}/{self.urlpath}"
         return endpoint_url

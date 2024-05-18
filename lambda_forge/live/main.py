@@ -29,7 +29,10 @@ def lambda_handler(event, context):
     def callback(client, userdata, message):
         global response
         response = message.payload.decode()
-        mqtt_client.disconnect()
+        try:
+            mqtt_client.disconnect()
+        except Exception as e:
+            print(f"Unexpected error during disconnect: {e}")
 
     mqtt_client.subscribe(f"{CLIENT_ID}/response", 0, callback)
 

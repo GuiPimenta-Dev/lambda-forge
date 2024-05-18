@@ -1,9 +1,11 @@
 import argparse
 import base64
 import importlib
+import io
 import json
 import os
 import pickle
+import sys
 import threading
 import time
 import uuid
@@ -54,14 +56,70 @@ def process(event, context):
 
 
 def message_callback(client, userdata, message):
+    try:
+        # Decode the message payload
+        decoded_bytes = base64.b64decode(message.payload)
+        deserialized_data = pickle.loads(decoded_bytes)
 
-    decoded_bytes = base64.b64decode(message.payload)
-    deserialized_data = pickle.loads(decoded_bytes)
+        # Check if the message topic matches the expected request topic
+        if message.topic == topic_request:
+            # Create a StringIO object to capture the output
+            captured_output = io.StringIO()
 
-    if message.topic == topic_request:
-        response_payload = process(deserialized_data["event"], deserialized_data["context"])
-        mqtt_client.publish(topic_response, json.dumps(response_payload), 0)
-        log(response_payload)
+            # Redirect sys.stdout to the StringIO object
+            sys.stdout = captured_output
+
+            try:
+                # Call the process function
+                response_payload = process(deserialized_data["event"], deserialized_data["context"])
+
+            except Exception as e:
+                # Log the exception
+                log(
+                    {
+                        "function_name": args.function_name,
+                        "type": "error",
+                        "response": str(e),
+                    }
+                )
+                response_payload = {"statusCode": 500, "body": str(e)}
+            finally:
+                # Reset sys.stdout to its original value
+                sys.stdout = sys.__stdout__
+
+            # Get the captured output
+            captured_text = captured_output.getvalue()
+
+            # Publish response to MQTT
+            mqtt_client.publish(topic_response, json.dumps(response_payload), 0)
+
+            # Log the captured stdout output if any
+            if captured_text:
+                log(
+                    {
+                        "function_name": args.function_name,
+                        "type": "stdout",
+                        "response": captured_text,
+                    }
+                )
+
+            # Log the response payload
+            log(
+                {
+                    "function_name": args.function_name,
+                    "type": "response",
+                    "response": response_payload,
+                }
+            )
+    except Exception as e:
+        # Log the exception
+        log(
+            {
+                "function_name": args.function_name,
+                "type": "error",
+                "response": str(e),
+            }
+        )
 
 
 mqtt_client.subscribe(topic_request, 1, message_callback)
@@ -78,10 +136,13 @@ def watchdog():
     last_modified = os.path.getmtime(main_file_path)
     while True:
         time.sleep(1)
-        current_modified = os.path.getmtime(main_file_path)
-        if current_modified != last_modified:
-            reload_lambda_handler()
-            last_modified = current_modified
+        try:
+            current_modified = os.path.getmtime(main_file_path)
+            if current_modified != last_modified:
+                reload_lambda_handler()
+                last_modified = current_modified
+        except:
+            pass
 
 
 def log(event):
