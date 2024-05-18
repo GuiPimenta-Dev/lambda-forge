@@ -1,7 +1,7 @@
 from aws_cdk import aws_apigateway as apigateway
 
 from lambda_forge.api_gateway import REST
-from lambda_forge.trackers import track
+from lambda_forge.trackers import trigger
 
 
 class APIGateway:
@@ -22,7 +22,7 @@ class APIGateway:
 
         self.rest = REST(scope=scope, api=api, context=context)
 
-    @track
+    @trigger(service="api_gateway", trigger="path", function="function", extra=["method", "public"])
     def create_endpoint(self, method, path, function, public=False, authorizer=None):
         self.rest.create_endpoint(method=method, path=path, function=function, public=public, authorizer=authorizer)
 

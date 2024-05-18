@@ -332,7 +332,7 @@ def create_authorizer(name, description, default, no_tests):
 AVALABLE_SERVICES = sorted(
     [
         "sns",
-        "dynamo_db",
+        "dynamodb",
         "s3",
         "event_bridge",
         "sqs",
@@ -366,7 +366,7 @@ def create_service(service):
 
     services = {
         "sns": service_builder.with_sns,
-        "dynamo_db": service_builder.with_dynamodb,
+        "dynamodb": service_builder.with_dynamodb,
         "s3": service_builder.with_s3,
         "event_bridge": service_builder.with_event_bridge,
         "sqs": service_builder.with_sqs,
