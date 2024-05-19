@@ -50,6 +50,10 @@ def create_diagram(json_input, output_file):
                     if trigger_name not in service_nodes["s3"]:
                         service_nodes["s3"][trigger_name] = S3(trigger_name)
                     trigger_node = service_nodes["s3"][trigger_name]
+                elif service == "dynamodb":
+                    if trigger_name not in service_nodes["dynamodb"]:
+                        service_nodes["dynamodb"][trigger_name] = Dynamodb(trigger_name)
+                    trigger_node = service_nodes["dynamodb"][trigger_name]
                 else:
                     continue
 
@@ -78,5 +82,3 @@ def create_diagram(json_input, output_file):
                     continue
 
                 lambda_function >> invocation_node
-
-

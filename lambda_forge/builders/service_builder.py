@@ -69,8 +69,11 @@ class Layers:
         return self
 
     def with_dynamodb(self):
-        f = """from aws_cdk import aws_dynamodb as dynamodb
-from lambda_forge.trackers import invoke
+        f = """from aws_cdk import aws_dynamodb as dynamo_db
+from aws_cdk import aws_iam as iam
+from aws_cdk import aws_lambda as lambda_
+from aws_cdk import aws_lambda_event_sources as event_source
+from lambda_forge.trackers import invoke, trigger
 
 
 class DynamoDB:
@@ -83,10 +86,27 @@ class DynamoDB:
         # )
         ...
         
+    @trigger(service="dynamodb", trigger="table", function="function")
+    def create_stream(self, table, function):
+        table = getattr(self, table)
+        my_dynamo_event_stream = event_source.DynamoEventSource(
+            table, starting_position=lambda_.StartingPosition.TRIM_HORIZON
+        )
+        function.add_event_source(my_dynamo_event_stream)
+    
     @invoke(service="dynamodb", resource="table", function="function")
     def grant_write_data(self, table, function):
         table = getattr(self, table)
         table.grant_write_data(function)
+    
+    def add_query_permission(self, table, function):
+        table = getattr(self, table)
+        function.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["dynamodb:Query"],
+                resources=[f"{table.table_arn}/index/*"],
+            )
+        )
 """
         file_exists = self.file_exists("infra/services/dynamodb.py")
         if not file_exists:
