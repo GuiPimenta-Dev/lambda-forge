@@ -17,6 +17,7 @@ from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge.live import log_cli, server_cli, trigger_cli
 from lambda_forge.printer import Printer
+from lambda_forge.diagram import create_diagram
 
 printer = Printer()
 
@@ -492,7 +493,7 @@ def deploy(stack, all):
 
     result = subprocess.run(["cdk", "list"], capture_output=True, text=True)
     stacks = result.stdout.splitlines()
-    printer.show_banner(f"Deployment")
+    printer.show_banner("Deployment")
     printer.br()
 
     if all:
@@ -541,6 +542,63 @@ def deploy(stack, all):
 
         printer.stop_spinner()
         printer.print(f"\rStack {stack_name} Deployed", "green", 0, 1)
+
+@forge.command()
+@click.option(
+    "--output-file",
+    help="Name of the output file",
+    default="diagram.png",
+)
+def diagram(output_file):
+    """
+    Create a diagram of the project in png format
+
+    This command creates a diagram of the project, including all the functions, triggers, and services.
+    """
+    printer.show_banner("Diagram")
+    
+    try:
+        printer.start_spinner("Synthesizing CDK")
+        with open(os.devnull, "w") as devnull:
+            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+
+    except Exception as e:
+        printer.print(str(e), "red", 1, 1)
+        printer.stop_spinner()
+        exit()
+
+    functions = json.load(open("functions.json", "r"))
+    printer.change_spinner_legend("Creating Diagram")
+    
+    if "." in output_file:
+        output_file = output_file.split(".")[0]
+        
+    create_diagram(functions, output_file)
+    
+    printer.stop_spinner()
+    printer.print(f"\rDiagram created in {output_file}.png", "gray", 0, 1)
+    
+
+AVAILABLE_TESTS = sorted(["unit", "integration", "coverage", "all"])
+@forge.command()
+@click.argument("test_type", type=click.Choice(AVAILABLE_TESTS))
+def test(test_type):
+    """
+    Run the tests or coverage of the project
+    """
+    
+    if test_type == "unit":
+        subprocess.run(["pytest", "-k", "unit", "."], check=True)
+        
+    elif test_type == "integration":
+        subprocess.run(["pytest", "-k", "integration", "."], check=True)
+    
+    elif test_type == "coverage":
+        subprocess.run(["coverage", "run", "-m", "pytest", "."], check=True)
+        subprocess.run(["coverage", "report"], check=True)
+    
+    elif test_type == "all":
+        subprocess.run(["pytest", "."], check=True)
 
 
 if __name__ == "__main__":

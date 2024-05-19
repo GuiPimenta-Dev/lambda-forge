@@ -116,25 +116,22 @@ def run_live(log_file, input_file, output_file):
                         )
 
                     if function_trigger["service"] == "sns":
-                        trigger = create_sns_trigger(
-                            account, region, function_arn, function_name, function_trigger["trigger"]
-                        )
+                        topic = f"Live-{project}-{function_trigger['trigger']}"
+                        trigger = create_sns_trigger(account, region, function_arn, function_name, topic)
 
                     if function_trigger["service"] == "sqs":
-                        trigger = create_sqs_trigger(region, function_arn, function_trigger["trigger"])
+                        queue = f"Live-{project}-{function_trigger['trigger']}"
+                        trigger = create_sqs_trigger(region, function_arn, queue)
 
                     if function_trigger["service"] == "s3":
-                        trigger = create_s3_trigger(
-                            region,
-                            account,
-                            function_arn,
-                            function_trigger["trigger"].replace("_", "-").replace(" ", "-").lower(),
+                        bucket = (
+                            f"live-{project.lower()}-{function_trigger['trigger'].replace('_', '-').replace(' ', '-').lower()}"
                         )
+                        trigger = create_s3_trigger(region, account, function_arn, bucket)
 
                     if function_trigger["service"] == "event_bridge":
-                        trigger = create_event_bridge_trigger(
-                            region, account, function_arn, function_trigger["trigger"]
-                        )
+                        bus = f"Live-{project}-{function_trigger['trigger']}"
+                        trigger = create_event_bridge_trigger(region, account, function_arn, bus)
 
                     live.attach_trigger(function_name, trigger)
 

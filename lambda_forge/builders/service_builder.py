@@ -18,7 +18,7 @@ from lambda_forge.trackers import trigger, invoke
 class SNS:
     def __init__(self, scope, resources) -> None:
     
-        # self.sns_topic = Topic.from_topic_arn(
+        # self.sns_topic = sns.Topic.from_topic_arn(
         #     scope,
         #     id="SNSTopic",
         #     topic_arn=resources["arns"]["sns_topic_arn"],
@@ -79,7 +79,7 @@ class DynamoDB:
         # self.dynamo = dynamo_db.Table.from_table_arn(
         #     scope,
         #     "Dynamo",
-        #     context.resources["arns"]["dynamo_arn"],
+        #     resources["arns"]["dynamo_arn"],
         # )
         ...
         
@@ -149,7 +149,7 @@ class Cognito:
     def with_s3(self):
         f = """from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_s3_notifications
-from lambda_forge.trackers import trigger, invoke
+from lambda_forge.trackers import trigger
 
 
 class S3:
@@ -158,7 +158,7 @@ class S3:
         # self.s3 = s3.Bucket.from_bucket_arn(
         #     scope,
         #     "S3",
-        #     bucket_arn=context.resources["arns"]["s3_arn"],
+        #     bucket_arn=resources["arns"]["s3_arn"],
         # )
         ...
 
@@ -167,6 +167,13 @@ class S3:
         bucket = getattr(self, bucket)
         notifications = aws_s3_notifications.LambdaDestination(function)
         bucket.add_event_notification(s3.EventType.OBJECT_CREATED, notifications)
+        bucket.grant_read(function)
+
+
+    @invoke(service="s3", resource="bucket", function="function")
+    def grant_write(self, bucket, function):
+        bucket = getattr(self, bucket)
+        bucket.grant_write(function)
 """
         file_exists = self.file_exists("infra/services/s3.py")
         if not file_exists:
@@ -211,7 +218,7 @@ class SQS:
         # self.sqs = sqs.Queue.from_queue_arn(
         #     scope,
         #     "SQS",
-        #     queue_arn=context.resources["arns"]["sqs_arn"],
+        #     queue_arn=resources["arns"]["sqs_arn"],
         # )
         ...
     
@@ -220,6 +227,8 @@ class SQS:
         queue = getattr(self, queue)
         event_source = aws_lambda_event_sources.SqsEventSource(queue)
         function.add_event_source(event_source)
+        queue.grant_consume_messages(function)
+
 
     @invoke(service="sqs", resource="queue", function="function")
     def grant_send_messages(self, queue, function):

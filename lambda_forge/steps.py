@@ -92,7 +92,8 @@ class CodeBuildSteps:
             name=name,
             permissions=self.s3_permissions + permissions,
             commands=[
-                f"python generate_diagram.py {self.context.stage}",
+                "forge diagram",
+                "python embed_image_in_html.py diagram.png diagram.html",
                 f"aws s3 cp diagram.html s3://{self.bucket}/diagram.html",
             ],
         )
