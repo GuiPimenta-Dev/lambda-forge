@@ -1,5 +1,6 @@
 import json
 import os
+import platform
 import subprocess
 import time
 
@@ -124,9 +125,7 @@ def run_live(log_file, input_file, output_file):
                         trigger = create_sqs_trigger(region, function_arn, queue)
 
                     if function_trigger["service"] == "s3":
-                        bucket = (
-                            f"live-{project.lower()}-{function_trigger['trigger'].replace('_', '-').replace(' ', '-').lower()}"
-                        )
+                        bucket = f"live-{project.lower()}-{function_trigger['trigger'].replace('_', '-').replace(' ', '-').lower()}"
                         trigger = create_s3_trigger(region, account, function_arn, bucket)
 
                     if function_trigger["service"] == "event_bridge":
@@ -152,6 +151,12 @@ def run_live(log_file, input_file, output_file):
             style=style,
             choices=options,
         ).execute()
+        
+        if platform.system() == "Windows":
+            subprocess.run(["taskkill", "/F", "/IM", "live_server.py"], check=True)
+        else:
+            subprocess.run(["pkill", "-f", "live_server.py"], check=True)
+
 
         if choice == "Synth":
             printer.show_banner("Live Server")
@@ -166,3 +171,4 @@ def run_live(log_file, input_file, output_file):
                 printer.stop_spinner()
 
             functions = json.load(open("functions.json", "r"))
+

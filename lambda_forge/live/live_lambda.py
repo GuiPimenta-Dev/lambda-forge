@@ -8,7 +8,7 @@ import zipfile
 
 import boto3
 
-from lambda_forge.certificates import CertificateGenerator
+from lambda_forge.live.certificates import CertificateGenerator
 
 
 class LiveLambda:
@@ -31,7 +31,7 @@ class LiveLambda:
             self.printer.change_spinner_legend(f"Deploying {self.function_name}")
             response = self.lambda_client.create_function(
                 FunctionName=self.function_name,
-                Description="Lambda Stub for Live Development with AWS IoT Core",
+                Description="Lambda Function for Live Development with AWS IoT Core",
                 Runtime="python3.9",
                 Role=role["Role"]["Arn"],
                 Handler="main.lambda_handler",
@@ -77,7 +77,7 @@ class LiveLambda:
 
     def __create_certificates(self):
         self.printer.change_spinner_legend("Creating Certificates")
-        cert_generator = CertificateGenerator()
+        cert_generator = CertificateGenerator(self.region)
         cert, private, ca = cert_generator.generate_certificate()
         return cert, private, ca
 

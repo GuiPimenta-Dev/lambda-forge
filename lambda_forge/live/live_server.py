@@ -12,7 +12,7 @@ import uuid
 
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
-from lambda_forge.certificates import CertificateGenerator
+from lambda_forge.live.certificates import CertificateGenerator
 from lambda_forge.printer import Printer
 
 printer = Printer()
@@ -22,12 +22,13 @@ parser.add_argument("function_name", type=str)
 parser.add_argument("file_path", type=str)
 parser.add_argument("iot_endpoint", type=str)
 parser.add_argument("log_file", type=str)
+parser.add_argument("region", type=str)
 
 args = parser.parse_args()
 
 main_file_path = args.file_path + "/main.py"
 
-cert_generator = CertificateGenerator()
+cert_generator = CertificateGenerator(args.region)
 cert, private, ca = cert_generator.generate_certificate()
 
 topic_request = f"{args.function_name}/request"
@@ -38,8 +39,8 @@ mqtt_client.configureEndpoint(args.iot_endpoint, 443)
 mqtt_client.configureCredentials(ca, private, cert)
 try:
     mqtt_client.connect()
-except:
-    printer.print(f"Connection Failed", "red", 1)
+except Exception as e:
+    printer.print(f"Connection Failed: {e}", "red", 1)
     exit()
 
 

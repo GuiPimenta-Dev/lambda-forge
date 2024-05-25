@@ -36,6 +36,7 @@ def create_diagram(json_input, output_file):
                     trigger_node = service_nodes["eventbridge"][trigger_name]
                 elif service == "api_gateway":
                     if trigger_name not in service_nodes["apigateway"]:
+                        trigger_name = f"{trigger['method'].upper()} {trigger_name}"
                         service_nodes["apigateway"][trigger_name] = APIGateway(trigger_name)
                     trigger_node = service_nodes["apigateway"][trigger_name]
                 elif service == "sqs":

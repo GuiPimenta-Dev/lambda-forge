@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lambda_forge",
-    version="1.0.1009",
+    version="1.0.1020",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -21,7 +21,7 @@ setup(
         "pyfiglet==1.0.2",
         "inquirerpy==0.3.4",
         "tabulate==0.9.0",
-        "diagrams==0.23.4"
+        "diagrams==0.23.4",
     ],
     include_package_data=True,
     package_data={

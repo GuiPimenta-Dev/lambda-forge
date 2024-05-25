@@ -16,20 +16,20 @@ class CertificateGenerator:
             cls._instance.temp_dir = tempfile.mkdtemp()
         return cls._instance
 
-    def __init__(self):
-        self.iot_client = boto3.client("iot")
+    def __init__(self, region):
+        self.iot_client = boto3.client("iot", region_name=region)
 
     def generate_certificate(self):
         response = self.iot_client.describe_endpoint()
         iot_endpoint = response["endpointAddress"]
 
-        certificate_path = os.path.join(self.temp_dir, "certificate.pem")
+        # certificate_path = os.path.join(self.temp_dir, "certificate.pem")
 
-        if os.path.exists(certificate_path):
-            certificate_file_path = os.path.join(self.temp_dir, "certificate.pem")
-            private_key_file_path = os.path.join(self.temp_dir, "private_key.pem")
-            ca_file_path = os.path.join(self.temp_dir, "ca.pem")
-            return certificate_file_path, private_key_file_path, ca_file_path
+        # if os.path.exists(certificate_path):
+        #     certificate_file_path = os.path.join(self.temp_dir, "certificate.pem")
+        #     private_key_file_path = os.path.join(self.temp_dir, "private_key.pem")
+        #     ca_file_path = os.path.join(self.temp_dir, "ca.pem")
+        #     return certificate_file_path, private_key_file_path, ca_file_path
 
         # Create keys and certificate
         response = self.iot_client.create_keys_and_certificate(setAsActive=True)

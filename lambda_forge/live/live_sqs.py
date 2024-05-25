@@ -1,5 +1,3 @@
-import uuid
-
 import boto3
 import click
 
@@ -26,7 +24,10 @@ class LiveSQS:
             "Statement": [{"Effect": "Allow", "Action": "sqs:*", "Resource": "*"}],
         }
 
-        self.iam = self.iam.attach_policy_to_lambda(policy, function_arn, str(uuid.uuid4()))
+        try:
+            self.iam = self.iam.attach_policy_to_lambda(policy, function_arn, "Live-SQS-Policy")
+        except:
+            pass
 
         self.sqs.set_queue_attributes(QueueUrl=queue_url, Attributes={"VisibilityTimeout": "900"})
 

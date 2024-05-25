@@ -1,12 +1,12 @@
-import contextlib
 import json
 import os
 import re
 import subprocess
-import sys
+import signal
 
 import click
 from InquirerPy import get_style, inquirer
+import platform
 
 from lambda_forge import layers
 from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
@@ -454,8 +454,25 @@ def live(types, log_file, input_file, output_file):
     The 'function_name' parameter must match the name of an existing Lambda function in the project.
     """
 
+    def handle_exit(signum, frame):
+        try:
+            if platform.system() == "Windows":
+                subprocess.run(["taskkill", "/F", "/IM", "live_server.py"], check=True)
+            else:
+                subprocess.run(["pkill", "-f", "live_server.py"], check=True)
+        except Exception as e:
+            print(f"Failed to kill process: {e}")
+        os._exit(0)  # Exit the script
+
+    signal.signal(signal.SIGHUP, handle_exit)  # Terminal closed
+    signal.signal(signal.SIGINT, handle_exit)  # Ctrl+C
+    signal.signal(signal.SIGTERM, handle_exit)  # Termination signal
+
     if types == "server":
-        server_cli.run_live(log_file, input_file, output_file)
+        try:
+            server_cli.run_live(log_file, input_file, output_file)
+        except:
+            handle_exit(None, None)
 
     if types == "logs":
         with open(log_file, "a") as f:
@@ -543,6 +560,7 @@ def deploy(stack, all):
         printer.stop_spinner()
         printer.print(f"\rStack {stack_name} Deployed", "green", 0, 1)
 
+
 @forge.command()
 @click.option(
     "--output-file",
@@ -556,7 +574,7 @@ def diagram(output_file):
     This command creates a diagram of the project, including all the functions, triggers, and services.
     """
     printer.show_banner("Diagram")
-    
+
     try:
         printer.start_spinner("Synthesizing CDK")
         with open(os.devnull, "w") as devnull:
@@ -569,34 +587,36 @@ def diagram(output_file):
 
     functions = json.load(open("functions.json", "r"))
     printer.change_spinner_legend("Creating Diagram")
-    
+
     if "." in output_file:
         output_file = output_file.split(".")[0]
-        
+
     create_diagram(functions, output_file)
-    
+
     printer.stop_spinner()
     printer.print(f"\rDiagram created in {output_file}.png", "gray", 0, 1)
-    
+
 
 AVAILABLE_TESTS = sorted(["unit", "integration", "coverage", "all"])
+
+
 @forge.command()
 @click.argument("test_type", type=click.Choice(AVAILABLE_TESTS))
 def test(test_type):
     """
     Run the tests or coverage of the project
     """
-    
+
     if test_type == "unit":
         subprocess.run(["pytest", "-k", "unit", "."], check=True)
-        
+
     elif test_type == "integration":
         subprocess.run(["pytest", "-k", "integration", "."], check=True)
-    
+
     elif test_type == "coverage":
         subprocess.run(["coverage", "run", "-m", "pytest", "."], check=True)
         subprocess.run(["coverage", "report"], check=True)
-    
+
     elif test_type == "all":
         subprocess.run(["pytest", "."], check=True)
 
