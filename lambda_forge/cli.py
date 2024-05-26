@@ -64,11 +64,6 @@ def forge():
     help="Bucket used to store the documentation",
     default="",
 )
-@click.option(
-    "--coverage",
-    help="Minimum coverage percentage",
-    default=80,
-)
 def project(
     name,
     repo_owner,
@@ -78,7 +73,6 @@ def project(
     account,
     region,
     bucket,
-    coverage,
 ):
     """
     Initializes a new AWS Lambda project with a specified structure.
@@ -170,7 +164,6 @@ def project(
         account,
         region,
         bucket,
-        coverage,
     )
 
 
@@ -183,12 +176,11 @@ def create_project(
     account,
     region,
     bucket,
-    coverage,
 ):
 
     project_builder = ProjectBuilder.a_project(name, no_docs, minimal)
 
-    project_builder = project_builder.with_cdk(repo_owner, repo_name, account, region, bucket, coverage).build()
+    project_builder = project_builder.with_cdk(repo_owner, repo_name, account, region, bucket).build()
 
     if not no_docs:
         DocsBuilder.a_doc().with_config().with_lambda_stack().build()

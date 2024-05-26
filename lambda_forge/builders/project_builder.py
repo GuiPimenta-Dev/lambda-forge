@@ -13,7 +13,7 @@ class ProjectBuilder(FileService):
         self.no_docs = no_docs
         self.minimal = minimal
 
-    def with_cdk(self, repo_owner, repo_name, account, region, bucket, coverage):
+    def with_cdk(self, repo_owner, repo_name, account, region, bucket):
         cdk = {
             "app": "python3 app.py",
             "watch": {
@@ -54,7 +54,6 @@ class ProjectBuilder(FileService):
                 "name": self.name.title().replace("_", "-").replace(" ", "-"),
                 "repo": {"owner": repo_owner, "name": repo_name},
                 "bucket": bucket,
-                "coverage": coverage,
                 "base_url": "",
             },
         }

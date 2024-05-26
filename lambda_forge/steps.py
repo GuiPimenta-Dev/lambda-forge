@@ -26,14 +26,14 @@ class CodeBuildSteps:
             commands=['pytest --junitxml=test-results.xml -k "unit.py"'],
         )
 
-    def coverage(self, name="Coverage", permissions=[]):
+    def coverage(self, name="Coverage", coverage=80, permissions=[]):
 
         return self.codebuild.create_step(
             name=name,
             permissions=permissions,
             commands=[
                 'coverage run -m pytest -k "unit.py"',
-                f"coverage xml --fail-under={self.context.coverage}",
+                f"coverage xml --fail-under={coverage}",
                 "touch coverage.xml",
             ],
         )

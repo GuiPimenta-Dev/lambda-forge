@@ -208,7 +208,6 @@ def test_it_should_add_the_cdk_json_file():
         '      "name": "repo"',
         "    },",
         '    "bucket": "bucket",',
-        '    "coverage": 80,',
         '    "base_url": "",',
         '    "dev": {',
         '      "arns": {}',

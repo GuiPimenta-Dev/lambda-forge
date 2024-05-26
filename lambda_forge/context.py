@@ -1,7 +1,7 @@
 import json
-from dataclasses import asdict, make_dataclass
+from dataclasses import asdict, dataclass, make_dataclass
 
-
+@dataclass
 class Context:
     stage: str
     name: str
@@ -9,7 +9,6 @@ class Context:
     region: str
     account: str
     bucket: str
-    coverage: str
     resources: dict
 
     def gen_id(self, resource):
@@ -36,7 +35,6 @@ def create_context(stage, resources):
     region = cdk["context"]["region"]
     account = cdk["context"]["account"]
     bucket = cdk["context"]["bucket"]
-    coverage = cdk["context"]["coverage"]
 
     context = Context(
         stage=stage.title().replace("_", "-").replace(" ", "-"),
@@ -45,7 +43,6 @@ def create_context(stage, resources):
         region=region,
         account=account,
         bucket=bucket,
-        coverage=coverage,
         resources=cdk["context"][resources],
     )
 
