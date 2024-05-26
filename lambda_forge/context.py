@@ -1,24 +1,24 @@
 import json
-from dataclasses import asdict, dataclass, make_dataclass
 
-@dataclass
 class Context:
-    stage: str
-    name: str
-    repo: dict
-    region: str
-    account: str
-    bucket: str
-    resources: dict
-
+    
+    def __init__(self, stage, name, repo, region, account, bucket, resources) -> None:
+        self.stage = stage
+        self.name = name
+        self.repo = repo
+        self.region = region
+        self.account = account
+        self.bucket = bucket
+        self.resources = resources
+            
     def gen_id(self, resource):
         return f"{self.stage}-{self.name}-{resource}"
 
-
-def dict_to_dataclass(class_name, data_dict):
-    keys = data_dict.keys()
-    fields = [(key, data_dict[key]) for key in keys]
-    return make_dataclass(class_name, fields)
+    def __str__(self):
+        return f"Context(stage='{self.stage}', name='{self.name}', repo='{self.repo}', region='{self.region}', account='{self.account}', bucket='{self.bucket}', resources='{self.resources}')"
+    
+    def __repr__(self):
+        return f"Context(stage='{self.stage}', name='{self.name}', repo='{self.repo}', region='{self.region}', account='{self.account}', bucket='{self.bucket}', resources='{self.resources}')"
 
 
 def create_context(stage, resources):
@@ -37,7 +37,7 @@ def create_context(stage, resources):
     bucket = cdk["context"]["bucket"]
 
     context = Context(
-        stage=stage.title().replace("_", "-").replace(" ", "-"),
+        stage=stage,
         name=name,
         repo=repo,
         region=region,
@@ -52,11 +52,7 @@ def create_context(stage, resources):
 def context(stage, resources, **decorator_kwargs):
     def decorator(func):
         def wrapper(*func_args, **func_kwargs):
-            kwargs = {**decorator_kwargs, **func_kwargs}
-            context = create_context(stage, resources)
-            input_dict = {**asdict(context), **kwargs}
-            context = dict_to_dataclass("Context", input_dict)
-            context = context(**input_dict)
+            context = create_context(stage, resources)            
             return func(context=context, *func_args, **func_kwargs)
 
         return wrapper
