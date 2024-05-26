@@ -33,6 +33,7 @@ setup(
             "scaffold/.coveragerc",
             "scaffold/**/**",
             "scaffold/**/**/*",
+            "services/*",
             "live/*",
             "stacks/*",
             "stacks/**/*",

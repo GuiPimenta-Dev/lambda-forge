@@ -1,9 +1,8 @@
 import json
-from dataclasses import asdict, dataclass, make_dataclass
+from dataclasses import asdict, make_dataclass
 
 
-@dataclass(frozen=True)
-class StageContext:
+class Context:
     stage: str
     name: str
     repo: dict
@@ -12,6 +11,9 @@ class StageContext:
     bucket: str
     coverage: str
     resources: dict
+
+    def gen_id(self, resource):
+        return f"{self.stage}-{self.name}-{resource}"
 
 
 def dict_to_dataclass(class_name, data_dict):
@@ -36,7 +38,7 @@ def create_context(stage, resources):
     bucket = cdk["context"]["bucket"]
     coverage = cdk["context"]["coverage"]
 
-    context = StageContext(
+    context = Context(
         stage=stage.title().replace("_", "-").replace(" ", "-"),
         name=name,
         repo=repo,

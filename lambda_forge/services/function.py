@@ -29,7 +29,7 @@ class Function:
             scope=self.scope,
             id=name,
             description=description,
-            function_name=f"{self.context.stage}-{self.context.name}-{name}",
+            function_name=self.context.gen_id(name),
             runtime=runtime,
             handler=Path.handler(directory),
             environment=environment,

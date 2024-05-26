@@ -23,14 +23,6 @@ class CertificateGenerator:
         response = self.iot_client.describe_endpoint()
         iot_endpoint = response["endpointAddress"]
 
-        # certificate_path = os.path.join(self.temp_dir, "certificate.pem")
-
-        # if os.path.exists(certificate_path):
-        #     certificate_file_path = os.path.join(self.temp_dir, "certificate.pem")
-        #     private_key_file_path = os.path.join(self.temp_dir, "private_key.pem")
-        #     ca_file_path = os.path.join(self.temp_dir, "ca.pem")
-        #     return certificate_file_path, private_key_file_path, ca_file_path
-
         # Create keys and certificate
         response = self.iot_client.create_keys_and_certificate(setAsActive=True)
         certificate_pem = response["certificatePem"]

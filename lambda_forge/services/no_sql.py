@@ -49,7 +49,7 @@ class NoSQL:
         return dynamo_db.Table(
             self.scope,
             name,
-            table_name=f"{self.context.stage}-{self.context.name}-{name}",
+            table_name=self.context.gen_id(name),
             partition_key=dynamo_db.Attribute(name=pk, type=pk_type),
             sort_key=dynamo_db.Attribute(name=sk, type=sk_type),
             billing_mode=billing_mode,

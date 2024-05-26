@@ -57,7 +57,7 @@ class REST:
             self.scope,
             f"{endpoint.replace('/','').title()}-API-Gateway-S3",
             assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            role_name=f"{self.context.stage}-{self.context.name}-{endpoint.replace('/','').title()}-S3",
+            role_name=self.context.gen_id(f"{endpoint.replace('/','').title()}-S3"),
         )
 
         s3_integration_role.add_to_policy(

@@ -1,6 +1,6 @@
 from b_aws_websocket_api.ws_api import WsApi
 
-from lambda_forge.websockets import WSS
+from lambda_forge.services import WSS
 
 
 class Websockets(WSS):
@@ -9,7 +9,7 @@ class Websockets(WSS):
 
         self.websocket = WsApi(
             scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-WebSocket",
-            name=f"{self.context.stage}-{self.name}-WebSocket",
+            id=self.context.gen_id("WSS"),
+            name=self.context.gen_id("WSS"),
             route_selection_expression="$request.body.action",
         )
