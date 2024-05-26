@@ -113,7 +113,7 @@ def test_it_should_configure_the_config_file_correctly_for_a_public_function():
         "            ",
         "        )",
         "",
-        '        services.api_gateway.create_endpoint("GET", "/function_name", ' "function, public=True)",
+        '        services.api_gateway.create_trigger("GET", "/function_name", ' "function, public=True)",
         "",
         "            ",
     ]
@@ -177,7 +177,7 @@ def test_it_should_configure_the_config_file_correctly_for_a_belongs_and_with_ap
         '            directory="function_name"',
         "        )",
         "",
-        '        services.api_gateway.create_endpoint("GET", "/belongs", function)',
+        '        services.api_gateway.create_trigger("GET", "/belongs", function)',
         "",
         "            ",
     ]
@@ -209,7 +209,7 @@ def test_it_should_configure_the_config_file_correctly_for_a_api_function():
         "            ",
         "        )",
         "",
-        '        services.api_gateway.create_endpoint("GET", "/function_name", ' "function)",
+        '        services.api_gateway.create_trigger("GET", "/function_name", ' "function)",
         "",
         "            ",
     ]

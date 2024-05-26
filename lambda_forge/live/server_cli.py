@@ -4,7 +4,6 @@ import platform
 import subprocess
 import time
 
-import click
 from InquirerPy import get_style, inquirer
 
 from lambda_forge.printer import Printer
@@ -151,12 +150,11 @@ def run_live(log_file, input_file, output_file):
             style=style,
             choices=options,
         ).execute()
-        
+
         if platform.system() == "Windows":
             subprocess.run(["taskkill", "/F", "/IM", "live_server.py"], check=True)
         else:
             subprocess.run(["pkill", "-f", "live_server.py"], check=True)
-
 
         if choice == "Synth":
             printer.show_banner("Live Server")
@@ -171,4 +169,3 @@ def run_live(log_file, input_file, output_file):
                 printer.stop_spinner()
 
             functions = json.load(open("functions.json", "r"))
-

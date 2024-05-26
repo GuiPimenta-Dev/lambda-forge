@@ -1,12 +1,12 @@
 import json
 import os
+import platform
 import re
-import subprocess
 import signal
+import subprocess
 
 import click
 from InquirerPy import get_style, inquirer
-import platform
 
 from lambda_forge import layers
 from lambda_forge.builders.authorizer_builder import AuthorizerBuilder
@@ -15,9 +15,9 @@ from lambda_forge.builders.function_builder import FunctionBuilder
 from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
+from lambda_forge.diagram import create_diagram
 from lambda_forge.live import log_cli, server_cli, trigger_cli
 from lambda_forge.printer import Printer
-from lambda_forge.diagram import create_diagram
 
 printer = Printer()
 

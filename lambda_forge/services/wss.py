@@ -7,15 +7,13 @@ from b_aws_websocket_api.ws_stage import WsStage
 
 
 class WSS:
-    def __init__(self, scope, context, name, wss) -> None:
+    def __init__(self, scope, context) -> None:
         self.scope = scope
         self.context = context
-        self.name = name
-        self.websocket = wss
 
         self.stage = WsStage(
             scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-WSS-Stage",
+            id=f"{self.context.stage}-{self.context.name}-WSS-Stage",
             ws_api=self.websocket,
             stage_name=context.stage.lower(),
             auto_deploy=True,
@@ -23,7 +21,7 @@ class WSS:
 
         self.deployment = WsDeployment(
             scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-Deploy",
+            id=f"{self.context.stage}-{self.context.name}-Deploy",
             ws_stage=self.stage,
         )
 
@@ -34,7 +32,7 @@ class WSS:
 
         CfnPermission(
             scope=self.scope,
-            id=f"{function}-{self.name}-{route_name}-Invoke",
+            id=f"{function}-{self.context.name}-{route_name}-Invoke",
             action="lambda:InvokeFunction",
             function_name=function.function_name,
             principal="apigateway.amazonaws.com",
@@ -49,15 +47,15 @@ class WSS:
 
         integration = WsLambdaIntegration(
             scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-Integration-{route_name}",
-            integration_name=f"{self.context.stage}-{self.name}-Integration-{route_name}",
+            id=f"{self.context.stage}-{self.context.name}-Integration-{route_name}",
+            integration_name=f"{self.context.stage}-{self.context.name}-Integration-{route_name}",
             ws_api=self.websocket,
             function=function,
         )
 
         route = WsRoute(
             scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-Route-{route_name}",
+            id=f"{self.context.stage}-{self.context.name}-Route-{route_name}",
             ws_api=self.websocket,
             route_key=route_key,
             authorization_type="NONE",

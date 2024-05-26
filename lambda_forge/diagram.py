@@ -1,8 +1,9 @@
 import json
+
 from diagrams import Diagram
 from diagrams.aws.compute import Lambda
 from diagrams.aws.database import Dynamodb
-from diagrams.aws.integration import Eventbridge, SQS, SNS
+from diagrams.aws.integration import SNS, SQS, Eventbridge
 from diagrams.aws.network import APIGateway
 from diagrams.aws.storage import S3
 

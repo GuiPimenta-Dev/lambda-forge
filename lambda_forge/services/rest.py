@@ -8,13 +8,11 @@ class REST:
         self,
         scope,
         context,
-        api,
     ) -> None:
-        self.__context = context
-        self.__scope = scope
+        self.context = context
+        self.scope = scope
         self.__authorizers = {}
         self.__default_authorizer = None
-        self.__api = api
 
     def create_endpoint(self, method, path, function, public, authorizer=None):
         resource = self.__create_resource(path)
@@ -38,10 +36,10 @@ class REST:
 
         function.add_environment(
             "API_ARN",
-            f"arn:aws:execute-api:{self.__context.region}:{self.__context.account}:{self.__api.rest_api_id}/*",
+            f"arn:aws:execute-api:{self.context.region}:{self.context.account}:{self.__api.rest_api_id}/*",
         )
         authorizer = apigateway.RequestAuthorizer(
-            self.__scope,
+            self.scope,
             id=f"{name}-Authorizer",
             handler=function,
             identity_sources=[apigateway.IdentitySource.context("identity.sourceIp")],
@@ -52,14 +50,14 @@ class REST:
 
     def create_docs(self, endpoint, artifact, authorizer=None, public=False, stages=None):
 
-        if stages and self.__context.stage not in stages:
+        if stages and self.context.stage not in stages:
             return
 
         s3_integration_role = iam.Role(
-            self.__scope,
+            self.scope,
             f"{endpoint.replace('/','').title()}-API-Gateway-S3",
             assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            role_name=f"{self.__context.stage}-{self.__context.name}-{endpoint.replace('/','').title()}-S3",
+            role_name=f"{self.context.stage}-{self.context.name}-{endpoint.replace('/','').title()}-S3",
         )
 
         s3_integration_role.add_to_policy(
@@ -85,7 +83,7 @@ class REST:
             "GET",
             apigateway.AwsIntegration(
                 service="s3",
-                path=f"{self.__context.bucket}/{self.__context.name}/{self.__context.stage.lower()}/{artifact.lower()}.html",
+                path=f"{self.context.bucket}/{self.context.name}/{self.context.stage.lower()}/{artifact.lower()}.html",
                 integration_http_method="GET",
                 options=apigateway.IntegrationOptions(
                     credentials_role=s3_integration_role,
