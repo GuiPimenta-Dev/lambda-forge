@@ -1,7 +1,9 @@
 import json
 
+from lambda_forge.trackers import reset
+
+
 class Context:
-    
     def __init__(self, stage, name, repo, region, account, bucket, resources) -> None:
         self.stage = stage
         self.name = name
@@ -10,13 +12,13 @@ class Context:
         self.account = account
         self.bucket = bucket
         self.resources = resources
-            
+
     def gen_id(self, resource):
         return f"{self.stage}-{self.name}-{resource}"
 
     def __str__(self):
         return f"Context(stage='{self.stage}', name='{self.name}', repo='{self.repo}', region='{self.region}', account='{self.account}', bucket='{self.bucket}', resources='{self.resources}')"
-    
+
     def __repr__(self):
         return f"Context(stage='{self.stage}', name='{self.name}', repo='{self.repo}', region='{self.region}', account='{self.account}', bucket='{self.bucket}', resources='{self.resources}')"
 
@@ -49,10 +51,11 @@ def create_context(stage, resources):
     return context
 
 
+@reset
 def context(stage, resources, **decorator_kwargs):
     def decorator(func):
         def wrapper(*func_args, **func_kwargs):
-            context = create_context(stage, resources)            
+            context = create_context(stage, resources)
             return func(context=context, *func_args, **func_kwargs)
 
         return wrapper

@@ -2,10 +2,7 @@ from aws_cdk import Stack
 from constructs import Construct
 from infra.services import Services
 
-from lambda_forge.trackers import reset
 
-
-@reset
 class LambdaStack(Stack):
     def __init__(self, scope: Construct, context, **kwargs) -> None:
 

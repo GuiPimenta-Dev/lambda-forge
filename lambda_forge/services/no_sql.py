@@ -1,10 +1,12 @@
 from typing import Any, Optional
+
 from aws_cdk import aws_dynamodb as dynamo_db
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda as lambda_
 from aws_cdk import aws_lambda_event_sources as event_source
 
 from lambda_forge.trackers import invoke, trigger
+
 
 class NoSQL:
     def __init__(self, scope: Any, context: Any) -> None:
