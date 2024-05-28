@@ -5,9 +5,8 @@ from lambda_forge.services import REST
 
 class APIGateway(REST):
     def __init__(self, scope, context):
-        super().__init__(scope=scope, context=context)
-
-        self.api = apigateway.RestApi(
+        
+        api = apigateway.RestApi(
             scope,
             id=context.gen_id("REST"),
             deploy_options={"stage_name": context.stage.lower()},
@@ -19,3 +18,6 @@ class APIGateway(REST):
                 "allow_credentials": True,
             },
         )
+        
+        super().__init__(scope=scope, context=context, api=api)
+        

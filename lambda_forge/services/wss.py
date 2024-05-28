@@ -7,9 +7,10 @@ from b_aws_websocket_api.ws_stage import WsStage
 
 
 class WSS:
-    def __init__(self, scope, context) -> None:
+    def __init__(self, scope, context, wss) -> None:
         self.scope = scope
         self.context = context
+        self.websocket = wss
 
         self.stage = WsStage(
             scope=self.scope,

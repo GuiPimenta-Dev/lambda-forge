@@ -8,9 +8,11 @@ class REST:
         self,
         scope,
         context,
+        api
     ) -> None:
         self.context = context
         self.scope = scope
+        self.api = api
         self.__authorizers = {}
         self.__default_authorizer = None
 
@@ -36,7 +38,7 @@ class REST:
 
         function.add_environment(
             "API_ARN",
-            f"arn:aws:execute-api:{self.context.region}:{self.context.account}:{self.__api.rest_api_id}/*",
+            f"arn:aws:execute-api:{self.context.region}:{self.context.account}:{self.api.rest_api_id}/*",
         )
         authorizer = apigateway.RequestAuthorizer(
             self.scope,
@@ -110,7 +112,7 @@ class REST:
 
     def __create_resource(self, endpoint):
         resources = list(filter(None, endpoint.split("/")))
-        resource = self.__api.root.get_resource(resources[0]) or self.__api.root.add_resource(resources[0])
+        resource = self.api.root.get_resource(resources[0]) or self.api.root.add_resource(resources[0])
         for subresource in resources[1:]:
             resource = resource.get_resource(subresource) or resource.add_resource(subresource)
         return resource
