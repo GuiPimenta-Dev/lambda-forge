@@ -1,4 +1,3 @@
-from aws_cdk import Duration
 from aws_cdk.aws_lambda import Runtime
 
 from lambda_forge.services import Function
@@ -18,7 +17,7 @@ class Lambda(Function):
         environment={},
         memory_size=128,
         runtime=Runtime.PYTHON_3_9,
-        timeout=Duration.minutes(1),
+        timeout=1,
     ):
 
         return super().create_function(

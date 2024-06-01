@@ -453,8 +453,7 @@ def live(types, log_file, input_file, output_file):
             else:
                 subprocess.run(["pkill", "-f", "live_server.py"], check=True)
         except Exception as e:
-            print(f"Failed to kill process: {e}")
-        os._exit(0)  # Exit the script
+            pass
 
     signal.signal(signal.SIGHUP, handle_exit)  # Terminal closed
     signal.signal(signal.SIGINT, handle_exit)  # Ctrl+C
