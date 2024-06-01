@@ -1,5 +1,6 @@
 from aws_cdk import Duration
-from aws_cdk.aws_lambda import Code, Function as AWSFunction
+from aws_cdk.aws_lambda import Code
+from aws_cdk.aws_lambda import Function as AWSFunction
 
 from lambda_forge.path import Path
 from lambda_forge.trackers import function

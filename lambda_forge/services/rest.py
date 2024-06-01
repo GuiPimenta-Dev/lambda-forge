@@ -2,20 +2,18 @@ from aws_cdk import Duration
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
 
+from lambda_forge.trackers import trigger
+
 
 class REST:
-    def __init__(
-        self,
-        scope,
-        context,
-        api
-    ) -> None:
+    def __init__(self, scope, context, api) -> None:
         self.context = context
         self.scope = scope
         self.api = api
         self.__authorizers = {}
         self.__default_authorizer = None
 
+    @trigger(service="api_gateway", trigger="path", function="function", extra=["method", "public"])
     def create_endpoint(self, method, path, function, public, authorizer=None):
         resource = self.__create_resource(path)
         authorizer = self.__get_authorizer(public, authorizer)
