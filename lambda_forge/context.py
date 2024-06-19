@@ -51,9 +51,9 @@ def create_context(stage, resources):
     return context
 
 
-@reset
 def context(stage, resources, **decorator_kwargs):
     def decorator(func):
+        @reset
         def wrapper(*func_args, **func_kwargs):
             context = create_context(stage, resources)
             return func(context=context, *func_args, **func_kwargs)

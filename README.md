@@ -1,7 +1,9 @@
 
 # Lambda Forge
 
-Lambda Forge is a powerful and flexible framework designed to streamline the creation, management, and deployment of AWS Lambda functions. Built with ease of use and scalability in mind, Lambda Forge empowers developers to focus on writing code while automating the tedious aspects of serverless application management.
+Lambda Forge is a powerful and flexible open-source framework designed to streamline the creation, management, and deployment of AWS Lambda functions. Built with ease of use and scalability in mind, Lambda Forge empowers developers to focus on writing code while automating the tedious aspects of serverless application management.
+
+Read the complete documentation at: [https://docs.lambda-forge.com/](https://docs.lambda-forge.com/)
 
 ## Table of Contents
 
