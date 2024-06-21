@@ -3,14 +3,17 @@ from b_aws_websocket_api.ws_api import WsApi
 from lambda_forge.services import WSS
 
 
-class Websockets(WSS):
+class Websockets:
     def __init__(self, scope, context) -> None:
 
         wss = WsApi(
             scope=self.scope,
-            id=self.context.gen_id("WSS"),
-            name=self.context.gen_id("WSS"),
+            id=context.gen_id("Websocket"),
+            name=context.gen_id("Websocket"),
             route_selection_expression="$request.body.action",
         )
 
-        super().__init__(scope=scope, context=context, wss=wss)
+        self.wss = WSS(scope=scope, context=context, name=context.name, wss=wss)
+
+    def create_route(self, route_key, function):
+        self.wss.create_route(route_key=route_key, function=function)

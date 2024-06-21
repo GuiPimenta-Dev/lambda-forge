@@ -1,11 +1,11 @@
-from aws_cdk import aws_sns as sns
+import aws_cdk.aws_events as events
+import aws_cdk.aws_events_targets as targets
 
-from lambda_forge.services import Bus
+from lambda_forge.trackers import trigger
 
 
-class EventBridge(Bus):
+class EventBridge:
     def __init__(self, scope, context) -> None:
-        super().__init__(scope=scope, context=context)
 
         # self.event_bridge = events.EventBus.from_event_bus_arn(
         #     scope,
@@ -13,3 +13,12 @@ class EventBridge(Bus):
         #     event_bus_arn=context.resources["arns"]["event_bridge_arn"],
         # )
         ...
+
+    @trigger(service="event_bridge", trigger="rule_name", function="function")
+    def schedule(self, rule_name, expression, function):
+        events.Rule(
+            self.scope,
+            rule_name,
+            schedule=events.Schedule.expression(expression),
+            targets=[targets.LambdaFunction(handler=function)],
+        )

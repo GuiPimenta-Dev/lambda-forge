@@ -13,7 +13,7 @@ class Context:
         self.bucket = bucket
         self.resources = resources
 
-    def gen_id(self, resource):
+    def create_id(self, resource):
         return f"{self.stage}-{self.name}-{resource}"
 
     def __str__(self):

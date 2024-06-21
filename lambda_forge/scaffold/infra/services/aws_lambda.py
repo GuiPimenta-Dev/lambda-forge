@@ -1,12 +1,18 @@
-from aws_cdk.aws_lambda import Runtime
+from aws_cdk import Duration
+from aws_cdk.aws_lambda import Code, Runtime
 
+from lambda_forge.path import Path
 from lambda_forge.services import Function
+from lambda_forge.trackers import function
 
 
-class Lambda(Function):
+class Lambda:
     def __init__(self, scope, context) -> None:
-        super().__init__(scope=scope, context=context)
+        self.functions = {}
+        self.scope = scope
+        self.context = context
 
+    @function
     def create_function(
         self,
         name,
@@ -16,18 +22,23 @@ class Lambda(Function):
         layers=[],
         environment={},
         memory_size=128,
-        runtime=Runtime.PYTHON_3_9,
+        runtime=Runtime.PYTHON_3_12,
         timeout=1,
     ):
 
-        return super().create_function(
-            name=name,
-            path=path,
+        function = Function(
+            scope=self.scope,
+            id=name,
             description=description,
-            directory=directory,
-            layers=layers,
-            environment=environment,
-            memory_size=memory_size,
+            function_name=self.context.gen_id(name),
             runtime=runtime,
-            timeout=timeout,
+            handler=Path.handler(directory),
+            environment=environment,
+            code=Code.from_asset(path=Path.function(path)),
+            layers=layers,
+            timeout=Duration.minutes(timeout),
+            memory_size=memory_size,
         )
+
+        self.functions[name] = function
+        return function
