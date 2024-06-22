@@ -22,7 +22,7 @@ class Lambda:
         layers=[],
         environment={},
         memory_size=128,
-        runtime=Runtime.PYTHON_3_12,
+        runtime=Runtime.PYTHON_3_9,
         timeout=1,
     ):
 
