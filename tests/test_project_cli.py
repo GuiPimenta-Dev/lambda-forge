@@ -2,7 +2,7 @@ from pprint import pprint
 
 from click.testing import CliRunner
 
-from lambda_forge.cli import project
+from lambda_forge.forge import project
 from tests.conftest import list_files, read_file_lines
 
 runner = CliRunner()
