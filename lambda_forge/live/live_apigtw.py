@@ -73,7 +73,7 @@ class LiveApiGtw:
         self.api_client.put_integration(
             restApiId=self.root_id,
             resourceId=parent_id,
-            httpMethod="ANY",
+            httpMethod=method,
             type="AWS_PROXY",
             integrationHttpMethod="POST",
             uri=f"arn:aws:apigateway:{self.region}:lambda:path/2015-03-31/functions/{function_arn}/invocations",
@@ -93,7 +93,7 @@ class LiveApiGtw:
             pass
 
         endpoint = self.__get_endpoint_url()
-        response = {"trigger": "API Gateway", "url": endpoint}
+        response = {"trigger": "API Gateway", "url": endpoint, "method": method}
         return response
 
     def __get_endpoint_url(self):

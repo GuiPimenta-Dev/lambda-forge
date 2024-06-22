@@ -78,12 +78,11 @@ class Live:
                 formatted_triggers.append(details)
             return "\n\n".join(formatted_triggers)
 
-        headers = ["Name", "Service", "Triggers"]
-        data_to_display = [[func["Name"], "", format_triggers(func["Triggers"])] for func in functions]
+        headers = ["Name", "Triggers"]
+        data_to_display = [[func["Name"], format_triggers(func["Triggers"])] for func in functions]
 
         for data in data_to_display:
             formated_text = ""
-            service_column = ""
             triggers = data[-1].split("\n\n")
             for trigger in triggers:
                 if trigger == "No Triggers":
@@ -91,20 +90,18 @@ class Live:
                     continue
                 service = trigger.split(",")[0].split(": ")[1]
                 resource = trigger.split(",")[1].strip()
-                service_column = service
-                formated_text += f"{resource}\n\n"
                 if service == "API Gateway":
-                    method = trigger.split(",")[2].strip()
-                    service_column += f" ({method.replace('Method: ', '')})"
-            data[-2] = service_column
+                    method = trigger.split(",")[2].split(": ")[1]
+                    resource += f" ({method})"
+                formated_text += f"{service} -> {resource}\n\n"
             data[-1] = formated_text
         self.printer.print(
             tabulate(
                 data_to_display,
                 headers=headers,
                 tablefmt="rounded_grid",
-                colalign=("center", "center", "center"),
-                rowalign=["center", "center", "center"],
+                colalign=("center", "center"),
+                rowalign=["center", "center"],
             ),
             color="gray",
         )
