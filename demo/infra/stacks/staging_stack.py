@@ -3,11 +3,11 @@ from aws_cdk import aws_codebuild as codebuild
 from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
+from infra.stages.deploy import DeployStage
+
 from lambda_forge.constants import ECR
 from lambda_forge.context import context
 from lambda_forge.steps import CodeBuildSteps
-
-from infra.stages.deploy import DeployStage
 
 
 @context(stage="Staging", resources="staging")
@@ -36,7 +36,9 @@ class StagingStack(cdk.Stack):
         coverage = steps.coverage()
         validate_docs = steps.validate_docs()
         validate_integration_tests = steps.validate_integration_tests()
-        validate_todo = steps.custom_step(name="ValidateTodo", commands=["cdk synth", "python infra/scripts/validate_todo.py"])
+        validate_todo = steps.custom_step(
+            name="ValidateTodo", commands=["cdk synth", "python infra/scripts/validate_todo.py"]
+        )
 
         # post
         redoc = steps.redoc()
@@ -47,13 +49,7 @@ class StagingStack(cdk.Stack):
 
         pipeline.add_stage(
             DeployStage(self, context),
-            pre=[
-                unit_tests,
-                coverage,
-                validate_integration_tests,
-                validate_docs,
-                validate_todo
-            ],
+            pre=[unit_tests, coverage, validate_integration_tests, validate_docs, validate_todo],
             post=[
                 redoc,
                 swagger,
