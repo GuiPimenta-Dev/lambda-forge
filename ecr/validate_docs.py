@@ -30,7 +30,7 @@ def validate_dataclass(path, attribute_name, attribute):
 
 
 def validate_paths(endpoint, function_file):
-    if "{" not in endpoint["endpoint"] and "}" not in endpoint["endpoint"]:
+    if "{" not in endpoint["trigger"] and "}" not in endpoint["trigger"]:
         return
     path = getattr(function_file, "Path", None)
     if path is None:
@@ -61,8 +61,13 @@ def validate_docs(endpoints, loader=default_module_loader):
 
 
 if __name__ == "__main__":
-    with open("cdk.json", "r") as json_file:
-        context = json.load(json_file)["context"]
-        functions = context["functions"]
-    endpoints = [endpoint for endpoint in functions if "method" in endpoint]
+    
+    with open("functions.json", "r") as json_file:
+        functions = json.load(json_file)
+        endpoints = []
+        for function in functions:
+            for trigger in function["triggers"]:
+                if trigger["service"] == "api_gateway":
+                    endpoints.append({**trigger, "path": function["path"]})
+    
     validate_docs(endpoints)

@@ -6,13 +6,13 @@ import yaml
 
 
 def get_paths(endpoints):
-    paths = {endpoint["endpoint"]: {} for endpoint in endpoints}
+    paths = {endpoint["trigger"]: {} for endpoint in endpoints}
     for endpoint in endpoints:
         method = endpoint["method"].lower()
-        tag = endpoint["endpoint"].split("/")[1].capitalize()
+        tag = endpoint["trigger"].split("/")[1].capitalize()
         repo_name = endpoint["name"]
         summary = endpoint["description"]
-        endpoint = endpoint["endpoint"]
+        endpoint = endpoint["trigger"]
         paths[endpoint][method] = {
             "tags": [tag],
             "summary": summary,
@@ -51,7 +51,7 @@ def get_schemas_from_endpoint(endpoint, loader):
     ]
 
     # If endpoint has a dynamic path, add the Path schema.
-    if "{" in endpoint["endpoint"] and "}" in endpoint["endpoint"]:
+    if "{" in endpoint["trigger"] and "}" in endpoint["trigger"]:
         schemas.append({"data": function_module.Path, "name": f"{repo_name}Path"})
 
     return schemas
@@ -307,13 +307,19 @@ def generate_docs(endpoints, name, loader=default_module_loader):
 
 if __name__ == "__main__":
 
+    with open("functions.json", "r") as json_file:
+        functions = json.load(json_file)
+        endpoints = []
+        for function in functions:
+            for trigger in function["triggers"]:
+                if trigger["service"] == "api_gateway":
+                    endpoints.append({**trigger, **function})
+    
+
     with open("cdk.json", "r") as json_file:
-        context = json.load(json_file)["context"]
-        name = context["name"]
-        functions = context["functions"]
-
-    endpoints = [endpoint for endpoint in functions if "method" in endpoint]
-
+        cdk = json.load(json_file)
+        name = cdk["context"]["name"]
+        
     spec = generate_docs(endpoints, name)
     with open(r"docs.yaml", "w") as f:
         yaml.dump(spec, f, sort_keys=True)
