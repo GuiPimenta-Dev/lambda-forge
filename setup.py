@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lambda_forge",
-    version="1.0.1067",
+    version="1.0.1069",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -12,6 +12,7 @@ setup(
         "boto3==1.26.59",
         "click==8.1.3",
         "pytest==6.2.5",
+        "pytest-sugar==1.0.0",
         "coverage==7.2.3",
         "python-dotenv==1.0.1",
         "b-aws-websocket-api==2.0.0",

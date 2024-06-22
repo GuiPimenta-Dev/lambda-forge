@@ -112,7 +112,13 @@ def run_live(log_file, input_file, output_file):
 
                     if function_trigger["service"] == "api_gateway":
                         trigger = create_api_gateway_trigger(
-                            account, region, project, function_arn, function_name, function_trigger["trigger"], function_trigger["method"]
+                            account,
+                            region,
+                            project,
+                            function_arn,
+                            function_name,
+                            function_trigger["trigger"],
+                            function_trigger["method"],
                         )
 
                     if function_trigger["service"] == "sns":

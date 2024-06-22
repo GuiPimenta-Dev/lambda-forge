@@ -22,6 +22,8 @@ def create_diagram(json_input, output_file):
 
         for function in json_input:
             function_name = function["name"]
+            if "authorizer" in function["path"]:
+                continue
 
             if function_name not in service_nodes["lambda"]:
                 service_nodes["lambda"][function_name] = Lambda(function_name)

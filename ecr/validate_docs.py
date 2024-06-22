@@ -61,7 +61,7 @@ def validate_docs(endpoints, loader=default_module_loader):
 
 
 if __name__ == "__main__":
-    
+
     with open("functions.json", "r") as json_file:
         functions = json.load(json_file)
         endpoints = []
@@ -69,5 +69,5 @@ if __name__ == "__main__":
             for trigger in function["triggers"]:
                 if trigger["service"] == "api_gateway":
                     endpoints.append({**trigger, "path": function["path"]})
-    
+
     validate_docs(endpoints)

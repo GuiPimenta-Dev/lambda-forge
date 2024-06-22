@@ -3,7 +3,6 @@ from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
 
 
-
 class REST:
     def __init__(self, scope, context, api) -> None:
         self.context = context

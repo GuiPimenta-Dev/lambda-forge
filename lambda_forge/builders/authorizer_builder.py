@@ -60,7 +60,7 @@ def lambda_handler(event, context):
                 {{
                     "Action": "execute-api:Invoke",
                     "Effect": effect,
-                    "Resource": "*"
+                    "Resource": event["methodArn"]
                 }}
             ],
         }},
@@ -77,7 +77,8 @@ def test_authorizer_should_pass_with_correct_secret():
     event = {{
         "headers": {{
             "secret": "{self.secret}"
-        }}
+        }},
+        "methodArn": "arn:aws:execute-api:us-east-1:123456789012:api-id/stage/GET/resource-path"
     }}
     response = lambda_handler(event, None)
 
@@ -88,7 +89,7 @@ def test_authorizer_should_pass_with_correct_secret():
                 {{
                     "Action": "execute-api:Invoke",
                     "Effect": "allow",
-                    "Resource": "*"
+                    "Resource": event["methodArn"]
                 }}
             ],
         }},
@@ -99,7 +100,8 @@ def test_authorizer_should_fail_with_invalid_secret():
     event = {{
         "headers": {{
             "secret": "INVALID-SECRET"
-        }}
+        }},
+        "methodArn": "arn:aws:execute-api:us-east-1:123456789012:api-id/stage/GET/resource-path"
     }}
     response = lambda_handler(event, None)
 

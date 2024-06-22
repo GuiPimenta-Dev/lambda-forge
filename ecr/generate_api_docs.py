@@ -314,12 +314,11 @@ if __name__ == "__main__":
             for trigger in function["triggers"]:
                 if trigger["service"] == "api_gateway":
                     endpoints.append({**trigger, **function})
-    
 
     with open("cdk.json", "r") as json_file:
         cdk = json.load(json_file)
         name = cdk["context"]["name"]
-        
+
     spec = generate_docs(endpoints, name)
     with open(r"docs.yaml", "w") as f:
         yaml.dump(spec, f, sort_keys=True)
