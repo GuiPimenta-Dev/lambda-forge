@@ -43,15 +43,14 @@ def lambda_handler(event, context):
     # It's crucial to develop and integrate your own robust authorization mechanism tailored to your application's security requirements.
     # To utilize the example authorizer as a temporary placeholder, ensure to include the following header in your requests:
 
-    # Header:
     # secret: {self.secret}
 
     # Remember, security is paramount. This placeholder serves as a guide to help you understand the kind of information your custom authorizer should authenticate. 
     # Please replace it with your secure, proprietary logic before going live. Happy coding!
 
     secret = event["headers"].get("secret")
-
     SECRET = "{self.secret}"
+
     effect = "allow" if secret == SECRET else "deny"
 
     policy = {{
