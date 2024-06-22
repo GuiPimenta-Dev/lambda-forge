@@ -2,7 +2,6 @@ from aws_cdk import Duration
 from aws_cdk import aws_apigateway as apigateway
 from aws_cdk import aws_iam as iam
 
-from lambda_forge.trackers import trigger
 
 
 class REST:
@@ -13,7 +12,6 @@ class REST:
         self.__authorizers = {}
         self.__default_authorizer = None
 
-    @trigger(service="api_gateway", trigger="path", function="function", extra=["method", "public"])
     def create_endpoint(self, method, path, function, public, authorizer=None):
         resource = self.__create_resource(path)
         authorizer = self.__get_authorizer(public, authorizer)
@@ -57,7 +55,7 @@ class REST:
             self.scope,
             f"{endpoint.replace('/','').title()}-API-Gateway-S3",
             assumed_by=iam.ServicePrincipal("apigateway.amazonaws.com"),
-            role_name=self.context.gen_id(f"{endpoint.replace('/','').title()}-S3"),
+            role_name=self.context.create_id(f"{endpoint.replace('/','').title()}-S3"),
         )
 
         s3_integration_role.add_to_policy(

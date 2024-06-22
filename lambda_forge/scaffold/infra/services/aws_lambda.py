@@ -1,8 +1,8 @@
 from aws_cdk import Duration
 from aws_cdk.aws_lambda import Code, Runtime
+from aws_cdk.aws_lambda import Function
 
 from lambda_forge.path import Path
-from lambda_forge.services import Function
 from lambda_forge.trackers import function
 
 
@@ -30,7 +30,7 @@ class Lambda:
             scope=self.scope,
             id=name,
             description=description,
-            function_name=self.context.gen_id(name),
+            function_name=self.context.create_id(name),
             runtime=runtime,
             handler=Path.handler(directory),
             environment=environment,

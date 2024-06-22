@@ -30,7 +30,7 @@ class LiveApiGtw:
             )
         return rest_api
 
-    def create_trigger(self, function_arn, function_name):
+    def create_trigger(self, function_arn, function_name, method):
         all_resources = self.api_client.get_resources(restApiId=self.root_id)["items"]
         parent_id = next(
             (resource["id"] for resource in all_resources if resource["path"] == "/"),
@@ -55,18 +55,18 @@ class LiveApiGtw:
                 parent_id = existing_resource["id"]
 
         try:
-            response = self.api_client.get_method(restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY")
+            response = self.api_client.get_method(restApiId=self.root_id, resourceId=parent_id, httpMethod=method)
 
             # If the method exists, delete it
-            if response["httpMethod"] == "ANY":
-                self.api_client.delete_method(restApiId=self.root_id, resourceId=parent_id, httpMethod="ANY")
+            if response["httpMethod"] == method:
+                self.api_client.delete_method(restApiId=self.root_id, resourceId=parent_id, httpMethod=method)
         except:
             pass
 
         self.api_client.put_method(
             restApiId=self.root_id,
             resourceId=parent_id,
-            httpMethod="ANY",
+            httpMethod=method,
             authorizationType="NONE",
         )
 

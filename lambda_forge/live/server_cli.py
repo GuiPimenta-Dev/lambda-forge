@@ -13,9 +13,9 @@ from . import Live, LiveApiGtw, LiveEventBridge, LiveS3, LiveSNS, LiveSQS
 printer = Printer()
 
 
-def create_api_gateway_trigger(account, region, project, function_arn, selected_function, endpoint):
+def create_api_gateway_trigger(account, region, project, function_arn, selected_function, endpoint, method):
     live_apigtw = LiveApiGtw(account, region, printer, project, endpoint)
-    trigger = live_apigtw.create_trigger(function_arn, selected_function)
+    trigger = live_apigtw.create_trigger(function_arn, selected_function, method)
     return trigger
 
 
@@ -112,7 +112,7 @@ def run_live(log_file, input_file, output_file):
 
                     if function_trigger["service"] == "api_gateway":
                         trigger = create_api_gateway_trigger(
-                            account, region, project, function_arn, function_name, function_trigger["trigger"]
+                            account, region, project, function_arn, function_name, function_trigger["trigger"], function_trigger["method"]
                         )
 
                     if function_trigger["service"] == "sns":

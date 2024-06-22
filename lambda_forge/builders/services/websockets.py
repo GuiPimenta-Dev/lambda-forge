@@ -8,8 +8,8 @@ class Websockets:
 
         wss = WsApi(
             scope=self.scope,
-            id=context.gen_id("Websocket"),
-            name=context.gen_id("Websocket"),
+            id=context.create_id("Websocket"),
+            name=context.create_id("Websocket"),
             route_selection_expression="$request.body.action",
         )
 

@@ -9,7 +9,7 @@ class APIGateway:
 
         api = apigateway.RestApi(
             scope,
-            id=f"{context.stage}-{context.name}-API-Gateway",
+            id=context.create_id("APIGateway"),
             deploy_options={"stage_name": context.stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
             binary_media_types=["multipart/form-data"],

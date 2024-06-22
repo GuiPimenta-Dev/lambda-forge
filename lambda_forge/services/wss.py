@@ -14,7 +14,7 @@ class WSS:
 
         self.stage = WsStage(
             scope=self.scope,
-            id=context.gen_id("WSS-Stage"),
+            id=context.create_id("WSS-Stage"),
             ws_api=self.websocket,
             stage_name=context.stage.lower(),
             auto_deploy=True,
@@ -22,7 +22,7 @@ class WSS:
 
         self.deployment = WsDeployment(
             scope=self.scope,
-            id=context.gen_id("WSS-Deployment"),
+            id=context.create_id("WSS-Deployment"),
             ws_stage=self.stage,
         )
 
@@ -33,7 +33,7 @@ class WSS:
 
         CfnPermission(
             scope=self.scope,
-            id=self.context.gen_id("Invoke"),
+            id=self.context.create_id("Invoke"),
             action="lambda:InvokeFunction",
             function_name=function.function_name,
             principal="apigateway.amazonaws.com",
@@ -48,15 +48,15 @@ class WSS:
 
         integration = WsLambdaIntegration(
             scope=self.scope,
-            id=self.context.gen_id(f"Integration-{route_name}"),
-            integration_name=self.context.gen_id(f"Integration-{route_name}"),
+            id=self.context.create_id(f"Integration-{route_name}"),
+            integration_name=self.context.create_id(f"Integration-{route_name}"),
             ws_api=self.websocket,
             function=function,
         )
 
         route = WsRoute(
             scope=self.scope,
-            id=self.context.gen_id(f"Route-{route_name}"),
+            id=self.context.create_id(f"Route-{route_name}"),
             ws_api=self.websocket,
             route_key=route_key,
             authorization_type="NONE",

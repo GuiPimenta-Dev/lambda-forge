@@ -1,7 +1,6 @@
 import json
 import os
 import subprocess
-import sys
 from threading import Thread
 
 import boto3
@@ -79,11 +78,12 @@ class Live:
                 formatted_triggers.append(details)
             return "\n\n".join(formatted_triggers)
 
-        headers = ["Name", "Triggers"]
-        data_to_display = [[func["Name"], format_triggers(func["Triggers"])] for func in functions]
+        headers = ["Name", "Service", "Triggers"]
+        data_to_display = [[func["Name"], "", format_triggers(func["Triggers"])] for func in functions]
 
         for data in data_to_display:
             formated_text = ""
+            service_column = ""
             triggers = data[-1].split("\n\n")
             for trigger in triggers:
                 if trigger == "No Triggers":
@@ -91,15 +91,20 @@ class Live:
                     continue
                 service = trigger.split(",")[0].split(": ")[1]
                 resource = trigger.split(",")[1].strip()
-                formated_text += f"{service} -> {resource}\n\n"
+                service_column = service
+                formated_text += f"{resource}\n\n"
+                if service == "API Gateway":
+                    method = trigger.split(",")[2].strip()
+                    service_column += f" ({method.replace('Method: ', '')})"
+            data[-2] = service_column
             data[-1] = formated_text
         self.printer.print(
             tabulate(
                 data_to_display,
                 headers=headers,
                 tablefmt="rounded_grid",
-                colalign=("center", "center"),
-                rowalign=["center", "center"],
+                colalign=("center", "center", "center"),
+                rowalign=["center", "center", "center"],
             ),
             color="gray",
         )

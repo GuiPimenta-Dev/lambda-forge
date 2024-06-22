@@ -13,14 +13,14 @@ from lambda_forge.steps import CodeBuildSteps
 @context(stage="Prod", resources="prod")
 class ProdStack(cdk.Stack):
     def __init__(self, scope: Construct, context, **kwargs) -> None:
-        super().__init__(scope, context.gen_id("Stack"), **kwargs)
+        super().__init__(scope, context.create_id("Stack"), **kwargs)
 
         source = CodePipelineSource.git_hub(f"{context.repo['owner']}/{context.repo['name']}", "dev")
 
         pipeline = pipelines.CodePipeline(
             self,
             "Pipeline",
-            pipeline_name=context.gen_id("Pipeline"),
+            pipeline_name=context.create_id("Pipeline"),
             synth=pipelines.ShellStep("Synth", input=source, commands=["cdk synth"]),
             code_build_defaults=pipelines.CodeBuildOptions(
                 build_environment=codebuild.BuildEnvironment(
