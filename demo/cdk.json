@@ -43,10 +43,10 @@
     "name": "Lambda-Forge-Demo",
     "repo": {
       "owner": "GuiPimenta-Dev",
-      "name": "lambda-forge"
+      "name": "lambda-forge-demo"
     },
     "bucket": "gui-docs",
-    "base_url": "",
+    "base_url": "https://zo3691q3pd.execute-api.us-east-2.amazonaws.com/dev",
     "dev": {
       "arns": {}
     },
