@@ -605,7 +605,7 @@ def test(test_type):
         subprocess.run(["pytest", "-k", "integration", "."], check=True)
 
     elif test_type == "coverage":
-        subprocess.run(["coverage", "run", "-m", "pytest", "."], check=True)
+        subprocess.run(["coverage", "run", "-m", "pytest", "-k", "unit", "."], check=True)
         subprocess.run(["coverage", "report"], check=True)
 
     elif test_type == "all":

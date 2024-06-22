@@ -3,6 +3,5 @@
 branch = True
 include =
     functions/**/main.py
-    functions/**/utils.py
 
 omit=

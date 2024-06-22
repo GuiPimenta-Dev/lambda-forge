@@ -81,6 +81,6 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
-        "body": json.dumps(json.dumps(data)),
+        "body": json.dumps(data),
         "headers": {"Access-Control-Allow-Origin": "*"},
     }
