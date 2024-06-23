@@ -11,7 +11,7 @@ setup(
         "constructs>=10.0.0,<11.0.0",
         "boto3==1.26.59",
         "click==8.1.3",
-        "pytest==6.2.5",
+        "pytest==8.2.2",
         "pytest-sugar==1.0.0",
         "coverage==7.2.3",
         "python-dotenv==1.0.1",

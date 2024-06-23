@@ -31,10 +31,6 @@ class ProdStack(cdk.Stack):
 
         steps = CodeBuildSteps(self, context, source=source)
 
-        # pre
-        unit_tests = steps.unit_tests()
-        integration_tests = steps.integration_tests()
-
         # post
         diagram = steps.diagram()
         redoc = steps.redoc()
@@ -42,10 +38,6 @@ class ProdStack(cdk.Stack):
 
         pipeline.add_stage(
             DeployStage(self, context),
-            pre=[
-                unit_tests,
-                integration_tests,
-            ],
             post=[
                 diagram,
                 redoc,

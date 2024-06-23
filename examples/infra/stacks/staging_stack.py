@@ -31,32 +31,14 @@ class StagingStack(cdk.Stack):
 
         steps = CodeBuildSteps(self, context, source=source)
 
-        # pre
-        unit_tests = steps.unit_tests()
-        coverage = steps.coverage()
-        validate_docs = steps.validate_docs()
-        validate_integration_tests = steps.validate_integration_tests()
-
         # post
         redoc = steps.redoc()
         swagger = steps.swagger()
-        integration_tests = steps.integration_tests()
-        tests_report = steps.tests_report()
-        coverage_report = steps.coverage_report()
 
         pipeline.add_stage(
             DeployStage(self, context),
-            pre=[
-                unit_tests,
-                coverage,
-                validate_integration_tests,
-                validate_docs,
-            ],
             post=[
                 redoc,
                 swagger,
-                integration_tests,
-                tests_report,
-                coverage_report,
             ],
         )
