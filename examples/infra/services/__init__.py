@@ -1,3 +1,5 @@
+from infra.services.websockets import Websockets
+from infra.services.kms import KMS
 from infra.services.secrets_manager import SecretsManager
 from infra.services.s3 import S3
 from infra.services.dynamodb import DynamoDB
@@ -13,3 +15,5 @@ class Services:
         self.s3 = S3(scope, context)
         self.secrets_manager = SecretsManager(scope, context)
         self.layers = Layers(scope)
+        self.kms = KMS(scope, context)
+        self.websockets = Websockets(scope, context)

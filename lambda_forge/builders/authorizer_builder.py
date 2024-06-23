@@ -6,13 +6,14 @@ from lambda_forge.builders.file_service import FileService
 
 class AuthorizerBuilder(FileService):
     @staticmethod
-    def an_authorizer(authorizer_name, description, belongs):
-        return AuthorizerBuilder(authorizer_name, description, belongs)
+    def an_authorizer(authorizer_name, description, belongs, no_tests):
+        return AuthorizerBuilder(authorizer_name, description, belongs, no_tests)
 
-    def __init__(self, authorizer_name, description, belongs):
+    def __init__(self, authorizer_name, description, belongs, no_tests):
         self.authorizer_name = authorizer_name
         self.description = description
         self.belongs = belongs
+        self.no_tests = no_tests
         self.pascal_name = "".join(word.capitalize() for word in self.authorizer_name.split("_"))
         if not self.pascal_name.endswith("Authorizer"):
             self.pascal_name += "Authorizer"
@@ -160,5 +161,6 @@ def test_authorizer_should_fail_with_invalid_secret():
         self.make_file(folder_path, "__init__.py")
         self.make_file(folder_path, "config.py", self.config)
         self.make_file(folder_path, "main.py", self.main)
-        self.make_file(folder_path, "unit.py", self.unit)
+        if self.no_tests is False:
+            self.make_file(folder_path, "unit.py", self.unit)
         self.write_lines("infra/stacks/lambda_stack.py", self.lambda_stack)

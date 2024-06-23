@@ -1,3 +1,10 @@
+from functions.chat.send_message.config import SendMessageConfig
+from functions.chat.connect.config import ConnectConfig
+from functions.chat.send_connection_id.config import SendConnectionIdConfig
+from functions.hello.config import HelloConfig
+from authorizers.jwt.config import JwtAuthorizerConfig
+from functions.auth.signin.config import SigninConfig
+from functions.auth.signup.config import SignupConfig
 from functions.images.mailer.config import MailerConfig
 from functions.images.qrcode.config import QrcodeConfig
 from functions.urls.redirect.config import RedirectConfig
@@ -17,6 +24,9 @@ class LambdaStack(Stack):
 
         self.services = Services(self, context)
 
+        # Authorizers
+        JwtAuthorizerConfig(self.services)
+
         # Docs
         DocsConfig(self.services)
 
@@ -31,3 +41,15 @@ class LambdaStack(Stack):
         # Images
         MailerConfig(self.services)
         QrcodeConfig(self.services)
+
+        # Auth
+        SigninConfig(self.services)
+        SignupConfig(self.services)
+
+        # Hello
+        HelloConfig(self.services)
+
+        # Chat
+        SendMessageConfig(self.services)
+        SendConnectionIdConfig(self.services, context)
+        ConnectConfig(self.services)

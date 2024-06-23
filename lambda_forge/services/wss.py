@@ -33,7 +33,7 @@ class WSS:
 
         CfnPermission(
             scope=self.scope,
-            id=self.context.create_id("Invoke"),
+            id=self.context.create_id(f"Invoke-{route_name}"),
             action="lambda:InvokeFunction",
             function_name=function.function_name,
             principal="apigateway.amazonaws.com",

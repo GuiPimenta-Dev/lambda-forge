@@ -1,5 +1,13 @@
 [
     {
+        "name": "JwtAuthorizer",
+        "path": "./authorizers/jwt",
+        "description": "A jwt authorizer for private lambda functions",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
         "name": "MakeGuess",
         "path": "./functions/guess_the_number/make_guess",
         "description": "Make a guess for a particular game",
@@ -95,6 +103,80 @@
                 "public": true
             }
         ],
+        "invocations": []
+    },
+    {
+        "name": "Signin",
+        "path": "./functions/auth/signin",
+        "description": "Authenticate user login by verifying email and password against stored credentials",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/signin",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "SignUp",
+        "path": "./functions/auth/signup",
+        "description": "Securely handle user registration with unique credentials.",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/signup",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "auth_table"
+            }
+        ]
+    },
+    {
+        "name": "Hello",
+        "path": "./functions/hello",
+        "description": "A private function",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/hello",
+                "method": "GET",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "SendMessage",
+        "path": "./functions/chat/send_message",
+        "description": "Send messages to sender and recipient",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
+        "name": "SendConnectionId",
+        "path": "./functions/chat/send_connection_id",
+        "description": "Sends the connection id to the client when a connection is made",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
+        "name": "Connect",
+        "path": "./functions/chat/connect",
+        "description": "Handle the websocket connection",
+        "timeout": 60,
+        "triggers": [],
         "invocations": []
     }
 ]
