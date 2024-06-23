@@ -1,6 +1,6 @@
 from aws_cdk import aws_apigateway as apigateway
 
-from lambda_forge.services import REST
+from lambda_forge.api_gateway import REST
 from lambda_forge.trackers import trigger
 
 
@@ -9,7 +9,7 @@ class APIGateway:
 
         api = apigateway.RestApi(
             scope,
-            id=context.create_id("APIGateway"),
+            id=context.create_id("REST"),
             deploy_options={"stage_name": context.stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
             binary_media_types=["multipart/form-data"],

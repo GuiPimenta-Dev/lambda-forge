@@ -1,6 +1,6 @@
 from aws_cdk import aws_apigateway as apigateway
 
-from lambda_forge.services import REST
+from lambda_forge.api_gateway import REST
 from lambda_forge.trackers import trigger
 
 
