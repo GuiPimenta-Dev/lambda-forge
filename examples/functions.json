@@ -27,6 +27,74 @@
                 "public": true
             }
         ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "numbers_table"
+            }
+        ]
+    },
+    {
+        "name": "Redirect",
+        "path": "./functions/urls/redirect",
+        "description": "Redirects from the short url to the original url",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/{url_id}",
+                "method": "GET",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "Shortener",
+        "path": "./functions/urls/shortener",
+        "description": "Creates a new short URL entry in DynamoDB mapping to the original url",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/urls",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "urls_table"
+            }
+        ]
+    },
+    {
+        "name": "Mailer",
+        "path": "./functions/images/mailer",
+        "description": "Sends an email when an image enters the bucket",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "s3",
+                "trigger": "images_bucket"
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "Qrcode",
+        "path": "./functions/images/qrcode",
+        "description": "Converts an image into a qr code",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/images/qrcode",
+                "method": "POST",
+                "public": true
+            }
+        ],
         "invocations": []
     }
 ]

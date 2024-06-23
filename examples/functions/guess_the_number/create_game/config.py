@@ -16,4 +16,4 @@ class CreateGameConfig:
 
         services.api_gateway.create_endpoint("POST", "/games", function, public=True)
 
-        services.dynamodb.numbers_table.grant_write_data(function)
+        services.dynamodb.grant_write("numbers_table", function)

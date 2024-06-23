@@ -1,3 +1,7 @@
+from functions.images.mailer.config import MailerConfig
+from functions.images.qrcode.config import QrcodeConfig
+from functions.urls.redirect.config import RedirectConfig
+from functions.urls.shortener.config import ShortenerConfig
 from functions.guess_the_number.make_guess.config import MakeGuessConfig
 from functions.guess_the_number.create_game.config import CreateGameConfig
 from docs.config import DocsConfig
@@ -19,3 +23,11 @@ class LambdaStack(Stack):
         # GuessTheNumber
         MakeGuessConfig(self.services)
         CreateGameConfig(self.services)
+
+        # Urls
+        RedirectConfig(self.services)
+        ShortenerConfig(self.services, context)
+
+        # Images
+        MailerConfig(self.services)
+        QrcodeConfig(self.services)
