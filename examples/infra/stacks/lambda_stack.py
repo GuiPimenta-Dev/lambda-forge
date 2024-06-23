@@ -50,6 +50,6 @@ class LambdaStack(Stack):
         HelloConfig(self.services)
 
         # Chat
-        SendMessageConfig(self.services)
+        SendMessageConfig(self.services, context)
         SendConnectionIdConfig(self.services, context)
         ConnectConfig(self.services)

@@ -1,6 +1,7 @@
 from b_aws_websocket_api.ws_api import WsApi
 
 from lambda_forge.services import WSS
+from lambda_forge.trackers import trigger
 
 
 class Websockets:
@@ -15,5 +16,6 @@ class Websockets:
 
         self.wss = WSS(scope=scope, context=context, wss=wss)
 
+    @trigger(service="wss", trigger="route_key", function="function")
     def create_route(self, route_key, function):
         self.wss.create_route(route_key=route_key, function=function)

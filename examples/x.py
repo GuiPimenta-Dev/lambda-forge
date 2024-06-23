@@ -8,6 +8,14 @@ from diagrams.aws.network import APIGateway
 from diagrams.aws.storage import S3
 
 
+import json
+from diagrams import Diagram, Cluster
+from diagrams.aws.compute import Lambda
+from diagrams.aws.database import Dynamodb
+from diagrams.aws.integration import SNS, SQS, Eventbridge
+from diagrams.aws.network import APIGateway
+from diagrams.aws.storage import S3
+
 def create_diagram(json_input, output_file):
     with Diagram(name="", show=False, filename=output_file, outformat="png"):
         folder_clusters = {}
@@ -94,3 +102,8 @@ def create_diagram(json_input, output_file):
             with Cluster(folder):
                 for node in nodes.values():
                     node
+
+functions = open("/Users/guialves/personal_projects/lambda-forge/examples/functions.json", "r")
+functions = json.load(functions)
+output_file = "output_diagram"
+create_diagram(functions, output_file)

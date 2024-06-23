@@ -160,7 +160,12 @@
         "path": "./functions/chat/send_message",
         "description": "Send messages to sender and recipient",
         "timeout": 60,
-        "triggers": [],
+        "triggers": [
+            {
+                "service": "wss",
+                "trigger": "sendMessage"
+            }
+        ],
         "invocations": []
     },
     {
@@ -176,7 +181,12 @@
         "path": "./functions/chat/connect",
         "description": "Handle the websocket connection",
         "timeout": 60,
-        "triggers": [],
+        "triggers": [
+            {
+                "service": "wss",
+                "trigger": "$connect"
+            }
+        ],
         "invocations": []
     }
 ]
