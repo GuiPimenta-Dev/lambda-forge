@@ -72,7 +72,7 @@ class ProjectBuilder(FileService):
         self.copy_folders("lambda_forge", "scaffold", "")
         if self.minimal:
             self.copy_file("lambda_forge", "stacks/minimal/app.py", "")
-            self.copy_file("lambda_forge", "stacks/minimal/prod_stack.py", "infra/stacks/prod_stack.py")
+            self.copy_file("lambda_forge", "stacks/minimal/stack.py", "infra/stacks/stack.py")
 
         else:
             if self.no_docs:
