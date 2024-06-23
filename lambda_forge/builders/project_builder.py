@@ -58,12 +58,13 @@ class ProjectBuilder(FileService):
             },
         }
 
-        if self.minimal is False:
+        if self.minimal:
+            cdk["context"]["resources"] = {"arns": {}}
+        else:
             cdk["context"]["dev"] = {"arns": {}}
             cdk["context"]["staging"] = {"arns": {}}
-
-        cdk["context"]["prod"] = {"arns": {}}
-
+            cdk["context"]["prod"] = {"arns": {}}
+        
         self.cdk = json.dumps(cdk, indent=2)
         return self
 

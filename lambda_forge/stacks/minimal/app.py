@@ -1,8 +1,8 @@
 import aws_cdk as cdk
-from infra.stacks.prod_stack import ProdStack
+from infra.stacks.stack import Stack
 
 app = cdk.App()
 
-ProdStack(app)
+Stack(app)
 
 app.synth()

@@ -5,19 +5,6 @@ Lambda Forge is a powerful and flexible open-source framework designed to stream
 
 Read the complete documentation at: [https://docs.lambda-forge.com/](https://docs.lambda-forge.com/)
 
-## Table of Contents
-
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Usage](#usage)
-  - [Creating a Lambda Function](#creating-a-lambda-function)
-  - [Managing Permissions](#managing-permissions)
-  - [Event Sources](#event-sources)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Features
 
 - **Simplified Lambda Function Creation**: Easily create and deploy AWS Lambda functions with minimal configuration.

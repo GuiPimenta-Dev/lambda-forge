@@ -182,7 +182,7 @@ def create_project(
 
     project_builder = project_builder.with_cdk(repo_owner, repo_name, account, region, bucket).build()
 
-    if not no_docs:
+    if not no_docs and not minimal:
         DocsBuilder.a_doc().with_config().with_lambda_stack().build()
 
 
