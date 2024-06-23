@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lambda_forge",
-    version="1.0.1092",
+    version="1.0.1094",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -34,7 +34,7 @@ setup(
             "scaffold/.coveragerc",
             "scaffold/**/**",
             "scaffold/**/**/*",
-            "services/*",
+            "api_gateway/*",
             "live/*",
             "stacks/*",
             "stacks/**/*",
