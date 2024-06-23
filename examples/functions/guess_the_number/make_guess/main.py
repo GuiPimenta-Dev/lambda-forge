@@ -24,7 +24,7 @@ class Output:
 def lambda_handler(event, context):
     # Initialize a DynamoDB resource using boto3 and get the table name from environment variables
     dynamodb = boto3.resource("dynamodb")
-    NUMBERS_TABLE_NAME = os.environ.get("NUMBERS_TABLE_NAME")
+    NUMBERS_TABLE_NAME = os.environ.get("NUMBERS_TABLE_NAME", "Dev-Guess-The-Number")
     numbers_table = dynamodb.Table(NUMBERS_TABLE_NAME)
 
     # Extract the game_id from path parameters in the event object

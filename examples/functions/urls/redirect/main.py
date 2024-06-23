@@ -1,7 +1,8 @@
-from dataclasses import dataclass
 import json
-import boto3
 import os
+from dataclasses import dataclass
+
+import boto3
 
 
 @dataclass

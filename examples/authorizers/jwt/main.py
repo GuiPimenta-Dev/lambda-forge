@@ -1,6 +1,8 @@
 import os
+
 import jwt
 import sm_utils
+
 
 def lambda_handler(event, context):
 

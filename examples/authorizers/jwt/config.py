@@ -9,9 +9,7 @@ class JwtAuthorizerConfig:
             path="./authorizers/jwt",
             description="A jwt authorizer for private lambda functions",
             layers=[services.layers.sm_utils_layer, services.layers.pyjwt_layer],
-            environment={
-                "JWT_SECRET_NAME": services.secrets_manager.jwt_secret.secret_name
-            },
+            environment={"JWT_SECRET_NAME": services.secrets_manager.jwt_secret.secret_name},
         )
 
         services.api_gateway.create_authorizer(function, name="jwt", default=False)

@@ -1,5 +1,6 @@
 from infra.services import Services
 
+
 class ShortenerConfig:
     def __init__(self, services: Services, context) -> None:
 

@@ -11,10 +11,9 @@ class RedirectConfig:
             directory="redirect",
             environment={
                 "URLS_TABLE_NAME": services.dynamodb.urls_table.table_name,
-            }
+            },
         )
 
         services.api_gateway.create_endpoint("GET", "/{url_id}", function, public=True)
 
         services.dynamodb.urls_table.grant_read_data(function)
-        

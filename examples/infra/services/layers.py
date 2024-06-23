@@ -1,4 +1,5 @@
 from aws_cdk import aws_lambda as _lambda
+
 from lambda_forge.path import Path
 
 
@@ -42,5 +43,3 @@ class Layers:
             id="IotLayer",
             layer_version_arn="arn:aws:lambda:us-east-2:211125768252:layer:awsiot:1",
         )
-
-        

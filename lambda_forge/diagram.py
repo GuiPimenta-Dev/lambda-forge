@@ -1,6 +1,4 @@
-import json
-
-from diagrams import Diagram
+from diagrams import Cluster, Diagram
 from diagrams.aws.compute import Lambda
 from diagrams.aws.database import Dynamodb
 from diagrams.aws.integration import SNS, SQS, Eventbridge

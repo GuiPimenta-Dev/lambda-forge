@@ -1,8 +1,10 @@
-from dataclasses import dataclass
 import hashlib
 import json
 import os
+from dataclasses import dataclass
+
 import boto3
+
 
 @dataclass
 class Input:
@@ -23,7 +25,7 @@ def lambda_handler(event, context):
     dynamodb = boto3.resource("dynamodb")
 
     # Reference the specified DynamoDB table.
-    urls_table = dynamodb.Table(URLS_TABLE_NAME)
+    urls_table = dynamodb.Table(URLS_TABLE_NAME, "Dev-URLs")
 
     # Parse the URL from the incoming event's body.
     body = json.loads(event["body"])

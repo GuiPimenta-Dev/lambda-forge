@@ -1,5 +1,4 @@
 from aws_cdk import aws_dynamodb as dynamodb
-
 from aws_cdk import aws_lambda as lambda_
 from aws_cdk import aws_lambda_event_sources as event_source
 

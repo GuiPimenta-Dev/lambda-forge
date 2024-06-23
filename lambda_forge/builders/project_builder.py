@@ -64,7 +64,7 @@ class ProjectBuilder(FileService):
             cdk["context"]["dev"] = {"arns": {}}
             cdk["context"]["staging"] = {"arns": {}}
             cdk["context"]["prod"] = {"arns": {}}
-        
+
         self.cdk = json.dumps(cdk, indent=2)
         return self
 

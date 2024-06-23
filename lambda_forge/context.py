@@ -31,24 +31,23 @@ def create_context(stage, resources, minimal):
     cdk = json.load(open("cdk.json"))
 
     if minimal:
-        
+
         stage = "Prod"
-        
+
         if "resources" not in cdk["context"]:
             raise ValueError(f"Resources not found in cdk.json")
-        
+
         resources = cdk["context"]["resources"]
-        
+
     else:
-    
+
         if resources not in cdk["context"]:
             raise ValueError(f"Resources {resources} not found in cdk.json")
-        
+
         if "arns" not in cdk["context"][resources]:
             raise ValueError(f"Resources {resources} arns not found in cdk.json")
 
         resources = cdk["context"][resources]
-        
 
     name = cdk["context"]["name"]
     repo = cdk["context"]["repo"]

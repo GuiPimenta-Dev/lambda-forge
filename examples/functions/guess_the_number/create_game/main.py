@@ -22,7 +22,7 @@ def lambda_handler(event, context):
     # Initialize a DynamoDB resource using the boto3 library
     dynamodb = boto3.resource("dynamodb")
     # Retrieve the DynamoDB table name from environment variables
-    NUMBERS_TABLE_NAME = os.environ.get("NUMBERS_TABLE_NAME")
+    NUMBERS_TABLE_NAME = os.environ.get("NUMBERS_TABLE_NAME", "Dev-Guess-The-Number")
     numbers_table = dynamodb.Table(NUMBERS_TABLE_NAME)
 
     body = json.loads(event["body"])
@@ -51,5 +51,5 @@ def lambda_handler(event, context):
     return {
         "statusCode": 200,
         "body": json.dumps({"game_id": game_id}),
-        "headers": {"Access-Control-Allow-Origin": "*"}
+        "headers": {"Access-Control-Allow-Origin": "*"},
     }
