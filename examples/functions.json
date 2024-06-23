@@ -1,1 +1,32 @@
-[]
+[
+    {
+        "name": "MakeGuess",
+        "path": "./functions/guess_the_number/make_guess",
+        "description": "Make a guess for a particular game",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/games/{game_id}",
+                "method": "GET",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "CreateGame",
+        "path": "./functions/guess_the_number/create_game",
+        "description": "Creates a new guess the number game",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/games",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": []
+    }
+]

@@ -45,10 +45,37 @@
       "owner": "GuiPimenta-Dev",
       "name": "lambda-forge-examples"
     },
-    "bucket": "",
+    "bucket": "gui-docs",
     "base_url": "",
-    "resources": {
-      "arns": {}
+    "dev": {
+      "base_url": "https://api.lambda-forge.com/dev",
+      "post_to_connection_url": "https://tq4hgk0jxd.execute-api.us-east-2.amazonaws.com/dev",
+      "arns": {
+          "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Guess-The-Number",
+          "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-URLs",
+          "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
+          "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Auth"
+      }
+    },
+    "staging": {
+        "base_url": "https://api.lambda-forge.com/staging",
+        "post_to_connection_url": "https://tq4hgk0jxd.execute-api.us-east-2.amazonaws.com/dev",
+        "arns": {
+            "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-Guess-The-Number",
+            "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-URLs",
+            "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
+            "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-Auth"
+        }
+    },
+    "prod": {
+        "base_url": "https://api.lambda-forge.com",
+        "post_to_connection_url": "https://tq4hgk0jxd.execute-api.us-east-2.amazonaws.com/dev",
+        "arns": {
+            "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-Guess-The-Number",
+            "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-URLs",
+            "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
+            "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-Auth"
+        }
     }
   }
 }
