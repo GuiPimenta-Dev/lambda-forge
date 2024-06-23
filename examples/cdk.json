@@ -40,21 +40,42 @@
     "@aws-cdk/customresources:installLatestAwsSdkDefault": false,
     "region": "us-east-2",
     "account": "211125768252",
-    "name": "Lambda-Forge-Demo",
+    "name": "Lambda-Forge-Examples",
     "repo": {
       "owner": "GuiPimenta-Dev",
-      "name": "lambda-forge-demo"
+      "name": "lambda-forge-examples"
     },
     "bucket": "gui-docs",
-    "base_url": "https://zo3691q3pd.execute-api.us-east-2.amazonaws.com/dev",
+    "base_url": "",
     "dev": {
-      "arns": {}
+      "base_url": "https://api.lambda-forge.com/dev",
+      "post_to_connection_url": "https://tq4hgk0jxd.execute-api.us-east-2.amazonaws.com/dev",
+      "arns": {
+          "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Guess-The-Number",
+          "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-URLs",
+          "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
+          "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Auth"
+      }
     },
     "staging": {
-      "arns": {}
+        "base_url": "https://api.lambda-forge.com/staging",
+        "post_to_connection_url": "https://tq4hgk0jxd.execute-api.us-east-2.amazonaws.com/dev",
+        "arns": {
+            "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-Guess-The-Number",
+            "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-URLs",
+            "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
+            "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-Auth"
+        }
     },
     "prod": {
-      "arns": {}
+        "base_url": "https://api.lambda-forge.com",
+        "post_to_connection_url": "https://tq4hgk0jxd.execute-api.us-east-2.amazonaws.com/dev",
+        "arns": {
+            "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-Guess-The-Number",
+            "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-URLs",
+            "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
+            "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-Auth"
+        }
     }
   }
 }

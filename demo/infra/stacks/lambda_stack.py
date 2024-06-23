@@ -1,7 +1,6 @@
+from authorizers.secret.config import SecretAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
-
-from authorizers.secret.config import SecretAuthorizerConfig
 from docs.config import DocsConfig
 from functions.custom.config import CustomConfig
 from functions.external.config import ExternalConfig

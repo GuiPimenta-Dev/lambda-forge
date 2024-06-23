@@ -1,6 +1,6 @@
 import aws_cdk as cdk
 from aws_cdk import aws_codebuild as codebuild
-from aws_cdk import pipelines
+from aws_cdk import pipelines as pipelines
 from aws_cdk.pipelines import CodePipelineSource
 from constructs import Construct
 from infra.stages.deploy import DeployStage
@@ -10,8 +10,8 @@ from lambda_forge.context import context
 from lambda_forge.steps import CodeBuildSteps
 
 
-@context(stage="Prod", resources="prod")
-class ProdStack(cdk.Stack):
+@context(stage="Dev", resources="dev")
+class DevStack(cdk.Stack):
     def __init__(self, scope: Construct, context, **kwargs) -> None:
         super().__init__(scope, context.create_id("Stack"), **kwargs)
 
@@ -31,24 +31,8 @@ class ProdStack(cdk.Stack):
 
         steps = CodeBuildSteps(self, context, source=source)
 
-        # pre
-        unit_tests = steps.unit_tests()
-        integration_tests = steps.integration_tests()
-
         # post
-        diagram = steps.diagram()
-        redoc = steps.redoc()
         swagger = steps.swagger()
+        redoc = steps.redoc()
 
-        pipeline.add_stage(
-            DeployStage(self, context),
-            pre=[
-                unit_tests,
-                integration_tests,
-            ],
-            post=[
-                diagram,
-                redoc,
-                swagger,
-            ],
-        )
+        pipeline.add_stage(DeployStage(self, context), post=[swagger, redoc])

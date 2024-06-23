@@ -58,12 +58,13 @@ class ProjectBuilder(FileService):
             },
         }
 
-        if self.minimal is False:
+        if self.minimal:
+            cdk["context"]["resources"] = {"arns": {}}
+        else:
             cdk["context"]["dev"] = {"arns": {}}
             cdk["context"]["staging"] = {"arns": {}}
-
-        cdk["context"]["prod"] = {"arns": {}}
-
+            cdk["context"]["prod"] = {"arns": {}}
+        
         self.cdk = json.dumps(cdk, indent=2)
         return self
 
@@ -71,7 +72,7 @@ class ProjectBuilder(FileService):
         self.copy_folders("lambda_forge", "scaffold", "")
         if self.minimal:
             self.copy_file("lambda_forge", "stacks/minimal/app.py", "")
-            self.copy_file("lambda_forge", "stacks/minimal/prod_stack.py", "infra/stacks/prod_stack.py")
+            self.copy_file("lambda_forge", "stacks/minimal/stack.py", "infra/stacks/stack.py")
 
         else:
             if self.no_docs:

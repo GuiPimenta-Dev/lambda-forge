@@ -9,12 +9,12 @@ from lambda_forge.constants import ECR
 from lambda_forge.context import context
 
 
-@context(stage="Prod", resources="prod")
-class ProdStack(cdk.Stack):
+@context(minimal=True)
+class Stack(cdk.Stack):
     def __init__(self, scope: Construct, context, **kwargs) -> None:
         super().__init__(scope, context.create_id("Stack"), **kwargs)
 
-        source = CodePipelineSource.git_hub(f"{context.repo['owner']}/{context.repo['name']}", "dev")
+        source = CodePipelineSource.git_hub(f"{context.repo['owner']}/{context.repo['name']}", "main")
 
         pipeline = pipelines.CodePipeline(
             self,
