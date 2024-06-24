@@ -48,13 +48,19 @@
     "bucket": "gui-docs",
     "base_url": "https://zo3691q3pd.execute-api.us-east-2.amazonaws.com/dev",
     "dev": {
-      "arns": {}
+      "arns": {
+        "hello_world_topic": "arn:aws:sns:us-east-2:211125768252:HelloWorld"
+      }
     },
     "staging": {
-      "arns": {}
+      "arns": {
+        "hello_world_topic": "arn:aws:sns:us-east-2:211125768252:HelloWorld"
+      }
     },
     "prod": {
-      "arns": {}
+      "arns": {
+        "hello_world_topic": "arn:aws:sns:us-east-2:211125768252:HelloWorld"
+      }
     }
   }
 }

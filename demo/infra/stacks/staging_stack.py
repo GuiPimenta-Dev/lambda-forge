@@ -15,7 +15,7 @@ class StagingStack(cdk.Stack):
     def __init__(self, scope: Construct, context, **kwargs) -> None:
         super().__init__(scope, context.create_id("Stack"), **kwargs)
 
-        source = CodePipelineSource.git_hub(f"{context.repo['owner']}/{context.repo['name']}", "dev")
+        source = CodePipelineSource.git_hub(f"{context.repo['owner']}/{context.repo['name']}", "staging")
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -37,7 +37,7 @@ class StagingStack(cdk.Stack):
         validate_docs = steps.validate_docs()
         validate_integration_tests = steps.validate_integration_tests()
         validate_todo = steps.custom_step(
-            name="ValidateTodo", commands=["cdk synth", "python infra/scripts/validate_todo.py"]
+            name="ValidateTodo", commands=["python infra/scripts/validate_todo.py"]
         )
 
         # post

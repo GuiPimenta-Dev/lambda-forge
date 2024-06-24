@@ -7,12 +7,11 @@ from lambda_forge.trackers import invoke, trigger
 class SNS:
     def __init__(self, scope, context) -> None:
 
-        # self.sns_topic = sns.Topic.from_topic_arn(
-        #     scope,
-        #     id="SNSTopic",
-        #     topic_arn=context.resources["arns"]["sns_topic_arn"],
-        # )
-        ...
+        self.hello_world_topic = sns.Topic.from_topic_arn(
+            scope,
+            id="HelloWorldTopic",
+            topic_arn=context.resources["arns"]["hello_world_topic"],
+        )
 
     @trigger(service="sns", trigger="topic", function="function")
     def create_trigger(self, topic, function):

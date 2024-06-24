@@ -18,21 +18,10 @@
                 "trigger": "/hello_world",
                 "method": "GET",
                 "public": true
-            }
-        ],
-        "invocations": []
-    },
-    {
-        "name": "Custom",
-        "path": "./functions/custom",
-        "description": "A function to make use of the custom layer",
-        "timeout": 60,
-        "triggers": [
+            },
             {
-                "service": "api_gateway",
-                "trigger": "/custom",
-                "method": "GET",
-                "public": true
+                "service": "sns",
+                "trigger": "hello_world_topic"
             }
         ],
         "invocations": []
@@ -48,6 +37,21 @@
                 "trigger": "/private",
                 "method": "GET",
                 "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "Custom",
+        "path": "./functions/custom",
+        "description": "A function to make use of the custom layer",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/custom",
+                "method": "GET",
+                "public": true
             }
         ],
         "invocations": []

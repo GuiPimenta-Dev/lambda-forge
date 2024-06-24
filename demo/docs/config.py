@@ -17,3 +17,7 @@ class DocsConfig:
 
         # Coverage Report at /coverage
         services.api_gateway.create_docs(endpoint="/coverage", artifact="coverage", public=True, stages=["Staging"])
+
+        # Wiki at /wiki
+        # Use the Wiki's title as artifact
+        services.api_gateway.create_docs(endpoint="/wiki", artifact="Wiki", public=True)

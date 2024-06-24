@@ -25,11 +25,11 @@ class LambdaStack(Stack):
         # HelloWorld
         HelloWorldConfig(self.services)
 
+        # # Private
+        PrivateConfig(self.services)
+        
         # Custom
         CustomConfig(self.services)
 
-        # Private
-        PrivateConfig(self.services)
-
-        # External
+        # # External
         ExternalConfig(self.services)

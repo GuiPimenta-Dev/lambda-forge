@@ -5,12 +5,12 @@ from lambda_forge.trackers import invoke, trigger
 
 
 class SQS:
-    def __init__(self, scope, resources) -> None:
+    def __init__(self, scope, context) -> None:
 
         # self.sqs = sqs.Queue.from_queue_arn(
         #     scope,
         #     "SQS",
-        #     queue_arn=resources["arns"]["sqs_arn"],
+        #     queue_arn=context.resources["arns"]["sqs_arn"],
         # )
         ...
 
