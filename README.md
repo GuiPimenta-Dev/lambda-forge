@@ -76,7 +76,7 @@ Lambda Forge automatically generates documentation for your project and let them
 Lambda Forge automatically tracks the triggers and invocations of your Lambda functions, generating a comprehensive diagram of your application.
 
 <p align="center">
-<img src="https://i.ibb.co/McYdKPD/diagram.png" width=500> 
+<img src="https://i.ibb.co/McYdKPD/diagram.png" width=400> 
 </p>
 
 
