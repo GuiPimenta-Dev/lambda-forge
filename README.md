@@ -1,13 +1,12 @@
 
-![GitHub repo size](https://img.shields.io/github/repo-size/GuiPimenta-Dev/lambda-forge?style=for-the-badge)
-![GitHub language count](https://img.shields.io/github/languages/count/GuiPimenta-Dev/lambda-forge?style=for-the-badge)
-![GitHub forks](https://img.shields.io/github/forks/GuiPimenta-Dev/lambda-forge?style=for-the-badge)
-![Bitbucket open issues](https://img.shields.io/bitbucket/issues/GuiPimenta-Dev/lambda-forge?style=for-the-badge)
-![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/GuiPimenta-Dev/lambda-forge?style=for-the-badge)
 
 <p align="center">
 <img src="https://public-lambda-forge-logo.s3.us-east-2.amazonaws.com/wNSN2U7n9NiAKEItWlsrcdJ0RWFyZOmbNvsc6Kht84WsWVxuBz5O.png" width=500 > 
 </p>
+
+![GitHub repo size](https://img.shields.io/github/repo-size/GuiPimenta-Dev/lambda-forge?style=for-the-badge)
+![GitHub language count](https://img.shields.io/github/languages/count/GuiPimenta-Dev/lambda-forge?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/GuiPimenta-Dev/lambda-forge?style=for-the-badge)
 
 # Lambda Forge
 
