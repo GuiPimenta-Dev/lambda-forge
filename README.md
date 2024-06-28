@@ -54,7 +54,6 @@ Lambda Forge provides multi-stage environments with automatic CI/CD pipelines on
 
 ### Automatic Documentation
 Lambda Forge automatically generates documentation for your project, as demonstrated below:
-<p align="center">
 
 <div style="width: 100%; text-align: center;" align="center">
 
@@ -71,7 +70,7 @@ Lambda Forge automatically generates documentation for your project, as demonstr
   </tr>
 </table>
 </div>
-</p>
+
 ## 🚀 Installing Lambda Forge
 
 To install Lambda Forge, follow these steps:
