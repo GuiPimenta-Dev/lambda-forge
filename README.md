@@ -1,10 +1,10 @@
 
 
+# Lambda Forge
+
 <p align="center">
 <img src="https://public-lambda-forge-logo.s3.us-east-2.amazonaws.com/wNSN2U7n9NiAKEItWlsrcdJ0RWFyZOmbNvsc6Kht84WsWVxuBz5O.png" width=500 > 
 </p>
-
-# Lambda Forge
 
 Lambda Forge is a powerful and flexible open-source framework written in Python designed to streamline the creation, management, and deployment of AWS Lambda functions. Built with ease of use and scalability in mind, Lambda Forge empowers developers to focus on writing code while automating the tedious aspects of serverless application management.
 
