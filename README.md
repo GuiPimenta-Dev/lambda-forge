@@ -1,39 +1,40 @@
 
+![GitHub repo size](https://img.shields.io/github/repo-size/iuricode/README-template?style=for-the-badge)
+![GitHub language count](https://img.shields.io/github/languages/count/iuricode/README-template?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/iuricode/README-template?style=for-the-badge)
+![Bitbucket open issues](https://img.shields.io/bitbucket/issues/iuricode/README-template?style=for-the-badge)
+![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/iuricode/README-template?style=for-the-badge)
+
+<img src="https://public-lambda-forge-logo.s3.us-east-2.amazonaws.com/wNSN2U7n9NiAKEItWlsrcdJ0RWFyZOmbNvsc6Kht84WsWVxuBz5O.png" alt="Example image">
+
 # Lambda Forge
 
-Lambda Forge is a powerful and flexible open-source framework designed to streamline the creation, management, and deployment of AWS Lambda functions. Built with ease of use and scalability in mind, Lambda Forge empowers developers to focus on writing code while automating the tedious aspects of serverless application management.
+Lambda Forge is a powerful and flexible open-source framework written in Python designed to streamline the creation, management, and deployment of AWS Lambda functions. Built with ease of use and scalability in mind, Lambda Forge empowers developers to focus on writing code while automating the tedious aspects of serverless application management.
 
 Read the complete documentation at: [https://docs.lambda-forge.com/](https://docs.lambda-forge.com/)
 
-## Features
 
-- **Simplified Lambda Function Creation**: Easily create and deploy AWS Lambda functions with minimal configuration.
-- **Event Source Management**: Integrate with various AWS event sources such as DynamoDB streams, S3 events, and more.
-- **Permission Management**: Automatically handle permissions for your Lambda functions.
-- **Extensible Architecture**: Designed to be extended and customized to fit your specific needs.
+## 🚀 Installing Lambda Forge
 
-## Installation
-
-To install Lambda Forge, you can use pip:
+To install Lambda Forge, follow these steps:
 
 ```sh
-pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/
+pip install lambda-forge
 ```
 
-## Configuration
 
-Configure your AWS resources and environment settings through the context and configuration files.
+## 📫 Contributing to Lambda Forge
 
-## Contributing
+To contribute to Lambda Forge, follow these steps:
 
-Contributions are welcome! If you would like to contribute to Lambda Forge, please follow these steps:
+1. Fork this repository.
+2. Create a branch: `git checkout -b <branch_name>`.
+3. Make your changes and commit them: `git commit -m '<commit_message>'`
+4. Push to the original branch: `git push origin <project_name>/<location>`
+5. Create the pull request.
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes and commit them (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Create a new Pull Request.
+Alternatively, see the GitHub documentation on [how to create a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
 
-## License
+## 📝 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed. See the [LICENSE](LICENSE.md) file for more details.
