@@ -16,6 +16,6 @@ class Layers:
 
         self.requests_layer = _lambda.LayerVersion.from_layer_version_arn(
             scope,
-            id='RequestsLayer',
-            layer_version_arn='arn:aws:lambda:us-east-2:211125768252:layer:requests:2',
-         )
+            id="RequestsLayer",
+            layer_version_arn="arn:aws:lambda:us-east-2:211125768252:layer:requests:2",
+        )

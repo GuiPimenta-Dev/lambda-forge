@@ -1,7 +1,7 @@
-from infra.services.sns import SNS
 from infra.services.api_gateway import APIGateway
 from infra.services.aws_lambda import Lambda
 from infra.services.layers import Layers
+from infra.services.sns import SNS
 
 
 class Services:

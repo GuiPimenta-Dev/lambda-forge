@@ -146,7 +146,7 @@ class CodeBuildSteps:
         partial_build_spec={},
         requirements="requirements.txt",
     ):
-        
+
         return self.codebuild.create_step(
             name=name,
             commands=["cdk synth", *commands],

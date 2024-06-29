@@ -27,7 +27,7 @@ class LambdaStack(Stack):
 
         # # Private
         PrivateConfig(self.services)
-        
+
         # Custom
         CustomConfig(self.services)
 

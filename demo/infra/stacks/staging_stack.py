@@ -36,9 +36,7 @@ class StagingStack(cdk.Stack):
         coverage = steps.coverage()
         validate_docs = steps.validate_docs()
         validate_integration_tests = steps.validate_integration_tests()
-        validate_todo = steps.custom_step(
-            name="ValidateTodo", commands=["python infra/scripts/validate_todo.py"]
-        )
+        validate_todo = steps.custom_step(name="ValidateTodo", commands=["python infra/scripts/validate_todo.py"])
 
         # post
         redoc = steps.redoc()

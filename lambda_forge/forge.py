@@ -5,6 +5,7 @@ import re
 import signal
 import subprocess
 
+import boto3
 import click
 from InquirerPy import get_style, inquirer
 
@@ -613,6 +614,55 @@ def test(test_type):
 
     elif test_type == "all":
         subprocess.run(["pytest", "."], check=True)
+
+
+@forge.command()
+def describe():
+    """
+    List the outputs of the stacks on AWS CloudFormation
+    """
+
+    def get_cdk_stacks():
+        # Run the cdk list command to get the stack names
+        result = subprocess.run(["cdk", "list"], capture_output=True, text=True)
+        if result.returncode != 0:
+            print("Error running 'cdk list':", result.stderr)
+            return []
+
+        # Split the output into a list of stack names
+        stack_names = result.stdout.strip().split("\n")
+        stacks = []
+        for stack_name in stack_names:
+            if "(" in stack_name:
+                stacks.append(stack_name.split("(")[1].split(")")[0].strip())
+            else:
+                stacks.append(stack_name)
+        return stacks
+
+    # Create a CloudFormation client
+    client = boto3.client("cloudformation")
+
+    stack_names = get_cdk_stacks()
+
+    # Iterate over the provided stack names and print their outputs
+    for stack_name in stack_names:
+        try:
+            response = client.describe_stacks(StackName=stack_name)
+            stacks = response["Stacks"]
+
+            for stack in stacks:
+
+                if "Outputs" in stack:
+                    printer.print(f"Stack Name: {stack['StackName']}", "rose", 1)
+                    for output in stack["Outputs"]:
+                        output_key = output.get("OutputKey", "N/A")
+                        output_value = output.get("OutputValue", "N/A")
+                        printer.print(f"{output_key}: {output_value}", "gray")
+
+        except Exception:
+            pass
+
+    printer.br()
 
 
 if __name__ == "__main__":
