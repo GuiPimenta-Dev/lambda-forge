@@ -21,7 +21,7 @@ class REST:
             authorizer=authorizer,
         )
 
-    def create_authorizer(self, function, name, default=False):
+    def create_authorizer(self, authorizer, name, default=False):
         if self.__authorizers.get(name) is not None:
             raise Exception(f"Authorizer {name} already set")
 
@@ -31,17 +31,20 @@ class REST:
         if default:
             self.__default_authorizer = name
 
-        function.add_environment(
-            "API_ARN",
-            f"arn:aws:execute-api:{self.context.region}:{self.context.account}:{self.api.rest_api_id}/*",
-        )
-        authorizer = apigateway.RequestAuthorizer(
-            self.scope,
-            id=f"{name}-Authorizer",
-            handler=function,
-            identity_sources=[apigateway.IdentitySource.context("identity.sourceIp")],
-            results_cache_ttl=Duration.seconds(0),
-        )
+        try:
+            authorizer.add_environment(
+                "API_ARN",
+                f"arn:aws:execute-api:{self.context.region}:{self.context.account}:{self.api.rest_api_id}/*",
+            )
+            authorizer = apigateway.RequestAuthorizer(
+                self.scope,
+                id=f"{name}-Authorizer",
+                handler=authorizer,
+                identity_sources=[apigateway.IdentitySource.context("identity.sourceIp")],
+                results_cache_ttl=Duration.seconds(0),
+            )
+        except:
+            pass
 
         self.__authorizers[name] = authorizer
 

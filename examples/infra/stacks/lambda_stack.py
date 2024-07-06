@@ -1,9 +1,15 @@
-from authorizers.jwt.config import JwtAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
+
+from authorizers.cognito.config import CognitoAuthorizerConfig
+from authorizers.jwt.config import JwtAuthorizerConfig
 from docs.config import DocsConfig
 from functions.auth.signin.config import SigninConfig
 from functions.auth.signup.config import SignupConfig
+from functions.blog.callback.config import CallbackConfig
+from functions.blog.comment_post.config import CommentPostConfig
+from functions.blog.create_post.config import CreatePostConfig
+from functions.blog.list_posts.config import ListPostsConfig
 from functions.chat.connect.config import ConnectConfig
 from functions.chat.send_connection_id.config import SendConnectionIdConfig
 from functions.chat.send_message.config import SendMessageConfig
@@ -25,6 +31,7 @@ class LambdaStack(Stack):
         self.services = Services(self, context)
 
         # Authorizers
+        CognitoAuthorizerConfig(self, self.services)
         JwtAuthorizerConfig(self.services)
 
         # Docs
@@ -53,3 +60,9 @@ class LambdaStack(Stack):
         SendMessageConfig(self.services, context)
         SendConnectionIdConfig(self.services, context)
         ConnectConfig(self.services)
+
+        # Blog
+        CallbackConfig(self.services)
+        CommentPostConfig(self.services)
+        ListPostsConfig(self.services)
+        CreatePostConfig(self.services)

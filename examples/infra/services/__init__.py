@@ -1,5 +1,6 @@
 from infra.services.api_gateway import APIGateway
 from infra.services.aws_lambda import Lambda
+from infra.services.cognito import Cognito
 from infra.services.dynamodb import DynamoDB
 from infra.services.kms import KMS
 from infra.services.layers import Layers
@@ -18,3 +19,4 @@ class Services:
         self.layers = Layers(scope)
         self.kms = KMS(scope, context)
         self.websockets = Websockets(scope, context)
+        self.cognito = Cognito(scope, context)

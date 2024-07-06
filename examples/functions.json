@@ -188,5 +188,65 @@
             }
         ],
         "invocations": []
+    },
+    {
+        "name": "Callback",
+        "path": "./functions/blog/callback",
+        "description": "SSO callback",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/callback",
+                "method": "GET",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "CommentPost",
+        "path": "./functions/blog/comment_post",
+        "description": "Comment on a blog post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/comments/{post_id}",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "ListPosts",
+        "path": "./functions/blog/list_posts",
+        "description": "List posts paginated",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts",
+                "method": "GET",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "CreatePost",
+        "path": "./functions/blog/create_post",
+        "description": "Create a new post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": []
     }
 ]

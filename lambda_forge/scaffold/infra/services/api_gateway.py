@@ -28,7 +28,7 @@ class APIGateway:
         self.rest.create_endpoint(method=method, path=path, function=function, public=public, authorizer=authorizer)
 
     def create_authorizer(self, function, name, default=False):
-        self.rest.create_authorizer(function=function, name=name, default=default)
+        self.rest.create_authorizer(authorizer=function, name=name, default=default)
 
     def create_docs(self, endpoint, artifact, authorizer=None, public=False, stages=None):
         self.rest.create_docs(endpoint=endpoint, artifact=artifact, authorizer=authorizer, public=public, stages=stages)

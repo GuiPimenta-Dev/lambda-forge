@@ -438,9 +438,9 @@ AVAILABLE_TYPES = ["server", "logs", "trigger"]
 @forge.command()
 @click.argument("types", type=click.Choice(AVAILABLE_TYPES))
 @click.option("-l", "--log-file", help="Name of Log file", default="live.log")
-@click.option("-i", "--input-file", help="Name of the input file", default=None)
-@click.option("-o", "--output-file", help="Name of the output file", default=None)
-def live(types, log_file, input_file, output_file):
+@click.option("-i", "--include", help="Include files to watch", default=None)
+@click.option("-e", "--exclude", help="Exclude files to watch", default=None)
+def live(types, log_file, include, exclude):
     """
     Starts a live development environment for the specified Lambda function.
 
@@ -465,7 +465,9 @@ def live(types, log_file, input_file, output_file):
 
     if types == "server":
         try:
-            server_cli.run_live(log_file, input_file, output_file)
+            include = include.split(",") if include else None
+            exclude = exclude.split(",") if exclude else None
+            server_cli.run_live(log_file, include, exclude)
         except:
             handle_exit(None, None)
 
@@ -562,7 +564,9 @@ def deploy(stack, all):
     help="Name of the output file",
     default="diagram.png",
 )
-def diagram(output_file):
+@click.option("-i", "--include", help="Comma-separated files to watch", default=None)
+@click.option("-e", "--exclude", help="Comma-separated files to not watch", default=None)
+def diagram(output_file, include, exclude):
     """
     Create a diagram of the project in png format
 
@@ -581,6 +585,12 @@ def diagram(output_file):
         exit()
 
     functions = json.load(open("functions.json", "r"))
+    if exclude:
+        functions = [function for function in functions if function["name"] not in exclude]
+    
+    if include:
+        functions = [function for function in functions if function["name"] in include]
+        
     printer.change_spinner_legend("Creating Diagram")
 
     if "." in output_file:
@@ -617,7 +627,7 @@ def test(test_type):
 
 
 @forge.command()
-def describe():
+def output():
     """
     List the outputs of the stacks on AWS CloudFormation
     """

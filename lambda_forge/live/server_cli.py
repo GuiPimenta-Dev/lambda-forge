@@ -49,7 +49,7 @@ def create_event_bridge_trigger(region, account, function_arn, bus_name):
     return trigger
 
 
-def run_live(log_file, input_file, output_file):
+def run_live(log_file, include, exclude):
     printer.show_banner("Live Server")
 
     data = json.load(open("cdk.json", "r"))
@@ -82,6 +82,12 @@ def run_live(log_file, input_file, output_file):
 
     functions = json.load(open("functions.json", "r"))
 
+    if exclude:
+        functions = [function for function in functions if function["name"] not in exclude]
+    
+    if include:
+        functions = [function for function in functions if function["name"] in include]
+        
     live = Live(printer, log_file)
 
     style = get_style(
@@ -149,7 +155,7 @@ def run_live(log_file, input_file, output_file):
         live.intro()
 
         printer.br()
-        options = ["Synth"]
+        options = ["Synth", "Exit"]
 
         choice = inquirer.select(
             message="Select an option: ",
@@ -175,3 +181,15 @@ def run_live(log_file, input_file, output_file):
                 printer.stop_spinner()
 
             functions = json.load(open("functions.json", "r"))
+            if exclude:
+                functions = [function for function in functions if function["name"] not in exclude]
+    
+            if include:
+                functions = [function for function in functions if function["name"] in include]
+        
+        if choice == "Exit":
+            if platform.system() == "Windows":
+                subprocess.run(["taskkill", "/F", "/IM", "live_server.py"], check=True)
+            else:
+                subprocess.run(["pkill", "-f", "live_server.py"], check=True)
+            exit()
