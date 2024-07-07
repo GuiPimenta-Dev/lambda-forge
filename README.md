@@ -12,7 +12,7 @@ Lambda Forge is a versatile Python framework that simplifies AWS Lambda function
 
 <div align="center">
 
-Documentation: [https://docs.lambda-forge.com/](https://docs.lambda-forge.com/)
+Docs: [https://docs.lambda-forge.com/](https://docs.lambda-forge.com/)
 </div>
 
 ## Features
