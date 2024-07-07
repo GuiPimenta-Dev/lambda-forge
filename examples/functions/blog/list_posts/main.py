@@ -64,11 +64,10 @@ def lambda_handler(event, context):
             "body": json.dumps(body),
             "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"},
         }
+
     except Exception as e:
         return {
             "statusCode": 500,
             "body": json.dumps({"message": str(e)}),
             "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"},
         }
-
-

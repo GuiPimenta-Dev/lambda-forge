@@ -587,10 +587,10 @@ def diagram(output_file, include, exclude):
     functions = json.load(open("functions.json", "r"))
     if exclude:
         functions = [function for function in functions if function["name"] not in exclude]
-    
+
     if include:
         functions = [function for function in functions if function["name"] in include]
-        
+
     printer.change_spinner_legend("Creating Diagram")
 
     if "." in output_file:

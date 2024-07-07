@@ -84,10 +84,10 @@ def run_live(log_file, include, exclude):
 
     if exclude:
         functions = [function for function in functions if function["name"] not in exclude]
-    
+
     if include:
         functions = [function for function in functions if function["name"] in include]
-        
+
     live = Live(printer, log_file)
 
     style = get_style(
@@ -183,10 +183,10 @@ def run_live(log_file, include, exclude):
             functions = json.load(open("functions.json", "r"))
             if exclude:
                 functions = [function for function in functions if function["name"] not in exclude]
-    
+
             if include:
                 functions = [function for function in functions if function["name"] in include]
-        
+
         if choice == "Exit":
             if platform.system() == "Windows":
                 subprocess.run(["taskkill", "/F", "/IM", "live_server.py"], check=True)
