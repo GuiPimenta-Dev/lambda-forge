@@ -20,6 +20,8 @@ def lambda_handler(event, context):
     POSTS_TABLE_NAME = os.environ.get("POSTS_TABLE_NAME", "Dev-Blog-Posts")
     posts_table = dynamodb.Table(POSTS_TABLE_NAME)
 
+    email = event["requestContext"]["authorizer"]["email"]
+
     LIMIT = 10
     query = event.get("queryStringParameters", {})
     last_evaluated_key = None
@@ -42,6 +44,20 @@ def lambda_handler(event, context):
         if last_evaluated_key:
             last_evaluated_key = last_evaluated_key["PK"]
 
+        items = [
+            {
+                "post_id": item["PK"],
+                "email": item["email"],
+                "title": item["title"],
+                "content": item["content"],
+                "created_at": item["created_at"],
+                "comments": item["comments"],
+                "likes": len(item["likes"]),
+                "liked": email in item["likes"],
+            }
+            for item in items
+        ]
+
         body = {"items": items, "last_evaluated_key": last_evaluated_key}
 
         return {
@@ -57,4 +73,3 @@ def lambda_handler(event, context):
         }
 
 
-lambda_handler({}, {})
