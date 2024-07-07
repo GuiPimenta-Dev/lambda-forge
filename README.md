@@ -152,7 +152,7 @@ forge live logs
 Executing this command saves the logs and starts a live tailing process, enabling you to monitor them in real time. You can run this command in a separate terminal while the live server is running.
 
 <p align="center">
-<img src="https://i.ibb.co/GWHGFL4/live-logs.gif" width=350> 
+<img src="https://i.ibb.co/GWHGFL4/live-logs.gif" width=450> 
 </p>
 
 ### Live Trigger
