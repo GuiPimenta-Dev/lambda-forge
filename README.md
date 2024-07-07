@@ -162,7 +162,7 @@ To simplify the testing of Lambda function triggers, Lambda Forge offers a strea
 To trigger a service, use the following command:
 
 ```shell
-forge live logs
+forge live trigger
 ```
 
 Executing this command initiates a session in your terminal, enabling you to publish messages directly to AWS resources such as SQS, SNS, or upload files to an S3 bucket.
