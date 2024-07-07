@@ -3,19 +3,17 @@
 <div align="center">
 
 # LAMBDA FORGE
-
-
 <img height="350" alt="Lambda Forge's Logo" src="https://docs.lambda-forge.com/assets/logo.png">
-
-
 </div>
 
 <br>
 
-
 Lambda Forge is a versatile Python framework that simplifies AWS Lambda function creation and deployment. It automates serverless management, letting developers focus on coding.
 
+<div align="center">
+
 Documentation: [https://docs.lambda-forge.com/](https://docs.lambda-forge.com/)
+</div>
 
 ## Features
 
