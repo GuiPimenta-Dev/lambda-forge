@@ -47,7 +47,6 @@ def lambda_handler(event, context):
         items = [
             {
                 "post_id": item["PK"],
-                "email": item["email"],
                 "title": item["title"],
                 "content": item["content"],
                 "created_at": item["created_at"],
