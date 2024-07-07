@@ -198,6 +198,21 @@
         "invocations": []
     },
     {
+        "name": "GetMe",
+        "path": "./functions/blog/get_me",
+        "description": "Get the current user",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/blog/me",
+                "method": "GET",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
         "name": "DeletePost",
         "path": "./functions/blog/delete_post",
         "description": "Delete a post",

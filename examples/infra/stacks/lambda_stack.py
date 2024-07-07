@@ -1,7 +1,8 @@
-from authorizers.cognito.config import CognitoAuthorizerConfig
-from authorizers.jwt.config import JwtAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
+
+from authorizers.cognito.config import CognitoAuthorizerConfig
+from authorizers.jwt.config import JwtAuthorizerConfig
 from docs.config import DocsConfig
 from functions.auth.hello.config import HelloConfig
 from functions.auth.signin.config import SigninConfig
@@ -10,6 +11,7 @@ from functions.blog.comment_post.config import CommentPostConfig
 from functions.blog.create_post.config import CreatePostConfig
 from functions.blog.delete_comment.config import DeleteCommentConfig
 from functions.blog.delete_post.config import DeletePostConfig
+from functions.blog.get_me.config import GetMeConfig
 from functions.blog.like_post.config import LikePostConfig
 from functions.blog.list_posts.config import ListPostsConfig
 from functions.blog.update_post.config import UpdatePostConfig
@@ -62,6 +64,7 @@ class LambdaStack(Stack):
         ConnectConfig(self.services)
 
         # Blog
+        GetMeConfig(self.services)
         DeletePostConfig(self.services)
         UpdatePostConfig(self.services)
         LikePostConfig(self.services)
