@@ -15,3 +15,4 @@ class DeleteCommentConfig:
         services.api_gateway.create_endpoint("DELETE", "/posts/{post_id}/comments", function, authorizer="cognito")
 
         services.dynamodb.grant_write("posts_table", function)
+        services.dynamodb.posts_table.grant_read_data(function)

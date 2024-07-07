@@ -15,3 +15,4 @@ class UpdatePostConfig:
         services.api_gateway.create_endpoint("PUT", "/posts/{post_id}", function, authorizer="cognito")
 
         services.dynamodb.grant_write("posts_table", function)
+        services.dynamodb.posts_table.grant_read_data(function)
