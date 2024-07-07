@@ -5,7 +5,7 @@
 # LAMBDA FORGE
 
 
-<img height="400" alt="Poku's Logo" src="https://docs.lambda-forge.com/assets/logo.png">
+<img height="350" alt="Lambda Forge Logo" src="https://docs.lambda-forge.com/assets/logo.png">
 
 
 </div>
