@@ -114,6 +114,21 @@
         "invocations": []
     },
     {
+        "name": "Hello",
+        "path": "./functions/auth/hello",
+        "description": "A private function",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/hello",
+                "method": "GET",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
         "name": "Signin",
         "path": "./functions/auth/signin",
         "description": "Authenticate user login by verifying email and password against stored credentials",
@@ -147,21 +162,6 @@
                 "resource": "auth_table"
             }
         ]
-    },
-    {
-        "name": "Hello",
-        "path": "./functions/hello",
-        "description": "A private function",
-        "timeout": 60,
-        "triggers": [
-            {
-                "service": "api_gateway",
-                "trigger": "/hello",
-                "method": "GET",
-                "public": false
-            }
-        ],
-        "invocations": []
     },
     {
         "name": "SendMessage",

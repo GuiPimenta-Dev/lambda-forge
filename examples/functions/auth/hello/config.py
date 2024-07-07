@@ -6,8 +6,9 @@ class HelloConfig:
 
         function = services.aws_lambda.create_function(
             name="Hello",
-            path="./functions/hello",
+            path="./functions/auth",
             description="A private function",
+            directory="hello",
         )
 
         services.api_gateway.create_endpoint("GET", "/hello", function, authorizer="jwt")

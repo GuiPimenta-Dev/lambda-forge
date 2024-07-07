@@ -1,10 +1,17 @@
 
 
-# Lambda Forge
+<div align="center">
 
-<p align="center">
-<img src="https://public-lambda-forge-logo.s3.us-east-2.amazonaws.com/wNSN2U7n9NiAKEItWlsrcdJ0RWFyZOmbNvsc6Kht84WsWVxuBz5O.png" width=500 > 
-</p>
+# LAMBDA FORGE
+
+
+<img height="400" alt="Poku's Logo" src="https://docs.lambda-forge.com/assets/logo.png">
+
+
+</div>
+
+<br>
+
 
 Lambda Forge is a powerful and flexible open-source framework written in Python designed to streamline the creation, management, and deployment of AWS Lambda functions. Built with ease of use and scalability in mind, Lambda Forge empowers developers to focus on writing code while automating the tedious aspects of serverless application management.
 
@@ -134,6 +141,36 @@ Lambda Forge creates real endpoints on AWS that are easily accessible through th
 <img src="https://i.ibb.co/6sRcyxF/live-server.gif" width=500> 
 </p>
 
+### Live Logs
+
+During live development sessions, all events are automatically logged. To view these logs, use the following command:
+
+```shell
+forge live logs
+```
+
+Executing this command saves the logs and starts a live tailing process, enabling you to monitor them in real time. You can run this command in a separate terminal while the live server is running.
+
+<p align="center">
+<img src="https://i.ibb.co/GWHGFL4/live-logs.gif" width=500> 
+</p>
+
+### Live Trigger
+
+To simplify the testing of Lambda function triggers, Lambda Forge offers a streamlined solution. This feature allows developers to publish messages directly to AWS resources, making the testing process easy and simple.
+
+To trigger a service, use the following command:
+
+```shell
+forge live logs
+```
+
+Executing this command initiates a session in your terminal, enabling you to publish messages directly to AWS resources such as SQS, SNS, or upload files to an S3 bucket.
+
+<p align="center">
+<img src="https://i.ibb.co/rxvpNvq/live-trigger.png" width=500> 
+</p>
+
 ### Multi-Stage Environments with Automatic CI/CD Pipelines
 Lambda Forge provides multi-stage environments with automatic CI/CD pipelines on CodePipeline for each environment, ensuring complete isolation from each other.
 
@@ -183,7 +220,7 @@ forge diagram
 ```
 
 <p align="center">
-<img src="https://i.ibb.co/McYdKPD/diagram.png" width=400> 
+<img src="https://i.ibb.co/McYdKPD/diagram.png" width=350> 
 </p>
 
 

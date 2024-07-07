@@ -3,6 +3,7 @@ from authorizers.jwt.config import JwtAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
 from docs.config import DocsConfig
+from functions.auth.hello.config import HelloConfig
 from functions.auth.signin.config import SigninConfig
 from functions.auth.signup.config import SignupConfig
 from functions.blog.comment_post.config import CommentPostConfig
@@ -17,7 +18,6 @@ from functions.chat.send_connection_id.config import SendConnectionIdConfig
 from functions.chat.send_message.config import SendMessageConfig
 from functions.guess_the_number.create_game.config import CreateGameConfig
 from functions.guess_the_number.make_guess.config import MakeGuessConfig
-from functions.hello.config import HelloConfig
 from functions.images.mailer.config import MailerConfig
 from functions.images.qrcode.config import QrcodeConfig
 from functions.urls.redirect.config import RedirectConfig
@@ -52,11 +52,9 @@ class LambdaStack(Stack):
         QrcodeConfig(self.services)
 
         # Auth
+        HelloConfig(self.services)
         SigninConfig(self.services)
         SignupConfig(self.services)
-
-        # Hello
-        HelloConfig(self.services)
 
         # Chat
         SendMessageConfig(self.services, context)
