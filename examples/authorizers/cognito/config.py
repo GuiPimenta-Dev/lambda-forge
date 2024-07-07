@@ -1,13 +1,14 @@
-
-from aws_cdk import aws_apigateway as apigateway
+from infra.services import Services
 
 
 class CognitoAuthorizerConfig:
-    def __init__(self, scope, services) -> None:
+    def __init__(self, services: Services) -> None:
 
-        authorizer = apigateway.CognitoUserPoolsAuthorizer(
-            scope, 'CognitoAuthorizer',
-            cognito_user_pools=[services.cognito.blog_user_pool]
+        function = services.aws_lambda.create_function(
+            name="CognitoSSOAuthorizer",
+            path="./authorizers/cognito",
+            description="A cognito authorizer for private lambda functions",
+            layers=[services.layers.pyjwt_layer],
         )
 
-        services.api_gateway.create_authorizer(authorizer, name="cognito", default=False)
+        services.api_gateway.create_authorizer(function, name="cognito", default=False)

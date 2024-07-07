@@ -14,6 +14,7 @@ class Input:
 class Output:
     message: str
 
+
 def lambda_handler(event, context):
     dynamodb = boto3.resource("dynamodb")
     POSTS_TABLE_NAME = os.environ.get("POSTS_TABLE_NAME", "Dev-Blog-Posts")
@@ -54,3 +55,6 @@ def lambda_handler(event, context):
             "body": json.dumps({"message": str(e)}),
             "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"},
         }
+
+
+lambda_handler({}, {})

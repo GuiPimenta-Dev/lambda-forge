@@ -1,11 +1,14 @@
 import base64
 import json
 import os
-import uuid
 from dataclasses import dataclass
-from datetime import datetime
 
 import boto3
+
+
+@dataclass
+class Path:
+    post_id: str
 
 
 @dataclass
@@ -20,15 +23,15 @@ class Output:
 
 def lambda_handler(event, context):
 
-    dynamodb = boto3.resource("dynamodb")
-
     POSTS_TABLE_NAME = os.environ.get("POSTS_TABLE_NAME", "Dev-Blog-Posts")
-
+    dynamodb = boto3.resource("dynamodb")
     posts_table = dynamodb.Table(POSTS_TABLE_NAME)
 
-    post_id = str(uuid.uuid4())
-    email = event["requestContext"]["authorizer"]["email"]
+    post_id = event.get("pathParameters", {}).get("post_id")
 
+    post = posts_table.get_item(Key={"PK": post_id}).get("Item")
+
+    # update a post feature
     body = base64.b64decode(event["body"]).decode("utf-8")
 
     # Parse the body to extract file content and file name
@@ -47,19 +50,10 @@ def lambda_handler(event, context):
     if not title or not file_content:
         raise ValueError("File name or content not found in the request")
 
-    created_at = datetime.now().isoformat()
+    post["title"] = title
+    post["content"] = file_content
 
-    posts_table.put_item(
-        Item={
-            "PK": post_id,
-            "email": email,
-            "title": title,
-            "content": file_content,
-            "comments": [],
-            "likes": [],
-            "created_at": created_at,
-        }
-    )
+    posts_table.put_item(Item={**post})
 
     return {
         "statusCode": 201,

@@ -54,7 +54,8 @@
           "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Guess-The-Number",
           "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-URLs",
           "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
-          "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Auth"
+          "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Auth",
+          "blog_bucket": "arn:aws:s3:::lambda-forge-blog-bucket"
       }
     },
     "staging": {
@@ -64,7 +65,8 @@
             "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-Guess-The-Number",
             "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-URLs",
             "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
-            "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-Auth"
+            "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Staging-Auth",
+            "blog_bucket": "arn:aws:s3:::lambda-forge-blog-bucket"
         }
     },
     "prod": {
@@ -74,7 +76,8 @@
             "numbers_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-Guess-The-Number",
             "urls_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-URLs",
             "images_bucket": "arn:aws:s3:::lambda-forge-examples-image-processing",
-            "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-Auth"
+            "auth_table": "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-Auth",
+            "blog_bucket": "arn:aws:s3:::lambda-forge-blog-bucket"
         }
     }
   }

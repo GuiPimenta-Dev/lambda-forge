@@ -31,6 +31,12 @@ class DynamoDB:
             "arn:aws:dynamodb:us-east-2:211125768252:table/Books",
         )
 
+        self.posts_table = dynamodb.Table.from_table_arn(
+            scope,
+            "PostsTable",
+            "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Blog-Posts",
+        )
+
     @trigger(service="dynamodb", trigger="table", function="function")
     def create_trigger(self, table: str, function: lambda_.Function) -> None:
         table_instance = getattr(self, table)

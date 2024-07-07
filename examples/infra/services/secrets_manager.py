@@ -19,5 +19,5 @@ class SecretsManager:
         self.google_sso_secret = sm.Secret.from_secret_complete_arn(
             scope,
             id="GoogleSSOSecret",
-            secret_complete_arn="arn:aws:secretsmanager:us-east-2:211125768252:secret:google-sso-cVVYlk"
+            secret_complete_arn="arn:aws:secretsmanager:us-east-2:211125768252:secret:google-sso-cVVYlk",
         )

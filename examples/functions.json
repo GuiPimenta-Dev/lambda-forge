@@ -1,5 +1,13 @@
 [
     {
+        "name": "CognitoSSOAuthorizer",
+        "path": "./authorizers/cognito",
+        "description": "A cognito authorizer for private lambda functions",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
         "name": "JwtAuthorizer",
         "path": "./authorizers/jwt",
         "description": "A jwt authorizer for private lambda functions",
@@ -190,19 +198,84 @@
         "invocations": []
     },
     {
-        "name": "Callback",
-        "path": "./functions/blog/callback",
-        "description": "SSO callback",
+        "name": "DeletePost",
+        "path": "./functions/blog/delete_post",
+        "description": "Delete a post",
         "timeout": 60,
         "triggers": [
             {
                 "service": "api_gateway",
-                "trigger": "/callback",
-                "method": "GET",
+                "trigger": "/posts/{post_id}",
+                "method": "DELETE",
                 "public": false
             }
         ],
-        "invocations": []
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    },
+    {
+        "name": "UpdatePost",
+        "path": "./functions/blog/update_post",
+        "description": "Update a post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts/{post_id}",
+                "method": "PUT",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    },
+    {
+        "name": "LikePost",
+        "path": "./functions/blog/like_post",
+        "description": "Like a post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts/{post_id}/like",
+                "method": "POST",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    },
+    {
+        "name": "DeleteComment",
+        "path": "./functions/blog/delete_comment",
+        "description": "Delete a comment",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts/{post_id}/comments",
+                "method": "DELETE",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
     },
     {
         "name": "CommentPost",
@@ -212,12 +285,17 @@
         "triggers": [
             {
                 "service": "api_gateway",
-                "trigger": "/comments/{post_id}",
+                "trigger": "/posts/{post_id}/comments",
                 "method": "POST",
-                "public": true
+                "public": false
             }
         ],
-        "invocations": []
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
     },
     {
         "name": "ListPosts",
@@ -229,7 +307,7 @@
                 "service": "api_gateway",
                 "trigger": "/posts",
                 "method": "GET",
-                "public": true
+                "public": false
             }
         ],
         "invocations": []
@@ -244,9 +322,14 @@
                 "service": "api_gateway",
                 "trigger": "/posts",
                 "method": "POST",
-                "public": true
+                "public": false
             }
         ],
-        "invocations": []
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
     }
 ]
