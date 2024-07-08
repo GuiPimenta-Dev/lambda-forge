@@ -1,4 +1,5 @@
 site_name: Lambda Forge
+docs_dir: docs/
 
 theme:
   name: material
