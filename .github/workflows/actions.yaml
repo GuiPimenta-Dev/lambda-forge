@@ -54,4 +54,4 @@ jobs:
         run: | 
           git config --global user.email "guialvespimenta27@gmail.com"
           git config --global user.name "Guilherme Alves Pimenta"
-          mkdocs gh-deploy --config-file docs/mkdocs.yml --force
+          mkdocs gh-deploy --remote-name origin --remote-branch gh-pages --force --config-file docs/mkdocs.yml
