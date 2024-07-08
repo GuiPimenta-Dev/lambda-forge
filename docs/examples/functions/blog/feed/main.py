@@ -21,6 +21,11 @@ def lambda_handler(event, context):
     posts_table = dynamodb.Table(POSTS_TABLE_NAME)
 
     email = event["requestContext"]["authorizer"]["email"]
+    first_name = event["requestContext"]["authorizer"]["first_name"]
+    last_name = event["requestContext"]["authorizer"]["last_name"]
+    picture = event["requestContext"]["authorizer"]["picture"]
+
+    user = {"email": email, "first_name": first_name, "last_name": last_name, "picture": picture}
 
     LIMIT = 10
     query = event.get("queryStringParameters", {})
@@ -38,13 +43,13 @@ def lambda_handler(event, context):
     try:
         response = posts_table.scan(**scan_params)
 
-        items = sorted(response.get("Items", []), key=lambda x: x["created_at"], reverse=True)[:LIMIT]
+        feed = sorted(response.get("Items", []), key=lambda x: x["created_at"], reverse=True)[:LIMIT]
 
         last_evaluated_key = response.get("LastEvaluatedKey", None)
         if last_evaluated_key:
             last_evaluated_key = last_evaluated_key["PK"]
 
-        items = [
+        feed = [
             {
                 "post_id": item["PK"],
                 "title": item["title"],
@@ -54,10 +59,10 @@ def lambda_handler(event, context):
                 "likes": len(item["likes"]),
                 "liked": email in item["likes"],
             }
-            for item in items
+            for item in feed
         ]
 
-        body = {"items": items, "last_evaluated_key": last_evaluated_key}
+        body = {"user": user, "feed": feed, "last_evaluated_key": last_evaluated_key}
 
         return {
             "statusCode": 200,

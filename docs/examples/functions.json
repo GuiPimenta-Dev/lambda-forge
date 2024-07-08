@@ -198,21 +198,6 @@
         "invocations": []
     },
     {
-        "name": "GetMe",
-        "path": "./functions/blog/get_me",
-        "description": "Get the current user",
-        "timeout": 60,
-        "triggers": [
-            {
-                "service": "api_gateway",
-                "trigger": "/blog/me",
-                "method": "GET",
-                "public": false
-            }
-        ],
-        "invocations": []
-    },
-    {
         "name": "DeletePost",
         "path": "./functions/blog/delete_post",
         "description": "Delete a post",
@@ -313,14 +298,14 @@
         ]
     },
     {
-        "name": "ListPosts",
-        "path": "./functions/blog/list_posts",
-        "description": "List posts paginated",
+        "name": "Feed",
+        "path": "./functions/blog/feed",
+        "description": "Get feed of posts",
         "timeout": 60,
         "triggers": [
             {
                 "service": "api_gateway",
-                "trigger": "/posts",
+                "trigger": "/feed",
                 "method": "GET",
                 "public": false
             }
