@@ -51,7 +51,7 @@ jobs:
       - name: Deploy to GitHub Pages
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
-        run: 
+        run: | 
           git config --global user.email "guialvespimenta27@gmail.com"
           git config --global user.name "Guilherme Alves Pimenta"
           mkdocs gh-deploy --config-file docs/mkdocs.yml --force
