@@ -1,6 +1,5 @@
 from aws_cdk import Duration, aws_lambda_event_sources
 from aws_cdk import aws_sqs as sqs
-
 from lambda_forge.trackers import invoke, trigger
 
 
@@ -13,7 +12,7 @@ class SQS:
             queue_name=f"{context.stage.lower()}-insights-downloads",
             visibility_timeout=Duration.minutes(15),
         )
-        
+
         self.create_chart_queue = sqs.Queue(
             scope,
             "CreateChartQueue",

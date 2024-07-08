@@ -4,32 +4,7 @@ from datetime import datetime, timedelta
 
 import boto3
 
-def query_all_items(table, partition_key, interval):
-    items = []
-    last_evaluated_key = None
-    while True:
-        if last_evaluated_key:
-            response = table.query(
-                KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(f"{partition_key}#INTERVAL={interval}"),
-                ProjectionExpression="SK, rating, messages, chat_summary, reason",
-                ExclusiveStartKey=last_evaluated_key
-            )
-        else:
-            response = table.query(
-                KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(f"{partition_key}#INTERVAL={interval}"),
-                ProjectionExpression="SK, rating, messages, chat_summary, reason"
-            )
-
-        items.extend(response["Items"])
-
-        if "LastEvaluatedKey" not in response:
-            break
-
-        last_evaluated_key = response["LastEvaluatedKey"]
-    
-    filtered_data = [item for item in items if item['rating'] != '0']
-
-    return filtered_data
+from . import utils
 
 
 def lambda_handler(event, context):
@@ -38,17 +13,15 @@ def lambda_handler(event, context):
     interval = int(event["queryStringParameters"].get("interval", 10))
 
     dynamodb = boto3.resource("dynamodb")
-    TRANSCRIPTIONS_TABLE_NAME = os.environ.get(
-        "TRANSCRIPTIONS_TABLE_NAME", "Prod-Live-Insights-Live-Transcriptions"
-    )
+    TRANSCRIPTIONS_TABLE_NAME = os.environ.get("TRANSCRIPTIONS_TABLE_NAME", "Prod-Live-Insights-Live-Transcriptions")
     transcriptions_table = dynamodb.Table(TRANSCRIPTIONS_TABLE_NAME)
 
-    data = query_all_items(transcriptions_table, video_id, interval)
-    
+    data = utils.query_all_items(transcriptions_table, video_id, interval)
+
     for item in data:
-         hour = datetime.strptime(item.pop("SK"), "%H:%M")
-         hour = (hour - timedelta(hours=3)).strftime("%H:%M")
-         item["hour"] = hour
+        hour = datetime.strptime(item.pop("SK"), "%H:%M")
+        hour = (hour - timedelta(hours=3)).strftime("%H:%M")
+        item["hour"] = hour
 
     # HTML content with embedded script to dynamically generate the chart
     html_content = f"""
@@ -134,7 +107,6 @@ def lambda_handler(event, context):
     </body>
     </html>
     """
-
 
     return {
         "statusCode": 200,

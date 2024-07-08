@@ -27,8 +27,6 @@ def lambda_handler(event, context):
     min_messages = payload["min_messages"]
     author_summary = payload["prompt"]
 
-    print(f"Processing video {video_id} with interval {interval} and index {index}")
-
     TRANSCRIPTIONS_TABLE_NAME = os.environ.get("TRANSCRIPTIONS_TABLE_NAME", "Dev-Result")
 
     transcriptions_table = dynamodb.Table(TRANSCRIPTIONS_TABLE_NAME)

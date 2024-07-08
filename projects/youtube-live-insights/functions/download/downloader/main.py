@@ -48,8 +48,6 @@ def lambda_handler(event, context):
         }
     )
 
-    print(f"Publishing video {video_id} to SNS topic {VIDEOS_TOPIC_ARN}")
-
     sns_client = boto3.client("sns")
     sns_client.publish(
         TopicArn=VIDEOS_TOPIC_ARN,
