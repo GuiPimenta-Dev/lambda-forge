@@ -30,3 +30,30 @@ jobs:
 
       - name: Push Docker image to ECR
         run: docker push public.ecr.aws/x8r4y7j7/lambda-forge:latest
+  
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mkdocs
+          pip install mkdocs-material  # If you're using the Material theme
+
+      - name: Deploy to GitHub Pages
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/GuiPimenta-Dev/lambda-forge.git
+          mkdocs gh-deploy --config-file docs/mkdocs.yml --force
