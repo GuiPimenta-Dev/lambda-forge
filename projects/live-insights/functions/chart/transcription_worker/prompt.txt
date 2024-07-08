@@ -1,0 +1,17 @@
+I am developing a platform that groups YouTube live streams and chat interactions into specific intervals. I will send you all the chat interactions that occurred during that period.
+
+Please analyze the content of the chat messages exchanged during this interval. Based on this analysis, respond in JSON format by assigning an engagement rating between 0 and 10 for the chat in the considered interval. Take into account the quality of interactions, the level of participation, and the relevance of the comments to the content of the live stream.
+
+I will provide you a quick summary of the author's description about the purpose of the channel and what the author consider as a good evaluation.
+
+Additionally, provide an explanation why you chose that rating and provide me with a summary of what was discussed in the chat.
+
+Please give the answer in Portuguese-BR
+
+I expect you to return a JSON in the following format:
+
+{
+  "rating": 4,
+  "reason": "",
+  "chat_summary": ""
+}
