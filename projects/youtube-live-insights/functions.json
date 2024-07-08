@@ -75,9 +75,9 @@
         "invocations": []
     },
     {
-        "name": "TranscriptionWorker",
+        "name": "ChartWorker",
         "path": "./functions/chart/transcription_worker",
-        "description": "Parse the transcription",
+        "description": "Worker to create the chart from the chat messages in background",
         "timeout": 60,
         "triggers": [
             {

@@ -1,13 +1,13 @@
 from infra.services import Services
 
 
-class TranscriptionWorkerConfig:
+class ChartWorkerConfig:
     def __init__(self, services: Services) -> None:
 
         function = services.aws_lambda.create_function(
-            name="TranscriptionWorker",
+            name="ChartWorker",
             path="./functions/chart",
-            description="Parse the transcription",
+            description="Worker to create the chart from the chat messages in background",
             directory="transcription_worker",
             layers=[
                 services.layers.sm_utils_layer,
