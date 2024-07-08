@@ -1,8 +1,7 @@
+from authorizers.jwt.config import JwtAuthorizerConfig
+from authorizers.sso.config import SSOAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
-
-from authorizers.cognito.config import CognitoAuthorizerConfig
-from authorizers.jwt.config import JwtAuthorizerConfig
 from docs.config import DocsConfig
 from functions.auth.hello.config import HelloConfig
 from functions.auth.signin.config import SigninConfig
@@ -35,7 +34,7 @@ class LambdaStack(Stack):
         self.services = Services(self, context)
 
         # Authorizers
-        CognitoAuthorizerConfig(self.services)
+        SSOAuthorizerConfig(self.services)
         JwtAuthorizerConfig(self.services)
 
         # Docs

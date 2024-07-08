@@ -12,6 +12,6 @@ class ListPostsConfig:
             environment={"POSTS_TABLE_NAME": services.dynamodb.posts_table.table_name},
         )
 
-        services.api_gateway.create_endpoint("GET", "/posts", function, authorizer="cognito")
+        services.api_gateway.create_endpoint("GET", "/posts", function, authorizer="sso")
 
         services.dynamodb.posts_table.grant_read_data(function)

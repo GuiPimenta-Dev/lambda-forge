@@ -1,7 +1,7 @@
 [
     {
-        "name": "CognitoSSOAuthorizer",
-        "path": "./authorizers/cognito",
+        "name": "SSOAuthorizer",
+        "path": "./authorizers/sso",
         "description": "A cognito authorizer for private lambda functions",
         "timeout": 60,
         "triggers": [],

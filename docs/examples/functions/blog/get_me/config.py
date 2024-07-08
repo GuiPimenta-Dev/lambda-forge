@@ -8,4 +8,4 @@ class GetMeConfig:
             name="GetMe", path="./functions/blog", description="Get the current user", directory="get_me"
         )
 
-        services.api_gateway.create_endpoint("GET", "/blog/me", function, authorizer="cognito")
+        services.api_gateway.create_endpoint("GET", "/blog/me", function, authorizer="sso")
