@@ -31,7 +31,7 @@ jobs:
       - name: Push Docker image to ECR
         run: docker push public.ecr.aws/x8r4y7j7/lambda-forge:latest
 
-  deploy:
+  deploy-mkdocs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -49,4 +49,9 @@ jobs:
           pip install mkdocs-material 
 
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --config-file docs/mkdocs.yml --force
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: 
+          git config --global user.email "guialvespimenta27@gmail.com"
+          git config --global user.name "Guilherme Alves Pimenta"
+          mkdocs gh-deploy --config-file docs/mkdocs.yml --force
