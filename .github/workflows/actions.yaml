@@ -52,6 +52,7 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: | 
+          echo "Deploying to GitHub Pages"
           git remote set-url origin https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }}.git
           git config --global user.email "guialvespimenta27@gmail.com"
           git config --global user.name "Guilherme Alves Pimenta"
