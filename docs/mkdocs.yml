@@ -1,0 +1,81 @@
+site_name: Lambda Forge
+
+theme:
+  name: material
+  custom_dir: docs/theme_override_home/
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  logo: images/favicon.png
+  favicon: images/favicon.png
+  palette:
+    - scheme: default
+      primary: black
+
+nav:
+  - Home: index.md
+  - Docs:
+      - Getting Started: home/getting-started.md
+      - Creating a Hello World: home/creating-a-hello-world.md
+      - AWS Services: home/aws-services.md
+      - Authorizers: home/securing-endpoints.md
+      - Lambda Layers: home/lambda-layers.md
+      - Live Development: home/live-development.md
+      - CodeBuild Steps: home/custom-codepipeline-steps.md
+      - CodePipeline: home/multi-stage-environments.md
+      - Docs Generation: home/docs-generation.md
+  - Example Projects:
+      - Introduction: examples/introduction.md
+      - Begginer:
+          - Guess The Number: examples/guess-the-number.md
+          - URL Shortener: examples/url-shortener.md
+          - Image to QR Code: examples/image-to-qr-code-converter.md
+      - Intermediate:
+          - JWT Authentication: examples/jwt-authentication.md
+          - Real-Time Chat: examples/real-time-chat.md
+      - Advanced:
+          - Blog Application: examples/blog.md
+  - License: license/license.md
+
+markdown_extensions:
+  - pymdownx.tilde
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - footnotes
+  - pymdownx.details
+  - pymdownx.mark
+  - pymdownx.tabbed
+  - attr_list
+  - pymdownx.emoji
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+
+extra_css:
+  - https://unpkg.com/mermaid@8.5.1/dist/mermaid.css
+extra_javascript:
+  - https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js
+
+copyright: |
+  &copy; 2024 Guilherme Alves Pimenta
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: "https://github.com/GuiPimenta-Dev"
+    - icon: fontawesome/brands/linkedin
+      link: "https://www.linkedin.com/in/guilhermealvespimenta/"
