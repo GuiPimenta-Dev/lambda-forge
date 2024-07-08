@@ -22,7 +22,7 @@ Read the complete documentation at:
 ### CLI
 Lambda Forge comes with a CLI tool named `FORGE`, designed to facilitate the creation and management of resources related to serverless projects.
 
-### Easy Creation of Lambda Functions
+### Functions
 
 Create Lambda functions with ease, leveraging a modular and scalable architecture that adheres to the Single Responsibility Principle and Dependency Injection.
 
@@ -44,7 +44,7 @@ functions/
 Each component is organized to promote clean code practices and efficient development.
 
 
-### Seamless Creation of Authorizers
+### Authorizers
 
 Effortlessly create authorizers to secure access to your Lambda functions.
 
@@ -67,7 +67,7 @@ authorizers
 
 Each file is organized to ensure a clean and efficient implementation, making it easy to manage and secure your Lambda functions.
 
-### AWS Resource Management
+### AWS Services
 Lambda Forge encapsulates several AWS services, providing dedicated classes to handle specific responsibilities. Each class is injected into Lambda functions to facilitate seamless interaction with AWS resources.
 
 For instance, generate a service class for SNS using the CLI:
@@ -171,7 +171,7 @@ Executing this command initiates a session in your terminal, enabling you to pub
 <img src="https://i.ibb.co/rxvpNvq/live-trigger.png" width=500> 
 </p>
 
-### Multi-Stage Environments with Automatic CI/CD Pipelines
+### Multi-Stage Environments with CodePipeline
 Lambda Forge provides multi-stage environments with automatic CI/CD pipelines on CodePipeline for each environment, ensuring complete isolation from each other.
 
 #### Development
