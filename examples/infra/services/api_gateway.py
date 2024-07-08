@@ -30,12 +30,3 @@ class APIGateway:
 
     def create_docs(self, endpoint, artifact, authorizer=None, public=False, stages=None):
         self.rest.create_docs(endpoint=endpoint, artifact=artifact, authorizer=authorizer, public=public, stages=stages)
-
-    def create_cognito_integration(self, resource_path, handler, authorizer, method="ANY"):
-        resource = self.api.root.add_resource(resource_path)
-        resource.add_method(
-            method,
-            apigateway.LambdaIntegration(handler),
-            authorization_type=apigateway.AuthorizationType.COGNITO,
-            authorizer=authorizer,
-        )
