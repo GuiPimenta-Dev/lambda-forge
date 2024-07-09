@@ -1,6 +1,5 @@
 from aws_cdk import Stack
 from constructs import Construct
-
 from functions.chart.chart_worker.config import ChartWorkerConfig
 from functions.chart.create_chart.config import CreateChartConfig
 from functions.chart.get_chart.config import GetChartConfig
