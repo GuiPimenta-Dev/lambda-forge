@@ -2,6 +2,7 @@ import json
 import os
 
 import pytest
+
 from conftest import simplify_dynamodb_item
 
 from .main import lambda_handler

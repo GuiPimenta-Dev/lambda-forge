@@ -8,7 +8,7 @@ class ChartWorkerConfig:
             name="ChartWorker",
             path="./functions/chart",
             description="Worker to create the chart from the chat messages in background",
-            directory="transcription_worker",
+            directory="chart_worker",
             layers=[
                 services.layers.sm_utils_layer,
                 services.layers.openai_layer,

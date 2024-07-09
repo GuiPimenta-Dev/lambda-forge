@@ -2,6 +2,7 @@ import json
 import os
 
 import boto3
+
 from . import utils
 
 
@@ -42,7 +43,6 @@ def lambda_handler(event, context):
         Item={
             "PK": f"{video_id}#INTERVAL={interval}",
             "SK": label,
-            "chat": chat,
             "messages": messages,
             "rating": response["rating"],
             "reason": response["reason"],

@@ -84,7 +84,7 @@
     },
     {
         "name": "ChartWorker",
-        "path": "./functions/chart/transcription_worker",
+        "path": "./functions/chart/chart_worker",
         "description": "Worker to create the chart from the chat messages in background",
         "timeout": 60,
         "triggers": [

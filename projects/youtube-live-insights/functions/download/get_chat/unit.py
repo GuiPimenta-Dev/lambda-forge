@@ -21,7 +21,7 @@ def test_it_should_save_all_messages_on_dynamo_db(chats_table):
                     "Message": json.dumps(
                         {
                             "video_id": "123",
-                            "url": "https://www.youtube.com/watch?v=5Zw0taVl2l0",
+                            "url": "https://www.youtube.com/watch?v=9HQiTFZz0Gg",
                         }
                     )
                 }

@@ -1,4 +1,5 @@
 import boto3
+from datetime import datetime, timedelta
 
 
 def query_all_items(table, partition_key, interval):
@@ -25,5 +26,13 @@ def query_all_items(table, partition_key, interval):
         last_evaluated_key = response["LastEvaluatedKey"]
 
     filtered_data = [item for item in items if item["rating"] != "0"]
-
     return filtered_data
+
+
+def subtract_hours_from_utc(data, hour):
+    for item in data:
+        hours = datetime.strptime(item.pop("SK"), "%H:%M")
+        hours = (hours - timedelta(hours=hour)).strftime("%H:%M")
+        item["hour"] = hours
+
+    return data

@@ -1,4 +1,5 @@
 from aws_cdk import aws_iam as iam
+
 from infra.services import Services
 
 
@@ -12,13 +13,14 @@ class GetChartConfig:
             directory="get_chart",
             environment={
                 "TRANSCRIPTIONS_TABLE_NAME": services.dynamodb.transcriptions_table.table_name,
+                "VIDEOS_TABLE_NAME": services.dynamodb.videos_table.table_name,
             },
         )
 
         services.api_gateway.create_endpoint("GET", "/chart", function, public=True)
 
+        services.dynamodb.videos_table.grant_read_data(function)
         services.dynamodb.transcriptions_table.grant_read_data(function)
-
         function.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["dynamodb:Query"],

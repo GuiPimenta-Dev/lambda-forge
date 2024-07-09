@@ -1,13 +1,13 @@
 from infra.services import Services
 
 
-class DownloaderConfig:
+class GetVideoConfig:
     def __init__(self, services: Services) -> None:
 
         function = services.aws_lambda.create_function(
-            name="Downloader",
+            name="GetVideo",
             path="./functions/download",
-            directory="downloader",
+            directory="get_video",
             description="Download a YouTube video and Stores it on S3",
             layers=[services.layers.pytube_layer],
             memory_size=512,

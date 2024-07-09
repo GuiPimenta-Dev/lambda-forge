@@ -1,10 +1,22 @@
 import json
 import os
-from datetime import datetime, timedelta
-
+from dataclasses import dataclass
+from typing import Optional
 import boto3
 
 from . import utils
+
+
+@dataclass
+class Input:
+    video_id: str
+    interval: Optional[int]
+
+
+@dataclass
+class Output:
+    pass
+
 
 
 def lambda_handler(event, context):
@@ -13,17 +25,20 @@ def lambda_handler(event, context):
     interval = int(event["queryStringParameters"].get("interval", 10))
 
     dynamodb = boto3.resource("dynamodb")
-    TRANSCRIPTIONS_TABLE_NAME = os.environ.get("TRANSCRIPTIONS_TABLE_NAME", "Prod-Live-Insights-Live-Transcriptions")
+    TRANSCRIPTIONS_TABLE_NAME = os.environ.get("TRANSCRIPTIONS_TABLE_NAME")
+    VIDEOS_TABLE_NAME = os.environ.get("VIDEOS_TABLE_NAME", "Dev-Videos")
+
     transcriptions_table = dynamodb.Table(TRANSCRIPTIONS_TABLE_NAME)
+    videos_table = dynamodb.Table(VIDEOS_TABLE_NAME)
+
+    video = videos_table.get_item(Key={"PK": video_id})["Item"]
 
     data = utils.query_all_items(transcriptions_table, video_id, interval)
+    data = utils.subtract_hours_from_utc(data, hour=3)
 
-    for item in data:
-        hour = datetime.strptime(item.pop("SK"), "%H:%M")
-        hour = (hour - timedelta(hours=3)).strftime("%H:%M")
-        item["hour"] = hour
+    data = {"video": video, "data": data}
+    print(data)
 
-    # HTML content with embedded script to dynamically generate the chart
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -60,7 +75,7 @@ def lambda_handler(event, context):
             <canvas id="ratingChart"></canvas>
         </div>
         <script>
-            const data = {json.dumps(data, default=str)};
+            const data = {json.dumps(data["data"], default=str)};
 
             const labels = data.map(item => item.hour);
             const ratings = data.map(item => parseInt(item.rating));
@@ -113,3 +128,7 @@ def lambda_handler(event, context):
         "body": html_content,
         "headers": {"Content-Type": "text/html", "Access-Control-Allow-Origin": "*"},
     }
+
+
+event = {"queryStringParameters": {"video_id": "559484e7-09b8-4dc7-a55c-cc4e0e810814", "interval": 10}}
+lambda_handler(event, None)

@@ -84,7 +84,3 @@ class Printer:
     @staticmethod
     def br(lines=1):
         print("\n" * lines)
-
-
-printer = Printer()
-printer.show_banner("DANIEL", color="rose")

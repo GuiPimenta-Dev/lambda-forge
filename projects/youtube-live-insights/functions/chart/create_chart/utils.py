@@ -95,7 +95,7 @@ def group_chat_by_interval(partition_key, interval):
         sk = sk.split("#")[0]
         sk = sk.replace(" UTC+0000", "")
         sk_datetime = datetime.strptime(sk, "%Y-%m-%d %H:%M:%S")
-        rounded_time = round_time(sk_datetime)
+        rounded_time = round_time(sk_datetime, interval)
         time_label = format_time_label(rounded_time)
         grouped_items[time_label].append(item)
 

@@ -1,4 +1,5 @@
 from aws_cdk import aws_iam as iam
+
 from infra.services import Services
 
 
@@ -17,7 +18,6 @@ class CreateChartConfig:
         )
 
         services.sqs.create_trigger("create_chart_queue", function)
-
         services.sqs.grant_send_messages("workers_queue", function)
 
         services.s3.large_payload_bucket.grant_read_write(function)
