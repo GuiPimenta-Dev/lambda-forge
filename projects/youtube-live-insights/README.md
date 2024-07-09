@@ -15,7 +15,7 @@ This command provides a visual representation of the entire system's structure, 
 
 <div align="center">
 
-<img height="800" alt="Lambda Forge's Logo" src="assets/diagram.png">
+<img height="650" alt="Diagram" src="assets/diagram.png">
 </div>
 
 # API Documentation
