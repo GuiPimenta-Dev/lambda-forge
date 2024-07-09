@@ -1,5 +1,13 @@
 [
     {
+        "name": "SecretAuthorizer",
+        "path": "./authorizers/secret",
+        "description": "An authorizer based on a secret",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
         "name": "StartDownload",
         "path": "./functions/download/starter",
         "description": "Start the process",
@@ -9,7 +17,7 @@
                 "service": "api_gateway",
                 "trigger": "/start",
                 "method": "POST",
-                "public": true
+                "public": false
             }
         ],
         "invocations": [

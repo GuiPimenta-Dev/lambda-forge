@@ -1,3 +1,4 @@
+from authorizers.secret.config import SecretAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
 from functions.chart.chart_worker.config import ChartWorkerConfig
@@ -15,6 +16,9 @@ class LambdaStack(Stack):
         super().__init__(scope, f"{context.name}-Lambda-Stack", **kwargs)
 
         self.services = Services(self, context)
+
+        # Authorizers
+        SecretAuthorizerConfig(self.services)
 
         # Download
         StarterConfig(self.services)
