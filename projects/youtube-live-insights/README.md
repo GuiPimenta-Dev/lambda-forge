@@ -56,7 +56,8 @@ Using Large Language Models (LLMs), we have broken down the chat engagement of t
 
 ## Fernanda Kipper
 
-In the video below, Fernanda Kipper teaches how to create a blog from scratch.
+In the video below, Fernanda Kipper teaches how to recreate the Medius with Angular from scratch.
+
 <div align="center">
 
 [CRIANDO UM BLOG DO ZERO USANDO ANGULAR + ONE ENTRY CMS](https://www.youtube.com/watch?v=9HQiTFZz0Gg)
