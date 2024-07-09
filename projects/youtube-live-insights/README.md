@@ -3,7 +3,7 @@
 
 This project is the MVP of a SaaS that utilizes Large Language Models (LLMs) to measure and analyze engagement levels in YouTube live streams. By focusing on interactions within the live chat, it identifies key moments in the video that can be transformed into engaging, shorter clips for YouTube.
 
-It's a serverless project deployed on AWS using [Lambda Forge](https://docs.lambda-forge.com/).
+It's a serverless project deployed on AWS using [Lambda Forge](https://github.com/GuiPimenta-Dev/lambda-forge).
 
 # Diagram
 
