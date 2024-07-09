@@ -28,8 +28,8 @@
         ]
     },
     {
-        "name": "Downloader",
-        "path": "./functions/download/downloader",
+        "name": "GetVideo",
+        "path": "./functions/download/get_video",
         "description": "Download a YouTube video and Stores it on S3",
         "timeout": 900,
         "triggers": [

@@ -1,31 +1,97 @@
-# Youtube Live Insights
 
-This project aims to measure and analyze the level of engagement in YouTube live streams, focusing specifically on interactions within the live chat.
+This project is the MVP of a SaaS that utilizes Large Language Models (LLMs) to measure and analyze engagement levels in YouTube live streams. By focusing on interactions within the live chat, it identifies key moments in the video that can be transformed into engaging, shorter clips for YouTube.
 
-## Architecture Diagram
+It's a serverless project deployed on AWS using [Lambda Forge](https://docs.lambda-forge.com/).
 
-![Diagram](diagram.png)# live-insights
-<!-- 
-{
-    "video_id": "559484e7-09b8-4dc7-a55c-cc4e0e810814",
-    "interval": 10,
-    "prompt": "Mano Deyvin is a brazilian YouTuber who talks about programming and technical careers in general. His channel has a stronger focus on humor, and in this specific video, he is reacting to projects, LinkedIn profiles, and portfolios sent by subscribers.",
-} -->
+# Diagram
 
+The diagram below showcases the project's architecture. It was created using the command:
 
-<!-- {
-    "video_id": "559484e7-09b8-4dc7-a55c-cc4e0e810814",
-    "interval": 10,
-    "min_messages": 5,
-    "prompt": "Fernanda Kipper is a Brazilian content creator known for her insightful and educational videos on technology and programming. With a strong background in software development, she shares tutorials, tips, and career advice, helping her audience navigate the tech industry. Fernanda's channel is appreciated for its clear and approachable style, making complex topics accessible to beginners and experienced developers alike."
-} -->
+```
+forge diagram
+```
 
-<!-- {
-    "video_id": "0789152f-ba55-4c7b-8e29-bd77124c9ca8",
-    "interval": 10,
-    "min_messages": 5,
-    "prompt": "Eduardo Mendes is a well-known Brazilian software developer and content creator who shares educational videos on Python and technology. His channel offers clear tutorials, practical insights, and career advice, making complex topics accessible to all skill levels."
-}  -->
+This command provides a visual representation of the entire system's structure, highlighting key components and their interactions.
+
+<div align="center">
+
+<img height="800" alt="Lambda Forge's Logo" src="assets/diagram.png">
+</div>
+
+# API Documentation
+
+The project includes comprehensive documentation for all available endpoints, ensuring ease of use and clarity for developers. The documentation is accessible through Swagger and Redoc interfaces, providing detailed descriptions, request and response formats, and examples for each endpoint.
 
 
+- [Swagger](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/swagger)
+- [Redoc](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/redoc)
 
+
+# Live Stream Analysys
+
+In this section, we analyze the chat interactions from a few Brazilian YouTubers.
+
+
+## Mano Deyvin
+
+In the video below, Mano Deyvin reacts to various projects and portfolios submitted by his subscribers, including Lambda Forge at the 2:28 mark.
+
+<div align="center">
+
+[reagindo projetos, portfólio, github, linkedin // SEJA MEMBRO](https://www.youtube.com/watch?v=5Zw0taVl2l0)
+
+<img height="750" src="https://img.youtube.com/vi/5Zw0taVl2l0/maxresdefault.jpg">
+</div>
+
+Using Large Language Models (LLMs), we have broken down the chat engagement of this live stream into 10-minute intervals. Below, you can find a detailed analysis of the chat interactions during this specific live stream.
+
+<div align="center">
+
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=559484e7-09b8-4dc7-a55c-cc4e0e810814](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=559484e7-09b8-4dc7-a55c-cc4e0e810814)
+
+<img height="700" alt="Lambda Forge's Logo" src="assets/mano-deyvin-analysis.png">
+
+</div>
+
+
+## Fernanda Kipper
+
+In the video below, Fernanda Kipper teaches how to create a blog from scratch.
+<div align="center">
+
+[CRIANDO UM BLOG DO ZERO USANDO ANGULAR + ONE ENTRY CMS](https://www.youtube.com/watch?v=9HQiTFZz0Gg)
+
+<img height="750" src="https://img.youtube.com/vi/9HQiTFZz0Gg/maxresdefault.jpg">
+
+</div>
+
+The analysis for the chat interactions can be found in the link below.
+
+<div align="center">
+
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=e4c06bad-5f31-4678-8d17-95770390b192](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=e4c06bad-5f31-4678-8d17-95770390b192)
+</div>
+
+![alt text](assets/fernanda-kipper-analysis.png)
+
+## Eduardo Mendes
+
+In the video below, Eduardo Mendes teaches how the imports system works in Python.
+
+<div align="center">
+
+[Sistema de imports, como o python importa código? | Live de Python #269](https://www.youtube.com/watch?v=a5R5dvim6TQ)
+
+<img height="750" src="https://img.youtube.com/vi/a5R5dvim6TQ/maxresdefault.jpg">
+
+</div>
+
+The analysis for the chat interactions can be found in the link below.
+
+<div align="center">
+
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=0789152f-ba55-4c7b-8e29-bd77124c9ca8](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=0789152f-ba55-4c7b-8e29-bd77124c9ca8)
+
+![alt text](assets/eduardo-mendes-analysis.png)
+
+</div>
