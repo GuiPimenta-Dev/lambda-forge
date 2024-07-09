@@ -1,21 +1,38 @@
 import json
 import os
 from dataclasses import dataclass
-from typing import Optional
+from typing import List, Optional
 import boto3
 
 from . import utils
 
-
 @dataclass
 class Input:
     video_id: str
-    interval: Optional[int]
+    interval: Optional[int] = 10
 
 
 @dataclass
+class Video:
+    publish_date: str
+    url: str
+    duration: str
+    language: str
+    title: str
+
+
+@dataclass
+class ChatData:
+    chat_summary: str
+    rating: int
+    reason: str
+    messages: List[str]
+    
+
+@dataclass
 class Output:
-    pass
+    video: Video
+    data: List[ChatData]
 
 
 
@@ -128,7 +145,3 @@ def lambda_handler(event, context):
         "body": html_content,
         "headers": {"Content-Type": "text/html", "Access-Control-Allow-Origin": "*"},
     }
-
-
-event = {"queryStringParameters": {"video_id": "559484e7-09b8-4dc7-a55c-cc4e0e810814", "interval": 10}}
-lambda_handler(event, None)
