@@ -13,7 +13,6 @@ class APIGateway:
             deploy_options={"stage_name": context.stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
             binary_media_types=["multipart/form-data"],
-            endpoint_export_name="BASE-URL",
             default_cors_preflight_options={
                 "allow_origins": ["*"],
                 "allow_methods": apigateway.Cors.ALL_METHODS,

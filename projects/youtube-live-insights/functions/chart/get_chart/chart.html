@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carregando...</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            overflow: hidden;
+        }
+        #chart-container {
+            width: 80%;
+            max-width: 1200px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex-shrink: 0;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+        .video-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .video-title a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .chartjs-tooltip {
+            display: none;
+            max-width: 300px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 3px;
+            pointer-events: none;
+            padding: 10px;
+            font-size: 12px;
+            text-align: left; 
+        }
+        #interval-container {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #messages-container {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 1200px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .message {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart-container">
+        <div class="video-title" id="video-title">
+            <a href="" target="_blank"></a>
+        </div>
+        <canvas id="ratingChart"></canvas>
+        <div id="chartjs-tooltip" class="chartjs-tooltip"></div>
+    </div>
+    <div id="interval-container"></div>
+    <div id="messages-container"></div>
+    <script>
+        const data = '{{ data }}'
+
+        const labels = data.data.map(item => item.hour);
+        const ratings = data.data.map(item => parseInt(item.rating));
+        const chatSummaries = data.data.map(item => item.chat_summary);
+        const reasons = data.data.map(item => item.reason);
+        const messages = data.data.map(item => item.messages);
+
+        const chartData = {
+            labels: labels,
+            datasets: [{
+                label: 'Chat Ratings',
+                data: ratings,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 1
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: chartData,
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                        },
+                        beginAtZero: true,
+                        max: 10
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false 
+                    },
+                    tooltip: {
+                        enabled: false,
+                        external: function(context) {
+                            const tooltipEl = document.getElementById('chartjs-tooltip');
+                            const tooltipModel = context.tooltip;
+
+                            if (tooltipModel.opacity === 0) {
+                                tooltipEl.style.opacity = 0;
+                                tooltipEl.style.display = 'none';
+                                return;
+                            }
+
+                            tooltipEl.style.display = 'block';
+
+                            tooltipEl.classList.remove('above', 'below', 'no-transform');
+                            tooltipEl.classList.add('no-transform');
+
+                            if (tooltipModel.body) {
+                                const index = tooltipModel.dataPoints[0].dataIndex;
+                                const rating = ratings[index];
+                                const reason = reasons[index];
+                                const chatSummary = chatSummaries[index];
+
+                                let innerHtml = `<div><strong>Nota: ${rating}</strong></div>`;
+                                innerHtml += `<br>`;
+                                innerHtml += `<div><strong>Motivo: ${reason}</strong></div>`;
+                                innerHtml += `<br>`;
+                                innerHtml += `<div><strong>Resumo do chat: ${chatSummary}</strong></div>`;
+
+                                tooltipEl.innerHTML = innerHtml;
+                            }
+
+                            const position = context.chart.canvas.getBoundingClientRect();
+                            tooltipEl.style.opacity = 1;
+                            tooltipEl.style.position = 'absolute';
+                            tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+                            tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+                            tooltipEl.style.fontFamily = tooltipModel.options.bodyFont.family;
+                            tooltipEl.style.fontSize = tooltipModel.options.bodyFont.size + 'px';
+                            tooltipEl.style.fontStyle = tooltipModel.options.bodyFont.style;
+                            tooltipEl.style.padding = tooltipModel.options.padding + 'px ' + tooltipModel.options.padding + 'px';
+                        }
+                    }
+                },
+                onClick: (e) => {
+                    const points = ratingChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+                    if (points.length) {
+                        const index = points[0].index;
+                        const msgContainer = document.getElementById('messages-container');
+                        const intervalContainer = document.getElementById('interval-container');
+
+                        msgContainer.innerHTML = '';
+
+                        if (index > 0) {
+                            const previousHour = labels[index - 1];
+                            const currentHour = labels[index];
+                            intervalContainer.textContent = `${previousHour} - ${currentHour}`;
+                        } else {
+                            intervalContainer.textContent = `Início - ${labels[index]}`;
+                        }
+
+                        messages[index].forEach(msg => {
+                            const msgDiv = document.createElement('div');
+                            msgDiv.className = 'message';
+                            msgDiv.textContent = msg;
+                            msgContainer.appendChild(msgDiv);
+                        });
+                    }
+                }
+            }
+        };
+
+        const ratingChart = new Chart(
+            document.getElementById('ratingChart'),
+            config
+        );
+
+        function loadInitialMessages() {
+            const index = 0; 
+            const msgContainer = document.getElementById('messages-container');
+            const intervalContainer = document.getElementById('interval-container');
+
+            msgContainer.innerHTML = '';
+
+            if (index > 0) {
+                const previousHour = labels[index - 1];
+                const currentHour = labels[index];
+                intervalContainer.textContent = `${previousHour} - ${currentHour}`;
+            } else {
+                intervalContainer.textContent = `Início - ${labels[index]}`;
+            }
+
+            messages[index].forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message';
+                msgDiv.textContent = msg;
+                msgContainer.appendChild(msgDiv);
+            });
+        }
+
+        window.onload = () => {
+            document.title = data.video.title;
+
+            const videoId = data.video.url.split('v=')[1];
+            const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+            const link = document.createElement('link');
+            link.rel = 'icon';
+            link.href = thumbnailUrl;
+            document.head.appendChild(link);
+
+            const videoTitleElement = document.getElementById('video-title').querySelector('a');
+            videoTitleElement.textContent = data.video.title;
+            videoTitleElement.href = data.video.url;
+
+            loadInitialMessages();
+        };
+    </script>
+</body>
+</html>
