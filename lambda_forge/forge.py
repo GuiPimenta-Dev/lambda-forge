@@ -576,8 +576,7 @@ def diagram(output_file, include, exclude):
 
     try:
         printer.start_spinner("Synthesizing CDK")
-        with open(os.devnull, "w") as devnull:
-            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+        subprocess.run(["cdk", "synth"], shell=True, stderr=subprocess.STDOUT, check=True)
 
     except Exception as e:
         printer.print(str(e), "red", 1, 1)
