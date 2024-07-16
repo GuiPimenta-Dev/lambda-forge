@@ -1,8 +1,8 @@
-from functions.crawler.config import CrawlerConfig
 from aws_cdk import Stack
 from constructs import Construct
 
-from functions.start.config import StartConfig
+from functions.web_scraper.crawler.config import CrawlerConfig
+from functions.web_scraper.start.config import StartConfig
 from infra.services import Services
 
 

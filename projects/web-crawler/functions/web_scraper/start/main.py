@@ -15,7 +15,7 @@ class Input:
 @dataclass
 class Output:
     job_id: str
-    
+
 
 def lambda_handler(event, context):
     sqs = boto3.resource("sqs")

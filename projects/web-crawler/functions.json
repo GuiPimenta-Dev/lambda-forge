@@ -1,7 +1,7 @@
 [
     {
         "name": "Start",
-        "path": "./functions/start",
+        "path": "./functions/web_scraper/start",
         "description": "handle start command",
         "timeout": 60,
         "triggers": [
@@ -21,7 +21,7 @@
     },
     {
         "name": "Crawler",
-        "path": "./functions/crawler",
+        "path": "./functions/web_scraper/crawler",
         "description": "crawl the websites",
         "timeout": 60,
         "triggers": [

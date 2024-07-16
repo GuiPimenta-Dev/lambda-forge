@@ -6,7 +6,8 @@ class StartConfig:
 
         function = services.aws_lambda.create_function(
             name="Start",
-            path="./functions/start",
+            path="./functions/web_scraper",
+            directory="start",
             description="handle start command",
             environment={"CRAWLER_QUEUE_NAME": services.sqs.crawler_queue.queue_name},
         )

@@ -6,7 +6,8 @@ class CrawlerConfig:
 
         function = services.aws_lambda.create_function(
             name="Crawler",
-            path="./functions/crawler",
+            path="./functions/web_scraper",
+            directory="crawler",
             description="crawl the websites",
             dead_letter_queue_enabled=True,
             dead_letter_queue=services.sqs.crawler_queue_dlq,
@@ -16,7 +17,7 @@ class CrawlerConfig:
                 "CRAWLER_QUEUE_URL": services.sqs.crawler_queue.queue_url,
             },
         )
-        
+
         services.sqs.create_trigger("crawler_queue", function)
 
         services.dynamodb.grant_write("visited_urls_table", function)
