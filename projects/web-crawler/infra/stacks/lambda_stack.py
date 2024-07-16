@@ -1,3 +1,4 @@
+from functions.telegram.bot.config import BotConfig
 from aws_cdk import Stack
 from constructs import Construct
 
@@ -18,3 +19,6 @@ class LambdaStack(Stack):
 
         # Crawler
         CrawlerConfig(self.services)
+
+        # Telegram
+        BotConfig(self.services)

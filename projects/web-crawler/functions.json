@@ -36,5 +36,20 @@
                 "resource": "visited_urls_table"
             }
         ]
+    },
+    {
+        "name": "Bot",
+        "path": "./functions/telegram/bot",
+        "description": "telegram bot",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/telegram",
+                "method": "GET",
+                "public": true
+            }
+        ],
+        "invocations": []
     }
 ]
