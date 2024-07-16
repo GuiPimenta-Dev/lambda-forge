@@ -1,0 +1,40 @@
+[
+    {
+        "name": "Start",
+        "path": "./functions/start",
+        "description": "handle start command",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/start",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": [
+            {
+                "service": "sqs",
+                "resource": "crawler_queue"
+            }
+        ]
+    },
+    {
+        "name": "Crawler",
+        "path": "./functions/crawler",
+        "description": "crawl the websites",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "sqs",
+                "trigger": "crawler_queue"
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "visited_urls_table"
+            }
+        ]
+    }
+]
