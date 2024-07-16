@@ -63,12 +63,13 @@ def get_content_from_urls(urls):
     return items
 
 
-def save_batch_in_dynamo(table, contents, sk, source_url, root_url):
+def save_batch_in_dynamo(table, contents, sk, timestamp, source_url, root_url):
     with table.batch_writer() as batch:
         for content in contents:
             item = {
                 "PK": content["url"],
                 "SK": sk,
+                "timestamp": timestamp,
                 "content": content["content"],
                 "source_url": source_url,
                 "root_url": root_url,
