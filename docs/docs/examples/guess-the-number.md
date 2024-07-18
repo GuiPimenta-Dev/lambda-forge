@@ -2,6 +2,12 @@
 
 In this section, we will develop a "Guess the Number" game. Players will attempt to identify a randomly generated number by making successive guesses.
 
+The architecture of the Lambda functions we are going to create will be as follows:
+
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/guess-the-number.png" alt="alt text">
+</p>
+
 ## Configuring DynamoDB Tables for Each Deployment Stage
 
 To ensure our application can operate smoothly across different environments, we'll create three separate DynamoDB tables on AWS DynamoDB console, each tailored for a distinct deployment stage: `Dev-Numbers`, `Staging-Numbers` and `Prod-Numbers`.
