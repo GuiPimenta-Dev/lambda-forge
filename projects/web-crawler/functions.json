@@ -32,6 +32,10 @@
         ],
         "invocations": [
             {
+                "service": "sqs",
+                "resource": "crawler_queue"
+            },
+            {
                 "service": "dynamodb",
                 "resource": "visited_urls_table"
             }
@@ -45,8 +49,8 @@
         "triggers": [
             {
                 "service": "api_gateway",
-                "trigger": "/telegram",
-                "method": "GET",
+                "trigger": "/webhook",
+                "method": "POST",
                 "public": true
             }
         ],

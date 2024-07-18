@@ -10,6 +10,6 @@ class BotConfig:
             directory="bot"
         )
 
-        services.api_gateway.create_endpoint("GET", "/telegram", function, public=True)
+        services.api_gateway.create_endpoint("POST", "/webhook", function, public=True)
 
             
