@@ -1248,6 +1248,11 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 
 <h1 id="creating-a-guess-the-number-game-with-dynamodb">Creating a Guess the Number Game with DynamoDB</h1>
 <p>In this section, we will develop a "Guess the Number" game. Players will attempt to identify a randomly generated number by making successive guesses.</p>
+<p>The architecture of the Lambda functions we are going to create will be as follows:</p>
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/guess-the-number.png" alt="alt text">
+</p>
+
 <h2 id="configuring-dynamodb-tables-for-each-deployment-stage">Configuring DynamoDB Tables for Each Deployment Stage</h2>
 <p>To ensure our application can operate smoothly across different environments, we'll create three separate DynamoDB tables on AWS DynamoDB console, each tailored for a distinct deployment stage: <code>Dev-Numbers</code>, <code>Staging-Numbers</code> and <code>Prod-Numbers</code>.</p>
 <div class="admonition note">
