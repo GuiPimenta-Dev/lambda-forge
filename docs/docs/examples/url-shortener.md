@@ -194,7 +194,7 @@ class ShortenerConfig:
 
         services.api_gateway.create_endpoint("POST", "/urls", function, public=True)
 
-        services.dynamodb.urls_table.grant_write_data(function)
+        services.dynamodb.grant_write("numbers_table", function)
 ```
 
 In this configuration, we specify resources according to the deployment stages of the Lambda function, setting up the DynamoDB table and API Gateway base URL accordingly. It also includes permission settings, enabling the Lambda function to write to our DynamoDB table.
