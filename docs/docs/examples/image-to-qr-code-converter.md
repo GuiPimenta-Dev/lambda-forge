@@ -45,7 +45,7 @@ This command generates a new service file named `s3.py` within the infra/service
 
 ```hl_lines="8"
 infra
-├── services
+└── services
     ├── __init__.py
     ├── api_gateway.py
     ├── aws_lambda.py
@@ -129,7 +129,7 @@ Similar to the S3 class, Forge will generate the new service file within the `in
 
 ```hl_lines="9"
 infra
-├── services
+└── services
     ├── __init__.py
     ├── api_gateway.py
     ├── aws_lambda.py
@@ -216,12 +216,11 @@ We now have the following directory:
 ```
 functions
 └── images
-    ├── qrcode
-    │   ├── __init__.py
-    │   ├── config.py
-    │   └── main.py
-    └── utils
-        └── __init__.py
+    └── qrcode
+        ├── __init__.py
+        ├── config.py
+        └── main.py
+    
 ```
 
 Let's dive into implementing this function, which will handle user input consisting of a `url` to convert the image parameter and an `email` parameter for sending notification.
@@ -329,17 +328,15 @@ Here's how our updated directory looks now.
 
 ```
 functions
-├── images
+└── images
     ├── mailer
     │   ├── __init__.py
     │   ├── config.py
     │   └── main.py
-    ├── qrcode
-    │   ├── __init__.py
-    │   ├── config.py
-    │   └── main.py
-    └── utils
-        └── __init__.py
+    └── qrcode
+        ├── __init__.py
+        ├── config.py
+        └── main.py
 ```
 
 Let's whip up an eye-catching HTML layout to give our email a touch of elegance.

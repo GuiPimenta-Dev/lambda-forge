@@ -32,17 +32,17 @@ Next, open your project’s `cdk.json` file and incorporate the tables ARNs into
 
 Next, we need to create a new variable class within the DynamoDB class to reference our URLs tables.
 
-```python title="infra/services/dynamo_db.py" hl_lines="10-14" linenums="5"
+```python title="infra/services/dynamodb.py" hl_lines="10-14" linenums="5"
 class DynamoDB:
     def __init__(self, scope, context: dict) -> None:
 
-        self.numbers_table = dynamo_db.Table.from_table_arn(
+        self.numbers_table = dynamodb.Table.from_table_arn(
             scope,
             "NumbersTable",
             context.resources["arns"]["numbers_table"],
         )
 
-        self.urls_table = dynamo_db.Table.from_table_arn(
+        self.urls_table = dynamodb.Table.from_table_arn(
             scope,
             "URLsTable",
             context.resources["arns"]["urls_table"],
@@ -187,14 +187,14 @@ class ShortenerConfig:
             description="Creates a new short URL entry in DynamoDB mapping to the original url",
             directory="shortener",
             environment={
-                "URLS_TABLE_NAME": services.dynamo_db.urls_table.table_name,
+                "URLS_TABLE_NAME": services.dynamodb.urls_table.table_name,
                 "BASE_URL": context.resources["base_url"],
             },
         )
 
         services.api_gateway.create_endpoint("POST", "/urls", function, public=True)
 
-        services.dynamo_db.urls_table.grant_write_data(function)
+        services.dynamodb.urls_table.grant_write_data(function)
 ```
 
 In this configuration, we specify resources according to the deployment stages of the Lambda function, setting up the DynamoDB table and API Gateway base URL accordingly. It also includes permission settings, enabling the Lambda function to write to our DynamoDB table.
@@ -295,13 +295,13 @@ class RedirectConfig:
             description="Redirects from the short url to the original url",
             directory="redirect",
             environment={
-                "URLS_TABLE_NAME": services.dynamo_db.urls_table.table_name,
+                "URLS_TABLE_NAME": services.dynamodb.urls_table.table_name,
             }
         )
 
         services.api_gateway.create_endpoint("GET", "/{url_id}", function, public=True)
 
-        services.dynamo_db.urls_table.grant_read_data(function)
+        services.dynamodb.urls_table.grant_read_data(function)
 ```
 
 ## Deploying the Functions
