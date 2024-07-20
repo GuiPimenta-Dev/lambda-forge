@@ -1,3 +1,4 @@
+from functions.create_vectors.config import CreateVectorsConfig
 from functions.telegram.bot.config import BotConfig
 from aws_cdk import Stack
 from constructs import Construct
@@ -22,3 +23,6 @@ class LambdaStack(Stack):
 
         # Telegram
         BotConfig(self.services)
+
+        # CreateVectors
+        CreateVectorsConfig(self.services)

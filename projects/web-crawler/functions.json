@@ -55,5 +55,20 @@
             }
         ],
         "invocations": []
+    },
+    {
+        "name": "CreateVectors",
+        "path": "./functions/create_vectors",
+        "description": "vectorize the scraped data",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/create_vectors",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": []
     }
 ]

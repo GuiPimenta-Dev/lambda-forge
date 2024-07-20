@@ -1,5 +1,6 @@
 import os
 from urllib.parse import urljoin
+import json
 
 import boto3
 import requests
@@ -63,12 +64,12 @@ def get_content_from_urls(urls):
     return items
 
 
-def save_batch_in_dynamo(table, contents, sk, timestamp, source_url, root_url):
+def save_batch_in_dynamo(table, contents, job_id, timestamp, source_url, root_url):
     with table.batch_writer() as batch:
         for content in contents:
             item = {
-                "PK": content["url"],
-                "SK": sk,
+                "PK": job_id,
+                "SK": content["url"],
                 "timestamp": timestamp,
                 "content": content["content"],
                 "source_url": source_url,
@@ -78,22 +79,24 @@ def save_batch_in_dynamo(table, contents, sk, timestamp, source_url, root_url):
             batch.put_item(Item=item)
 
 
+
 def send_batch_to_queue(sqs_client, queue_url, non_visited_urls, timestamp, job_id, source_url, root_url):
     BATCH_SIZE = 10
     for i in range(0, len(non_visited_urls), BATCH_SIZE):
         batch = non_visited_urls[i : i + BATCH_SIZE]
         entries = [
             {
-                "Id": str(index),
-                "MessageBody": {
+                "Id": str(i + index),  # Ensure unique IDs across batches
+                "MessageBody": json.dumps({
                     "url": url,
                     "timestamp": timestamp,
                     "job_id": job_id,
                     "source_url": source_url,
                     "root_url": root_url,
-                },
+                }),
             }
             for index, url in enumerate(batch)
         ]
         print(f"Sending batch: {entries}")
-        sqs_client.send_message_batch(QueueUrl=queue_url, Entries=entries)
+        response = sqs_client.send_message_batch(QueueUrl=queue_url, Entries=entries)
+        print(f"Response: {response}")
