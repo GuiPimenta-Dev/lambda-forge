@@ -1,10 +1,11 @@
-from functions.create_vectors.config import CreateVectorsConfig
-from functions.telegram.bot.config import BotConfig
 from aws_cdk import Stack
 from constructs import Construct
 
-from functions.web_scraper.crawler.config import CrawlerConfig
-from functions.web_scraper.start.config import StartConfig
+from authorizers.secret.config import SecretAuthorizerConfig
+from functions.rag.ask_questions.config import AskQuestionsConfig
+from functions.rag.create_vectors.config import CreateVectorsConfig
+from functions.web_crawler.crawler.config import CrawlerConfig
+from functions.web_crawler.start.config import StartConfig
 from infra.services import Services
 
 
@@ -15,14 +16,13 @@ class LambdaStack(Stack):
 
         self.services = Services(self, context)
 
-        # Start
-        StartConfig(self.services)
+        # Authorizers
+        SecretAuthorizerConfig(self.services)
 
-        # Crawler
+        # Web Crawler
+        StartConfig(self.services)
         CrawlerConfig(self.services)
 
-        # Telegram
-        BotConfig(self.services)
-
-        # CreateVectors
+        # Rag
+        AskQuestionsConfig(self.services)
         CreateVectorsConfig(self.services)

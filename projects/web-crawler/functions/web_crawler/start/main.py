@@ -29,7 +29,13 @@ def lambda_handler(event, context):
     job_id = str(uuid.uuid4())
     print(f"Initiating job {job_id} at {timestamp} for root url {url}")
 
-    data = {"url": url, "timestamp": timestamp, "job_id": job_id, "source_url": None, "root_url": url}
+    data = {
+        "url": url,
+        "timestamp": timestamp,
+        "job_id": job_id,
+        "source_url": None,
+        "root_url": url,
+    }
     queue.send_message(MessageBody=json.dumps(data, default=str))
 
     return {

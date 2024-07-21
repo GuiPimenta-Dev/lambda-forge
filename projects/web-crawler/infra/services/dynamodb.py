@@ -9,8 +9,7 @@ class DynamoDB:
 
         self.visited_urls_table = dynamodb.Table(
             scope,
-            "VisitedURLs",
-            table_name="VisitedURLs",
+            "ScrapedURLs",
             partition_key=dynamodb.Attribute(name="PK", type=dynamodb.AttributeType.STRING),
             sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,

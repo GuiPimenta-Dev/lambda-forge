@@ -1,7 +1,15 @@
 [
     {
+        "name": "SecretAuthorizer",
+        "path": "./authorizers/secret",
+        "description": "An authorizer based on a secret",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
         "name": "Start",
-        "path": "./functions/web_scraper/start",
+        "path": "./functions/web_crawler/start",
         "description": "handle start command",
         "timeout": 60,
         "triggers": [
@@ -9,7 +17,7 @@
                 "service": "api_gateway",
                 "trigger": "/start",
                 "method": "POST",
-                "public": true
+                "public": false
             }
         ],
         "invocations": [
@@ -21,7 +29,7 @@
     },
     {
         "name": "Crawler",
-        "path": "./functions/web_scraper/crawler",
+        "path": "./functions/web_crawler/crawler",
         "description": "crawl the websites",
         "timeout": 60,
         "triggers": [
@@ -42,31 +50,31 @@
         ]
     },
     {
-        "name": "Bot",
-        "path": "./functions/telegram/bot",
-        "description": "telegram bot",
+        "name": "AskQuestionsToLLM",
+        "path": "./functions/rag/ask_questions",
+        "description": "ask for llm",
         "timeout": 60,
         "triggers": [
             {
                 "service": "api_gateway",
-                "trigger": "/webhook",
-                "method": "POST",
-                "public": true
+                "trigger": "/question",
+                "method": "GET",
+                "public": false
             }
         ],
         "invocations": []
     },
     {
         "name": "CreateVectors",
-        "path": "./functions/create_vectors",
+        "path": "./functions/rag/create_vectors",
         "description": "vectorize the scraped data",
         "timeout": 60,
         "triggers": [
             {
                 "service": "api_gateway",
-                "trigger": "/create_vectors",
+                "trigger": "/vectors",
                 "method": "POST",
-                "public": true
+                "public": false
             }
         ],
         "invocations": []

@@ -1,6 +1,7 @@
-import os
-from urllib.parse import urljoin
 import json
+import os
+from datetime import time
+from urllib.parse import urljoin
 
 import boto3
 import requests
@@ -19,10 +20,12 @@ def find_urls_from_page(url):
     return urls_from_page
 
 
-def remove_urls_from_other_domains(urls, root_url):
-    removed_urls = [url for url in urls if not url.startswith(root_url)]
+def filter_unwanted_urls(urls, root_url):
+    removed_urls = [url for url in urls if not url.startswith(root_url) or "#_" in url]
     print(f"Removed urls: {removed_urls}")
-    return [url for url in urls if url.startswith(root_url)]
+    valid_urls = [url for url in urls if url.startswith(root_url) and "#_" not in url]
+    print(f"Valid urls: {valid_urls}")
+    return valid_urls
 
 
 def get_content_from_page(url):
@@ -34,22 +37,30 @@ def get_content_from_page(url):
     return soup.text
 
 
-def get_non_visited_urls(urls, sk):
+def get_non_visited_urls(urls, job_id):
     dynamodb = boto3.client("dynamodb")
     VISITED_URLS_TABLE_NAME = os.getenv("VISITED_URLS_TABLE_NAME", "VisitedURLs")
-    keys = [{"PK": {"S": url}, "SK": {"S": sk}} for url in set(urls)]
+    BATCH_SIZE = 100  # Maximum number of keys to send in each batch
+    keys = [{"PK": {"S": job_id}, "SK": {"S": url}} for url in set(urls)]
 
     non_visited_urls = set(urls)
     unprocessed_keys = keys
 
     while unprocessed_keys:
-        response = dynamodb.batch_get_item(RequestItems={VISITED_URLS_TABLE_NAME: {"Keys": unprocessed_keys}})
-        items = response["Responses"].get(VISITED_URLS_TABLE_NAME, [])
+        for i in range(0, len(unprocessed_keys), BATCH_SIZE):
+            batch_keys = unprocessed_keys[i : i + BATCH_SIZE]
+            try:
+                response = dynamodb.batch_get_item(RequestItems={VISITED_URLS_TABLE_NAME: {"Keys": batch_keys}})
+            except dynamodb.exceptions.ClientError as e:
+                print(f"[ERROR] {e}")
+                time.sleep(1)  # Sleep briefly to avoid retry storms
+                continue
 
-        for item in items:
-            non_visited_urls.discard(item["PK"]["S"])
+            items = response.get("Responses", {}).get(VISITED_URLS_TABLE_NAME, [])
+            for item in items:
+                non_visited_urls.discard(item["SK"]["S"])
 
-        unprocessed_keys = response.get("UnprocessedKeys", {}).get(VISITED_URLS_TABLE_NAME, {}).get("Keys", [])
+            unprocessed_keys = response.get("UnprocessedKeys", {}).get(VISITED_URLS_TABLE_NAME, {}).get("Keys", [])
 
     non_visited_urls = list(non_visited_urls)
     print(f"Non visited urls: {non_visited_urls}")
@@ -79,7 +90,6 @@ def save_batch_in_dynamo(table, contents, job_id, timestamp, source_url, root_ur
             batch.put_item(Item=item)
 
 
-
 def send_batch_to_queue(sqs_client, queue_url, non_visited_urls, timestamp, job_id, source_url, root_url):
     BATCH_SIZE = 10
     for i in range(0, len(non_visited_urls), BATCH_SIZE):
@@ -87,13 +97,15 @@ def send_batch_to_queue(sqs_client, queue_url, non_visited_urls, timestamp, job_
         entries = [
             {
                 "Id": str(i + index),  # Ensure unique IDs across batches
-                "MessageBody": json.dumps({
-                    "url": url,
-                    "timestamp": timestamp,
-                    "job_id": job_id,
-                    "source_url": source_url,
-                    "root_url": root_url,
-                }),
+                "MessageBody": json.dumps(
+                    {
+                        "url": url,
+                        "timestamp": timestamp,
+                        "job_id": job_id,
+                        "source_url": source_url,
+                        "root_url": root_url,
+                    }
+                ),
             }
             for index, url in enumerate(batch)
         ]
