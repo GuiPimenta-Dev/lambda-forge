@@ -11,6 +11,7 @@ class AskQuestionsConfig:
             description="ask for llm",
             memory_size=10240,
             layers=[
+                services.layers.sm_utils_layer,
                 services.layers.langchain_all_layer,
                 services.layers.pinecone_client_layer,
                 services.layers.tiktoken_layer,

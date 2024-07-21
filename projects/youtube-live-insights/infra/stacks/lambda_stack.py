@@ -1,13 +1,12 @@
+from authorizers.secret.config import SecretAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
-
-from authorizers.secret.config import SecretAuthorizerConfig
 from docs.config import DocsConfig
 from functions.chart.chart_worker.config import ChartWorkerConfig
 from functions.chart.create_chart.config import CreateChartConfig
 from functions.chart.get_chart.config import GetChartConfig
-from functions.download.get_video.config import GetVideoConfig
 from functions.download.get_chat.config import GetChatConfig
+from functions.download.get_video.config import GetVideoConfig
 from functions.download.starter.config import StarterConfig
 from infra.services import Services
 

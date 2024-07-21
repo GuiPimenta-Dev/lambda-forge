@@ -2,9 +2,11 @@ import json
 import os
 from dataclasses import dataclass
 from typing import List, Optional
+
 import boto3
 
 from . import utils
+
 
 @dataclass
 class Input:
@@ -27,13 +29,12 @@ class ChatData:
     rating: int
     reason: str
     messages: List[str]
-    
+
 
 @dataclass
 class Output:
     video: Video
     data: List[ChatData]
-
 
 
 def lambda_handler(event, context):
@@ -58,7 +59,7 @@ def lambda_handler(event, context):
     current_dir = os.path.dirname(__file__)
     with open(os.path.join(current_dir, "chart.html")) as f:
         html = f.read()
-    
+
     html = html.replace("'{{ data }}'", json.dumps(data, default=str))
 
     return {

@@ -1,5 +1,6 @@
-import boto3
 from datetime import datetime, timedelta
+
+import boto3
 
 
 def query_all_items(table, partition_key, interval):

@@ -1,5 +1,4 @@
 from aws_cdk import aws_iam as iam
-
 from infra.services import Services
 
 
@@ -12,6 +11,7 @@ class CreateVectorsConfig:
             directory="create_vectors",
             description="vectorize the scraped data",
             layers=[
+                services.layers.sm_utils_layer,
                 services.layers.langchain_all_layer,
                 services.layers.pinecone_client_layer,
                 services.layers.tiktoken_layer,

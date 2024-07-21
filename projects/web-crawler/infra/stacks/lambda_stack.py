@@ -1,7 +1,6 @@
+from authorizers.secret.config import SecretAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
-
-from authorizers.secret.config import SecretAuthorizerConfig
 from functions.rag.ask_questions.config import AskQuestionsConfig
 from functions.rag.create_vectors.config import CreateVectorsConfig
 from functions.web_crawler.crawler.config import CrawlerConfig
