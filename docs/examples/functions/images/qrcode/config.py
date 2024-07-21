@@ -17,4 +17,4 @@ class QrcodeConfig:
 
         services.api_gateway.create_endpoint("POST", "/images/qrcode", function, public=True)
 
-        services.s3.images_bucket.grant_write(function)
+        services.s3.grant_write("images_bucket", function)
