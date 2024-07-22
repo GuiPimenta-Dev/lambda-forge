@@ -1104,6 +1104,10 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 
 <h1 id="creating-a-url-shortener-service-using-dynamodb">Creating a URL Shortener Service Using DynamoDB</h1>
 <p>In this section, we will explore the development of a URL shortener. This utility enables users to input a lengthy URL, which the system then compresses into a more concise version.</p>
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/url-shortener.png" alt="alt text">
+</p>
+
 <h2 id="setting-up-the-dynamodb-tables">Setting Up the DynamoDB Tables</h2>
 <p>To begin, create three separate DynamoDB tables in the AWS Console to store URLs for different environments: <code>Dev-URLs</code>, <code>Staging-URLs</code>, and <code>Prod-URLs</code>.</p>
 <p>Next, open your project’s <code>cdk.json</code> file and incorporate the tables ARNs into the respective environment configurations. This setup ensures that each environment interacts only with its designated table, maintaining clear separation and organization.</p>
@@ -1144,7 +1148,7 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="w">    </span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
 <p>Next, we need to create a new variable class within the DynamoDB class to reference our URLs tables.</p>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/services/dynamo_db.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-5"> 5</a></span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/services/dynamodb.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-5"> 5</a></span>
 <span class="normal"><a href="#__codelineno-1-6"> 6</a></span>
 <span class="normal"><a href="#__codelineno-1-7"> 7</a></span>
 <span class="normal"><a href="#__codelineno-1-8"> 8</a></span>
@@ -1160,13 +1164,13 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <span class="normal"><a href="#__codelineno-1-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="k">class</span> <span class="nc">DynamoDB</span><span class="p">:</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7"></a>
-<a id="__codelineno-1-8" name="__codelineno-1-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">numbers_table</span> <span class="o">=</span> <span class="n">dynamo_db</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">numbers_table</span> <span class="o">=</span> <span class="n">dynamodb</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9"></a>            <span class="n">scope</span><span class="p">,</span>
 <a id="__codelineno-1-10" name="__codelineno-1-10"></a>            <span class="s2">&quot;NumbersTable&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11"></a>            <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;arns&quot;</span><span class="p">][</span><span class="s2">&quot;numbers_table&quot;</span><span class="p">],</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12"></a>        <span class="p">)</span>
 <a id="__codelineno-1-13" name="__codelineno-1-13"></a>
-<a id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">urls_table</span> <span class="o">=</span> <span class="n">dynamo_db</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">urls_table</span> <span class="o">=</span> <span class="n">dynamodb</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
 </span><a id="__codelineno-1-15" name="__codelineno-1-15"></a><span class="hll">            <span class="n">scope</span><span class="p">,</span>
 </span><a id="__codelineno-1-16" name="__codelineno-1-16"></a><span class="hll">            <span class="s2">&quot;URLsTable&quot;</span><span class="p">,</span>
 </span><a id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="hll">            <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;arns&quot;</span><span class="p">][</span><span class="s2">&quot;urls_table&quot;</span><span class="p">],</span>
@@ -1364,14 +1368,14 @@ Follow the article <a href="https://docs.lambda-forge.com/articles/locating-the-
 <a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Creates a new short URL entry in DynamoDB mapping to the original url&quot;</span><span class="p">,</span>
 <a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;shortener&quot;</span><span class="p">,</span>
 <a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
-</span><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="hll">                <span class="s2">&quot;URLS_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamo_db</span><span class="o">.</span><span class="n">urls_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
+</span><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="hll">                <span class="s2">&quot;URLS_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">urls_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
 </span><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="hll">                <span class="s2">&quot;BASE_URL&quot;</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;base_url&quot;</span><span class="p">],</span>
 </span><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="hll">            <span class="p">},</span>
 </span><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>        <span class="p">)</span>
 <a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
 <a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>        <span class="n">services</span><span class="o">.</span><span class="n">api_gateway</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/urls&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamo_db</span><span class="o">.</span><span class="n">urls_table</span><span class="o">.</span><span class="n">grant_write_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">grant_write</span><span class="p">(</span><span class="s2">&quot;numbers_table&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
 </span></code></pre></div>
 <p>In this configuration, we specify resources according to the deployment stages of the Lambda function, setting up the DynamoDB table and API Gateway base URL accordingly. It also includes permission settings, enabling the Lambda function to write to our DynamoDB table.</p>
 <h2 id="implementing-the-redirect-function">Implementing the Redirect Function</h2>
@@ -1456,13 +1460,13 @@ Follow the article <a href="https://docs.lambda-forge.com/articles/locating-the-
 <a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Redirects from the short url to the original url&quot;</span><span class="p">,</span>
 <a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;redirect&quot;</span><span class="p">,</span>
 <a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
-</span><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="hll">                <span class="s2">&quot;URLS_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamo_db</span><span class="o">.</span><span class="n">urls_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
+</span><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="hll">                <span class="s2">&quot;URLS_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">urls_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
 </span><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="hll">            <span class="p">}</span>
 </span><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>        <span class="p">)</span>
 <a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>
 <a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>        <span class="n">services</span><span class="o">.</span><span class="n">api_gateway</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="si">{url_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>
-<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamo_db</span><span class="o">.</span><span class="n">urls_table</span><span class="o">.</span><span class="n">grant_read_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">urls_table</span><span class="o">.</span><span class="n">grant_read_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="deploying-the-functions">Deploying the Functions</h2>
 <p>Next, we'll commit our code and push it to GitHub, following these steps:</p>
