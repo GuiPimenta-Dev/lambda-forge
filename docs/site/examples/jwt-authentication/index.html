@@ -1195,6 +1195,10 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <h1 id="implementing-a-serverless-authentication-system-with-jwt-dynamo-db-secrets-manager-and-kms">Implementing a Serverless Authentication System with JWT, Dynamo DB, Secrets Manager and KMS</h1>
 <p>In this section, we will develop a serverless authentication system using JWT authentication. This system effectively transmits information from the client and authenticates users to gain access to endpoints containing private information.</p>
 <p>JWT authentication is a secure method for transmitting information between parties as a JSON object. To gain a deeper understanding of JWT tokens and their functionality, you can refer to the article <a href="http://127.0.0.1:8000/articles/page6/">JSON Web Tokens</a>.</p>
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/auth.png" alt="alt text">
+</p>
+
 <h2 id="setting-up-the-dynamodb-tables">Setting Up the DynamoDB Tables</h2>
 <p>To get started, we must create tables to store user credentials securely. For maximum decoupling of environments, proceed to your AWS console and create three separate tables, each designated for a specific stage: <code>Dev-Auth</code>, <code>Staging-Auth</code> and <code>Prod-Auth</code>.</p>
 <p>Once you have obtained the ARNs for these tables, let's integrate them into the <code>cdk.json</code> file within the corresponding environment.</p>
@@ -1247,7 +1251,7 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
 <p>Next, we'll create a new variable class within the DynamoDB class to reference our JWT tables.</p>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/services/dynamo_db.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-8"> 8</a></span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/services/dynamodb.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-8"> 8</a></span>
 <span class="normal"><a href="#__codelineno-1-9"> 9</a></span>
 <span class="normal"><a href="#__codelineno-1-10">10</a></span>
 <span class="normal"><a href="#__codelineno-1-11">11</a></span>
@@ -1257,13 +1261,13 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <span class="normal"><a href="#__codelineno-1-15">15</a></span>
 <span class="normal"><a href="#__codelineno-1-16">16</a></span>
 <span class="normal"><a href="#__codelineno-1-17">17</a></span>
-<span class="normal"><a href="#__codelineno-1-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-8" name="__codelineno-1-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">urls_table</span> <span class="o">=</span> <span class="n">dynamo_db</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-1-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-8" name="__codelineno-1-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">urls_table</span> <span class="o">=</span> <span class="n">dynamodb</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9"></a>            <span class="n">scope</span><span class="p">,</span>
 <a id="__codelineno-1-10" name="__codelineno-1-10"></a>            <span class="s2">&quot;URLsTable&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11"></a>            <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;arns&quot;</span><span class="p">][</span><span class="s2">&quot;urls_table&quot;</span><span class="p">],</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12"></a>        <span class="p">)</span>
 <a id="__codelineno-1-13" name="__codelineno-1-13"></a>
-<a id="__codelineno-1-14" name="__codelineno-1-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">auth_table</span> <span class="o">=</span> <span class="n">dynamo_db</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">auth_table</span> <span class="o">=</span> <span class="n">dynamodb</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
 <a id="__codelineno-1-15" name="__codelineno-1-15"></a>            <span class="n">scope</span><span class="p">,</span>
 <a id="__codelineno-1-16" name="__codelineno-1-16"></a>            <span class="s2">&quot;AuthTable&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="hll">            <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;arns&quot;</span><span class="p">][</span><span class="s2">&quot;auth_table&quot;</span><span class="p">],</span>
@@ -1280,7 +1284,7 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    ├── __init__.py
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    ├── api_gateway.py
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    ├── aws_lambda.py
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    ├── dynamo_db.py
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    ├── dynamodb.py
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="hll">    ├── kms.py
 </span><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    ├── layers.py
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    ├── s3.py
@@ -1373,12 +1377,10 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <p>This command generates a new function within the <code>auth</code> directory.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>functions
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>└── auth
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    ├── signup
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    │   ├── __init__.py
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    │   ├── config.py
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    │   ├── main.py
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    └── utils
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>        └── __init__.py
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    └── signup
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>        ├── __init__.py
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>        ├── config.py
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>        └── main.py
 </code></pre></div>
 <p>The signup functionality can be implemented as follows:</p>
 <div class="highlight"><span class="filename">functions/auth/signup/main.py</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">import</span> <span class="nn">json</span>
@@ -1450,14 +1452,14 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Securely handle user registration with unique credentials.&quot;</span><span class="p">,</span>
 <a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;signup&quot;</span><span class="p">,</span>
 <a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
-</span><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="hll">                <span class="s2">&quot;AUTH_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamo_db</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
+</span><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="hll">                <span class="s2">&quot;AUTH_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
 </span><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="hll">                <span class="s2">&quot;KMS_KEY_ID&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">kms</span><span class="o">.</span><span class="n">auth_key</span><span class="o">.</span><span class="n">key_id</span><span class="p">,</span>
 </span><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="hll">            <span class="p">},</span>
 </span><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>        <span class="p">)</span>
 <a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>
 <a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>        <span class="n">services</span><span class="o">.</span><span class="n">api_gateway</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/signup&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>
-<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamo_db</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">grant_read_write_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">grant_read_write_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
 </span><a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>
 <a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">kms</span><span class="o">.</span><span class="n">auth_key</span><span class="o">.</span><span class="n">grant_encrypt</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
 </span></code></pre></div>
@@ -1472,12 +1474,10 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    │   ├── __init__.py
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    │   ├── config.py
 <a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    │   └── main.py
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    ├── signup
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    │   ├── __init__.py
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    │   ├── config.py
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    │   └── main.py
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    └── utils
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>        └── __init__.py
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    └── signup
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>        ├── __init__.py
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        ├── config.py
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>        └── main.py
 </code></pre></div>
 <p>And now, it's implementation.</p>
 <div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">functions/auth/signup/main.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-1"> 1</a></span>
@@ -1633,7 +1633,7 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;signin&quot;</span><span class="p">,</span>
 <a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="hll">            <span class="n">layers</span><span class="o">=</span><span class="p">[</span><span class="n">services</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">sm_utils_layer</span><span class="p">,</span> <span class="n">services</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">pyjwt_layer</span><span class="p">],</span>
 </span><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
-</span><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="hll">                <span class="s2">&quot;AUTH_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamo_db</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
+</span><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="hll">                <span class="s2">&quot;AUTH_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
 </span><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="hll">                <span class="s2">&quot;KMS_KEY_ID&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">kms</span><span class="o">.</span><span class="n">auth_key</span><span class="o">.</span><span class="n">key_id</span><span class="p">,</span>
 </span><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="hll">                <span class="s2">&quot;JWT_SECRET_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">secrets_manager</span><span class="o">.</span><span class="n">jwt_secret</span><span class="o">.</span><span class="n">secret_name</span><span class="p">,</span>
 </span><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="hll">            <span class="p">},</span>
@@ -1641,7 +1641,7 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>
 <a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>        <span class="n">services</span><span class="o">.</span><span class="n">api_gateway</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/signin&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>
-<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamo_db</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">grant_read_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">grant_read_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
 </span><a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>
 <a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">kms</span><span class="o">.</span><span class="n">auth_key</span><span class="o">.</span><span class="n">grant_decrypt</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
 </span><a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>
@@ -1654,12 +1654,10 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 </code></pre></div>
 <p>This command creates a new <code>jwt</code> authorizer under the <code>authorizers</code> folder.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>authorizers
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>  ├── jwt
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>  │   ├── __init__.py
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>  │   ├── config.py
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>  │   └── main.py
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>  └── utils
-<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>      └── __init__.py
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>  └── jwt
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>      ├── __init__.py
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>      ├── config.py
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>      └── main.py
 </code></pre></div>
 <p>Now, let's proceed with the implementation.</p>
 <div class="highlight"><span class="filename">authorizers/jwt/main.py</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">import</span> <span class="nn">os</span>

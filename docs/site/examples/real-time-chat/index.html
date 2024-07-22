@@ -1236,6 +1236,10 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 
 <h1 id="building-a-real-time-chat-application-with-websockets-in-a-serverless-architecture">Building a Real-Time Chat Application with WebSockets in a Serverless Architecture</h1>
 <p>In this section, we will develop a real-time chat application using WebSockets, facilitating instant communication. This solution is versatile and can be adapted to different scenarios that require fast, real-time interactions, such as the live chat application shown below.</p>
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/chat-diagram.png" alt="alt text">
+</p>
+
 <h2 id="incorporating-the-websockets-class-into-the-services-class">Incorporating the Websockets Class into the Services Class</h2>
 <p>Traditionally, integrating WebSockets involves a significant amount of setup, including configuring the API and establishing various routes to initiate a connection. Fortunately, Forge simplifies this process considerably by offering a template where the connections are pre-configured and interconnected.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>forge service websockets
@@ -1246,90 +1250,13 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    ├── __init__.py
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ├── api_gateway.py
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    ├── aws_lambda.py
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    ├── dynamo_db.py
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    ├── dynamodb.py
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    ├── kms.py
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    ├── layers.py
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    ├── s3.py
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    ├── secrets_manager.py
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="hll">    └── websockets.py
 </span></code></pre></div>
-<p>Unlike the service files we've encountered previously, the WebSockets class contains an extensive amount of boilerplate code, designed to streamline the process of connecting routes.</p>
-<div class="highlight"><span class="filename">infra/services/websockets.py</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_iam</span> <span class="k">as</span> <span class="n">iam</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span> <span class="nn">aws_cdk.aws_lambda</span> <span class="kn">import</span> <span class="n">CfnPermission</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">from</span> <span class="nn">b_aws_websocket_api.ws_api</span> <span class="kn">import</span> <span class="n">WsApi</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kn">from</span> <span class="nn">b_aws_websocket_api.ws_deployment</span> <span class="kn">import</span> <span class="n">WsDeployment</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kn">from</span> <span class="nn">b_aws_websocket_api.ws_lambda_integration</span> <span class="kn">import</span> <span class="n">WsLambdaIntegration</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kn">from</span> <span class="nn">b_aws_websocket_api.ws_route</span> <span class="kn">import</span> <span class="n">WsRoute</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kn">from</span> <span class="nn">b_aws_websocket_api.ws_stage</span> <span class="kn">import</span> <span class="n">WsStage</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="k">class</span> <span class="nc">Websockets</span><span class="p">:</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">context</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">websocket</span> <span class="o">=</span> <span class="n">WsApi</span><span class="p">(</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-WebSocket&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-WebSocket&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>            <span class="n">route_selection_expression</span><span class="o">=</span><span class="s2">&quot;$request.body.action&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>        <span class="p">)</span>
-<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>
-<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="n">WsStage</span><span class="p">(</span>
-<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-WSS-Stage&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>            <span class="n">ws_api</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">websocket</span><span class="p">,</span>
-<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>            <span class="n">stage_name</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
-<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>            <span class="n">auto_deploy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>        <span class="p">)</span>
-<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>
-<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">deployment</span> <span class="o">=</span> <span class="n">WsDeployment</span><span class="p">(</span>
-<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-Deploy&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a>            <span class="n">ws_stage</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stage</span><span class="p">,</span>
-<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>        <span class="p">)</span>
-<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a>
-<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">deployment</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">add_dependency</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stage</span><span class="p">)</span>
-<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a>
-<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a>    <span class="k">def</span> <span class="nf">create_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route_key</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
-<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a>        <span class="n">route_name</span> <span class="o">=</span> <span class="n">route_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a>
-<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a>        <span class="n">CfnPermission</span><span class="p">(</span>
-<a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a>            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-<a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a>            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">function</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">route_name</span><span class="si">}</span><span class="s2">-Invoke&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a>            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;lambda:InvokeFunction&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a>            <span class="n">function_name</span><span class="o">=</span><span class="n">function</span><span class="o">.</span><span class="n">function_name</span><span class="p">,</span>
-<a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a>            <span class="n">principal</span><span class="o">=</span><span class="s2">&quot;apigateway.amazonaws.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a>        <span class="p">)</span>
-<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a>
-<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a>        <span class="n">function</span><span class="o">.</span><span class="n">add_to_role_policy</span><span class="p">(</span>
-<a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a>            <span class="n">iam</span><span class="o">.</span><span class="n">PolicyStatement</span><span class="p">(</span>
-<a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a>                <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;execute-api:ManageConnections&quot;</span><span class="p">],</span>
-<a id="__codelineno-2-53" name="__codelineno-2-53" href="#__codelineno-2-53"></a>                <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;arn:aws:execute-api:*:*:*&quot;</span><span class="p">],</span>
-<a id="__codelineno-2-54" name="__codelineno-2-54" href="#__codelineno-2-54"></a>            <span class="p">)</span>
-<a id="__codelineno-2-55" name="__codelineno-2-55" href="#__codelineno-2-55"></a>        <span class="p">)</span>
-<a id="__codelineno-2-56" name="__codelineno-2-56" href="#__codelineno-2-56"></a>
-<a id="__codelineno-2-57" name="__codelineno-2-57" href="#__codelineno-2-57"></a>        <span class="n">integration</span> <span class="o">=</span> <span class="n">WsLambdaIntegration</span><span class="p">(</span>
-<a id="__codelineno-2-58" name="__codelineno-2-58" href="#__codelineno-2-58"></a>            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-<a id="__codelineno-2-59" name="__codelineno-2-59" href="#__codelineno-2-59"></a>            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-Integration-</span><span class="si">{</span><span class="n">route_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-60" name="__codelineno-2-60" href="#__codelineno-2-60"></a>            <span class="n">integration_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-Integration-</span><span class="si">{</span><span class="n">route_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-61" name="__codelineno-2-61" href="#__codelineno-2-61"></a>            <span class="n">ws_api</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">websocket</span><span class="p">,</span>
-<a id="__codelineno-2-62" name="__codelineno-2-62" href="#__codelineno-2-62"></a>            <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-<a id="__codelineno-2-63" name="__codelineno-2-63" href="#__codelineno-2-63"></a>        <span class="p">)</span>
-<a id="__codelineno-2-64" name="__codelineno-2-64" href="#__codelineno-2-64"></a>
-<a id="__codelineno-2-65" name="__codelineno-2-65" href="#__codelineno-2-65"></a>        <span class="n">route</span> <span class="o">=</span> <span class="n">WsRoute</span><span class="p">(</span>
-<a id="__codelineno-2-66" name="__codelineno-2-66" href="#__codelineno-2-66"></a>            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-<a id="__codelineno-2-67" name="__codelineno-2-67" href="#__codelineno-2-67"></a>            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-Route-</span><span class="si">{</span><span class="n">route_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-68" name="__codelineno-2-68" href="#__codelineno-2-68"></a>            <span class="n">ws_api</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">websocket</span><span class="p">,</span>
-<a id="__codelineno-2-69" name="__codelineno-2-69" href="#__codelineno-2-69"></a>            <span class="n">route_key</span><span class="o">=</span><span class="n">route_key</span><span class="p">,</span>
-<a id="__codelineno-2-70" name="__codelineno-2-70" href="#__codelineno-2-70"></a>            <span class="n">authorization_type</span><span class="o">=</span><span class="s2">&quot;NONE&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-71" name="__codelineno-2-71" href="#__codelineno-2-71"></a>            <span class="n">route_response_selection_expression</span><span class="o">=</span><span class="s2">&quot;$default&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-72" name="__codelineno-2-72" href="#__codelineno-2-72"></a>            <span class="n">target</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;integrations/</span><span class="si">{</span><span class="n">integration</span><span class="o">.</span><span class="n">ref</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-73" name="__codelineno-2-73" href="#__codelineno-2-73"></a>        <span class="p">)</span>
-<a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a>
-<a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">deployment</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">add_dependency</span><span class="p">(</span><span class="n">route</span><span class="p">)</span>
-</code></pre></div>
 <p>This class is crafted to simplify the traditionally complex process of creating, deploying, and integrating WebSocket APIs. It not only streamlines the setup but also manages the necessary permissions, enabling functions to seamlessly send messages through a WebSocket channel.</p>
 <p>To ease the configuration and management of WebSockets, we utilize the open-source library <code>b_aws_websocket_api</code>, enhancing our integration capabilities and efficiency.</p>
 <h2 id="setup-the-websocket-urls-for-a-multi-stage-environment">Setup the Websocket URLS for a Multi-Stage Environment</h2>
@@ -1339,59 +1266,59 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
     <p>If you have configured a custom domain name, you can preemptively specify your URLs. If not, you will need to deploy your code to AWS to obtain the WebSocket URLs. Subsequently, these URLs must be added to the cdk.json file.</p>
 </div>
 
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">cdk.json</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-51">51</a></span>
-<span class="normal"><a href="#__codelineno-3-52">52</a></span>
-<span class="normal"><a href="#__codelineno-3-53">53</a></span>
-<span class="normal"><a href="#__codelineno-3-54">54</a></span>
-<span class="normal"><a href="#__codelineno-3-55">55</a></span>
-<span class="normal"><a href="#__codelineno-3-56">56</a></span>
-<span class="normal"><a href="#__codelineno-3-57">57</a></span>
-<span class="normal"><a href="#__codelineno-3-58">58</a></span>
-<span class="normal"><a href="#__codelineno-3-59">59</a></span>
-<span class="normal"><a href="#__codelineno-3-60">60</a></span>
-<span class="normal"><a href="#__codelineno-3-61">61</a></span>
-<span class="normal"><a href="#__codelineno-3-62">62</a></span>
-<span class="normal"><a href="#__codelineno-3-63">63</a></span>
-<span class="normal"><a href="#__codelineno-3-64">64</a></span>
-<span class="normal"><a href="#__codelineno-3-65">65</a></span>
-<span class="normal"><a href="#__codelineno-3-66">66</a></span>
-<span class="normal"><a href="#__codelineno-3-67">67</a></span>
-<span class="normal"><a href="#__codelineno-3-68">68</a></span>
-<span class="normal"><a href="#__codelineno-3-69">69</a></span>
-<span class="normal"><a href="#__codelineno-3-70">70</a></span>
-<span class="normal"><a href="#__codelineno-3-71">71</a></span>
-<span class="normal"><a href="#__codelineno-3-72">72</a></span>
-<span class="normal"><a href="#__codelineno-3-73">73</a></span>
-<span class="normal"><a href="#__codelineno-3-74">74</a></span>
-<span class="normal"><a href="#__codelineno-3-75">75</a></span>
-<span class="normal"><a href="#__codelineno-3-76">76</a></span>
-<span class="normal"><a href="#__codelineno-3-77">77</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-51" name="__codelineno-3-51"></a>   <span class="s2">&quot;dev&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-3-52" name="__codelineno-3-52"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com/dev&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-53" name="__codelineno-3-53"></a><span class="hll">      <span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-POST-TO-CONNECTION-URL&quot;</span><span class="p">,</span>
-</span><a id="__codelineno-3-54" name="__codelineno-3-54"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-3-55" name="__codelineno-3-55"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-56" name="__codelineno-3-56"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-57" name="__codelineno-3-57"></a>        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-AUTH-TABLE-ARN&quot;</span>
-<a id="__codelineno-3-58" name="__codelineno-3-58"></a>      <span class="p">}</span>
-<a id="__codelineno-3-59" name="__codelineno-3-59"></a>    <span class="p">},</span>
-<a id="__codelineno-3-60" name="__codelineno-3-60"></a>    <span class="s2">&quot;staging&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-3-61" name="__codelineno-3-61"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com/staging&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-62" name="__codelineno-3-62"></a><span class="hll">      <span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-POST-TO-CONNECTION-URL&quot;</span><span class="p">,</span>
-</span><a id="__codelineno-3-63" name="__codelineno-3-63"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-3-64" name="__codelineno-3-64"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-65" name="__codelineno-3-65"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-66" name="__codelineno-3-66"></a>        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-AUTH-TABLE-ARN&quot;</span>
-<a id="__codelineno-3-67" name="__codelineno-3-67"></a>      <span class="p">}</span>
-<a id="__codelineno-3-68" name="__codelineno-3-68"></a>    <span class="p">},</span>
-<a id="__codelineno-3-69" name="__codelineno-3-69"></a>    <span class="s2">&quot;prod&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-3-70" name="__codelineno-3-70"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-71" name="__codelineno-3-71"></a><span class="hll">      <span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-POST-TO-CONNECTION-URL&quot;</span><span class="p">,</span>
-</span><a id="__codelineno-3-72" name="__codelineno-3-72"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-3-73" name="__codelineno-3-73"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-74" name="__codelineno-3-74"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-75" name="__codelineno-3-75"></a>        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-AUTH-TABLE-ARN&quot;</span>
-<a id="__codelineno-3-76" name="__codelineno-3-76"></a>      <span class="p">}</span>
-<a id="__codelineno-3-77" name="__codelineno-3-77"></a>    <span class="p">}</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">cdk.json</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-51">51</a></span>
+<span class="normal"><a href="#__codelineno-2-52">52</a></span>
+<span class="normal"><a href="#__codelineno-2-53">53</a></span>
+<span class="normal"><a href="#__codelineno-2-54">54</a></span>
+<span class="normal"><a href="#__codelineno-2-55">55</a></span>
+<span class="normal"><a href="#__codelineno-2-56">56</a></span>
+<span class="normal"><a href="#__codelineno-2-57">57</a></span>
+<span class="normal"><a href="#__codelineno-2-58">58</a></span>
+<span class="normal"><a href="#__codelineno-2-59">59</a></span>
+<span class="normal"><a href="#__codelineno-2-60">60</a></span>
+<span class="normal"><a href="#__codelineno-2-61">61</a></span>
+<span class="normal"><a href="#__codelineno-2-62">62</a></span>
+<span class="normal"><a href="#__codelineno-2-63">63</a></span>
+<span class="normal"><a href="#__codelineno-2-64">64</a></span>
+<span class="normal"><a href="#__codelineno-2-65">65</a></span>
+<span class="normal"><a href="#__codelineno-2-66">66</a></span>
+<span class="normal"><a href="#__codelineno-2-67">67</a></span>
+<span class="normal"><a href="#__codelineno-2-68">68</a></span>
+<span class="normal"><a href="#__codelineno-2-69">69</a></span>
+<span class="normal"><a href="#__codelineno-2-70">70</a></span>
+<span class="normal"><a href="#__codelineno-2-71">71</a></span>
+<span class="normal"><a href="#__codelineno-2-72">72</a></span>
+<span class="normal"><a href="#__codelineno-2-73">73</a></span>
+<span class="normal"><a href="#__codelineno-2-74">74</a></span>
+<span class="normal"><a href="#__codelineno-2-75">75</a></span>
+<span class="normal"><a href="#__codelineno-2-76">76</a></span>
+<span class="normal"><a href="#__codelineno-2-77">77</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-51" name="__codelineno-2-51"></a>   <span class="s2">&quot;dev&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-52" name="__codelineno-2-52"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com/dev&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-53" name="__codelineno-2-53"></a><span class="hll">      <span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-POST-TO-CONNECTION-URL&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-2-54" name="__codelineno-2-54"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-55" name="__codelineno-2-55"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-56" name="__codelineno-2-56"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-57" name="__codelineno-2-57"></a>        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-AUTH-TABLE-ARN&quot;</span>
+<a id="__codelineno-2-58" name="__codelineno-2-58"></a>      <span class="p">}</span>
+<a id="__codelineno-2-59" name="__codelineno-2-59"></a>    <span class="p">},</span>
+<a id="__codelineno-2-60" name="__codelineno-2-60"></a>    <span class="s2">&quot;staging&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-61" name="__codelineno-2-61"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com/staging&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-62" name="__codelineno-2-62"></a><span class="hll">      <span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-POST-TO-CONNECTION-URL&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-2-63" name="__codelineno-2-63"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-64" name="__codelineno-2-64"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-65" name="__codelineno-2-65"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-66" name="__codelineno-2-66"></a>        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-AUTH-TABLE-ARN&quot;</span>
+<a id="__codelineno-2-67" name="__codelineno-2-67"></a>      <span class="p">}</span>
+<a id="__codelineno-2-68" name="__codelineno-2-68"></a>    <span class="p">},</span>
+<a id="__codelineno-2-69" name="__codelineno-2-69"></a>    <span class="s2">&quot;prod&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-70" name="__codelineno-2-70"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-71" name="__codelineno-2-71"></a><span class="hll">      <span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-POST-TO-CONNECTION-URL&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-2-72" name="__codelineno-2-72"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-73" name="__codelineno-2-73"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-74" name="__codelineno-2-74"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-75" name="__codelineno-2-75"></a>        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-AUTH-TABLE-ARN&quot;</span>
+<a id="__codelineno-2-76" name="__codelineno-2-76"></a>      <span class="p">}</span>
+<a id="__codelineno-2-77" name="__codelineno-2-77"></a>    <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="establishing-a-connection-with-the-websocket">Establishing a Connection with the Websocket</h2>
 <p>To identify the connection IDs for each WebSocket channel, it's essential to inform the client of our application about their respective IDs. This step ensures we can accurately locate the channels as they begin to exchange messages.</p>
@@ -1399,41 +1326,39 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <p>Therefore, we must implement a sequential two-part process. The initial Lambda function, assigned to handle the connection setup, will trigger another Lambda function. This second function is specifically designed with the capability to send messages directly through the WebSocket channel.</p>
 <h3 id="creating-the-function-to-send-the-connection-ids">Creating the Function to Send the Connection IDs</h3>
 <p>Let's first create the function that will actually send the connection id.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>forge function send_connection_id --description &quot;Sends the connection id to the client when a connection is made&quot; --belongs-to &quot;chat&quot; --no-tests
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>forge function send_connection_id --description &quot;Sends the connection id to the client when a connection is made&quot; --belongs-to &quot;chat&quot; --no-tests
 </code></pre></div>
 <p>This command creates a new <code>send_connection_id</code> function within the <code>chat</code> directory.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>functions
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>└── chat
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    ├── __init__.py
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    ├── send_connection_id
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    │   ├── __init__.py
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    │   ├── config.py
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    │   └── main.py
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    └── utils
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        └── __init__.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>functions
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>└── chat
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    ├── __init__.py
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    └── send_connection_id
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        ├── __init__.py
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>        ├── config.py
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        └── main.py
 </code></pre></div>
 <p>This function is going to be very simple, it should simply receive an event with the connection id and send a message to the desired websocket channel.</p>
-<div class="highlight"><span class="filename">functions/chat/send_connection_id/main.py</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span> <span class="nn">json</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span> <span class="nn">os</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">import</span> <span class="nn">boto3</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="c1"># Retrieve the connection ID from the event</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">connection_id</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;connection_id&quot;</span><span class="p">]</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="c1"># Create a client for the API Gateway Management API</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="n">api_gateway_management_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>        <span class="s2">&quot;apigatewaymanagementapi&quot;</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;POST_TO_CONNECTION_URL&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="p">)</span>
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="c1"># Send the payload to the WebSocket</span>
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="n">api_gateway_management_client</span><span class="o">.</span><span class="n">post_to_connection</span><span class="p">(</span>
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>        <span class="n">ConnectionId</span><span class="o">=</span><span class="n">connection_id</span><span class="p">,</span> <span class="n">Data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;connection_id&quot;</span><span class="p">:</span> <span class="n">connection_id</span><span class="p">})</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>    <span class="p">)</span>
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>
-<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
+<div class="highlight"><span class="filename">functions/chat/send_connection_id/main.py</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span> <span class="nn">json</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">import</span> <span class="nn">os</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">import</span> <span class="nn">boto3</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="c1"># Retrieve the connection ID from the event</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">connection_id</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;connection_id&quot;</span><span class="p">]</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="c1"># Create a client for the API Gateway Management API</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="n">api_gateway_management_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="s2">&quot;apigatewaymanagementapi&quot;</span><span class="p">,</span> <span class="n">endpoint_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;POST_TO_CONNECTION_URL&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="p">)</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    <span class="c1"># Send the payload to the WebSocket</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="n">api_gateway_management_client</span><span class="o">.</span><span class="n">post_to_connection</span><span class="p">(</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>        <span class="n">ConnectionId</span><span class="o">=</span><span class="n">connection_id</span><span class="p">,</span> <span class="n">Data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;connection_id&quot;</span><span class="p">:</span> <span class="n">connection_id</span><span class="p">})</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    <span class="p">)</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
 </code></pre></div>
 <div class="admonition warning">
     <p class="admonition-title">Warning</p>
@@ -1441,266 +1366,222 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 </div>
 
 <p>We need to implement a minor adjustment to the Lambda stack, ensuring it passes the context to the <code>SendConnectionIdConfig</code> class. This modification allows the function to dynamically determine the appropriate environment for message delivery.</p>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/lambda_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-50">50</a></span>
-<span class="normal"><a href="#__codelineno-7-51">51</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-50" name="__codelineno-7-50"></a>        <span class="c1"># Chat</span>
-<a id="__codelineno-7-51" name="__codelineno-7-51"></a><span class="hll">        <span class="n">SendConnectionIdConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/lambda_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-50">50</a></span>
+<span class="normal"><a href="#__codelineno-6-51">51</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-50" name="__codelineno-6-50"></a>        <span class="c1"># Chat</span>
+<a id="__codelineno-6-51" name="__codelineno-6-51"></a><span class="hll">        <span class="n">SendConnectionIdConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
 <p>Now, Let's configure it.</p>
-<div class="highlight"><span class="filename">functions/chat/send_connection_id/config.py</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_iam</span> <span class="k">as</span> <span class="n">iam</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">class</span> <span class="nc">SendConnectionIdConfig</span><span class="p">:</span>
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="hll">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SendConnectionId&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/chat&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Sends the connection id to the client when a connection is made&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;send_connection_id&quot;</span><span class="p">,</span>
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
-</span><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="hll">              <span class="s2">&quot;POST_TO_CONNECTION_URL&quot;</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">]</span>
-</span><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="hll">            <span class="p">},</span>
-</span><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>        <span class="p">)</span>
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="hll">        <span class="n">function</span><span class="o">.</span><span class="n">add_to_role_policy</span><span class="p">(</span>
-</span><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="hll">            <span class="n">iam</span><span class="o">.</span><span class="n">PolicyStatement</span><span class="p">(</span>
-</span><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="hll">                <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;execute-api:ManageConnections&quot;</span><span class="p">],</span>
-</span><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="hll">                <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;arn:aws:execute-api:*:*:*&quot;</span><span class="p">],</span>
-</span><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="hll">            <span class="p">)</span>
-</span><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="hll">        <span class="p">)</span>
+<div class="highlight"><span class="filename">functions/chat/send_connection_id/config.py</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_iam</span> <span class="k">as</span> <span class="n">iam</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">class</span> <span class="nc">SendConnectionIdConfig</span><span class="p">:</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="hll">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SendConnectionId&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/chat&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Sends the connection id to the client when a connection is made&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;send_connection_id&quot;</span><span class="p">,</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
+</span><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="hll">              <span class="s2">&quot;POST_TO_CONNECTION_URL&quot;</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">]</span>
+</span><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="hll">            <span class="p">},</span>
+</span><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>        <span class="p">)</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="hll">        <span class="n">function</span><span class="o">.</span><span class="n">add_to_role_policy</span><span class="p">(</span>
+</span><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="hll">            <span class="n">iam</span><span class="o">.</span><span class="n">PolicyStatement</span><span class="p">(</span>
+</span><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="hll">                <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;execute-api:ManageConnections&quot;</span><span class="p">],</span>
+</span><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="hll">                <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;arn:aws:execute-api:*:*:*&quot;</span><span class="p">],</span>
+</span><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="hll">            <span class="p">)</span>
+</span><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="hll">        <span class="p">)</span>
 </span></code></pre></div>
 <h3 id="creating-the-function-to-handle-the-websocket-connections">Creating the Function to Handle the Websocket Connections</h3>
 <p>With the function for sending the connections id now established, let's proceed to set up the connection handler.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>forge function connect --description &quot;Handle the websocket connection&quot; --websocket --belongs-to &quot;chat&quot; --no-tests
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>forge function connect --description &quot;Handle the websocket connection&quot; --websocket --belongs-to &quot;chat&quot; --no-tests
 </code></pre></div>
 <p>As expected, a new function has been created on the <code>chat</code> directory.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>functions
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>└── chat
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    ├── __init__.py
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    ├── connect
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    │   ├── __init__.py
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    │   ├── config.py
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    │   └── main.py
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    ├── send_connection_id
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    │   ├── __init__.py
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    │   ├── config.py
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>    │   └── main.py
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    └── utils
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>        └── __init__.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>functions
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>└── chat
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    ├── __init__.py
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    ├── connect
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    │   ├── __init__.py
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    │   ├── config.py
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    │   └── main.py
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>    └── send_connection_id
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>       ├── __init__.py
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>       ├── config.py
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>       └── main.py
 </code></pre></div>
 <p>Let's move forward with its straightforward implementation, which will essentially involve invoking another function and passing along the connection ID.</p>
-<div class="highlight"><span class="filename">functions/chat/connect/main.py</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">import</span> <span class="nn">json</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">import</span> <span class="nn">os</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="kn">import</span> <span class="nn">boto3</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
-<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
-<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    <span class="c1"># Retrieve the connection ID from the request context</span>
-<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>    <span class="n">connection_id</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;requestContext&quot;</span><span class="p">][</span><span class="s2">&quot;connectionId&quot;</span><span class="p">]</span>
-<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>
-<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="c1"># Create a client for the AWS Lambda service</span>
-<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>    <span class="n">lambda_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">)</span>
-<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
-<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>    <span class="c1"># Retrieve the ARN of the target Lambda function from the environment variables</span>
-<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>    <span class="n">TARGET_FUNCTION_ARN</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TARGET_FUNCTION_ARN&quot;</span><span class="p">)</span>
-<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>
-<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>    <span class="c1"># Define the payload to pass to the target Lambda function</span>
-<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;connection_id&quot;</span><span class="p">:</span> <span class="n">connection_id</span><span class="p">}</span>
-<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>
-<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a>    <span class="c1"># Invoke the target Lambda function asynchronously</span>
-<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a>    <span class="n">lambda_client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">FunctionName</span><span class="o">=</span><span class="n">TARGET_FUNCTION_ARN</span><span class="p">,</span> <span class="n">InvocationType</span><span class="o">=</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="n">Payload</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
-<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a>
-<a id="__codelineno-11-25" name="__codelineno-11-25" href="#__codelineno-11-25"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
+<div class="highlight"><span class="filename">functions/chat/connect/main.py</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">import</span> <span class="nn">json</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">import</span> <span class="nn">os</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">import</span> <span class="nn">boto3</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="c1"># Retrieve the connection ID from the request context</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    <span class="n">connection_id</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;requestContext&quot;</span><span class="p">][</span><span class="s2">&quot;connectionId&quot;</span><span class="p">]</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="c1"># Create a client for the AWS Lambda service</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>    <span class="n">lambda_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;lambda&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>    <span class="c1"># Retrieve the ARN of the target Lambda function from the environment variables</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>    <span class="n">TARGET_FUNCTION_ARN</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TARGET_FUNCTION_ARN&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>    <span class="c1"># Define the payload to pass to the target Lambda function</span>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;connection_id&quot;</span><span class="p">:</span> <span class="n">connection_id</span><span class="p">}</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>    <span class="c1"># Invoke the target Lambda function asynchronously</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>    <span class="n">lambda_client</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">FunctionName</span><span class="o">=</span><span class="n">TARGET_FUNCTION_ARN</span><span class="p">,</span> <span class="n">InvocationType</span><span class="o">=</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="n">Payload</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
 </code></pre></div>
 <p>This function has a crucial dependency on another, requiring precise configuration to grant it the necessary permissions for invoking the target function and to correctly obtain its ARN.</p>
-<p>To manage such scenarios, the <code>AWSLambda</code> class maintains references to all functions it creates. This approach ensures these functions remain accessible for future interactions. Let's examine the AWSLambda class in more detail to understand how it achieves this.</p>
-<div class="highlight"><span class="filename">infra/services/aws_lambda.py</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">Duration</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kn">from</span> <span class="nn">aws_cdk.aws_lambda</span> <span class="kn">import</span> <span class="n">Code</span><span class="p">,</span> <span class="n">Function</span><span class="p">,</span> <span class="n">Runtime</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kn">from</span> <span class="nn">lambda_forge</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">track</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="kn">from</span> <span class="nn">lambda_forge.interfaces</span> <span class="kn">import</span> <span class="n">IAWSLambda</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="k">class</span> <span class="nc">AWSLambda</span><span class="p">(</span><span class="n">IAWSLambda</span><span class="p">):</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span> <span class="o">=</span> <span class="p">{}</span>
-</span><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    <span class="nd">@track</span>
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    <span class="k">def</span> <span class="nf">create_function</span><span class="p">(</span>
-<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>        <span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>        <span class="n">path</span><span class="p">,</span>
-<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>        <span class="n">description</span><span class="p">,</span>
-<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>        <span class="n">directory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>        <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a>        <span class="n">layers</span><span class="o">=</span><span class="p">[],</span>
-<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a>        <span class="n">environment</span><span class="o">=</span><span class="p">{},</span>
-<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a>    <span class="p">):</span>
-<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a>
-<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span>
-<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a>            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">,</span>
-<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a>            <span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a>            <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a>            <span class="n">function_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">stage</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a>            <span class="n">runtime</span><span class="o">=</span><span class="n">Runtime</span><span class="o">.</span><span class="n">PYTHON_3_9</span><span class="p">,</span>
-<a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a>            <span class="n">handler</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">handler</span><span class="p">(</span><span class="n">directory</span><span class="p">),</span>
-<a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a>            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-<a id="__codelineno-12-33" name="__codelineno-12-33" href="#__codelineno-12-33"></a>            <span class="n">code</span><span class="o">=</span><span class="n">Code</span><span class="o">.</span><span class="n">from_asset</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">path</span><span class="p">)),</span>
-<a id="__codelineno-12-34" name="__codelineno-12-34" href="#__codelineno-12-34"></a>            <span class="n">layers</span><span class="o">=</span><span class="n">layers</span><span class="p">,</span>
-<a id="__codelineno-12-35" name="__codelineno-12-35" href="#__codelineno-12-35"></a>            <span class="n">timeout</span><span class="o">=</span><span class="n">Duration</span><span class="o">.</span><span class="n">minutes</span><span class="p">(</span><span class="n">timeout</span><span class="p">),</span>
-<a id="__codelineno-12-36" name="__codelineno-12-36" href="#__codelineno-12-36"></a>        <span class="p">)</span>
-<a id="__codelineno-12-37" name="__codelineno-12-37" href="#__codelineno-12-37"></a>
-<a id="__codelineno-12-38" name="__codelineno-12-38" href="#__codelineno-12-38"></a><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">function</span>
-</span><a id="__codelineno-12-39" name="__codelineno-12-39" href="#__codelineno-12-39"></a>        <span class="k">return</span> <span class="n">function</span>
-</code></pre></div>
-<p>As shown above, It maintains a record of the created functions, cataloging them by name for referencing and management.</p>
+<p>To manage such scenarios, the <code>AWSLambda</code> class maintains references to all functions it creates. This approach ensures these functions remain accessible for future interactions.</p>
 <p>With this context in mind, let's proceed to set up the connection handler.</p>
-<div class="highlight"><span class="filename">functions/chat/connect/config.py</span><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="k">class</span> <span class="nc">ConnectConfig</span><span class="p">:</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="hll">        <span class="n">send_connection_id_function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="s2">&quot;SendConnectionId&quot;</span><span class="p">]</span>
-</span><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        <span class="n">connect_function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Connect&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/chat&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Handle the websocket connection&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;connect&quot;</span><span class="p">,</span>
-<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
-</span><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="hll">                <span class="s2">&quot;TARGET_FUNCTION_ARN&quot;</span><span class="p">:</span> <span class="n">send_connection_id_function</span><span class="o">.</span><span class="n">function_arn</span><span class="p">,</span>
-</span><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="hll">            <span class="p">},</span>
-</span><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>        <span class="p">)</span>
-<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>
-<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">websockets</span><span class="o">.</span><span class="n">create_route</span><span class="p">(</span><span class="s2">&quot;$connect&quot;</span><span class="p">,</span> <span class="n">connect_function</span><span class="p">)</span>
-</span><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a>
-<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="hll">        <span class="n">send_connection_id_function</span><span class="o">.</span><span class="n">grant_invoke</span><span class="p">(</span><span class="n">connect_function</span><span class="p">)</span>
+<div class="highlight"><span class="filename">functions/chat/connect/config.py</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">class</span> <span class="nc">ConnectConfig</span><span class="p">:</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="hll">        <span class="n">send_connection_id_function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">functions</span><span class="p">[</span><span class="s2">&quot;SendConnectionId&quot;</span><span class="p">]</span>
+</span><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>        <span class="n">connect_function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Connect&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/chat&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Handle the websocket connection&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;connect&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
+</span><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="hll">                <span class="s2">&quot;TARGET_FUNCTION_ARN&quot;</span><span class="p">:</span> <span class="n">send_connection_id_function</span><span class="o">.</span><span class="n">function_arn</span><span class="p">,</span>
+</span><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="hll">            <span class="p">},</span>
+</span><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>        <span class="p">)</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">websockets</span><span class="o">.</span><span class="n">create_route</span><span class="p">(</span><span class="s2">&quot;$connect&quot;</span><span class="p">,</span> <span class="n">connect_function</span><span class="p">)</span>
+</span><a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a>
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="hll">        <span class="n">send_connection_id_function</span><span class="o">.</span><span class="n">grant_invoke</span><span class="p">(</span><span class="n">connect_function</span><span class="p">)</span>
 </span></code></pre></div>
 <p>To ensure the <code>SendConnectionId</code> function is available in the configuration for the <code>Connect</code> function, it's crucial to define the target function before creating the trigger function.</p>
 <p>The order in which functions are generated and become operational is directly tied to their definition sequence within the <code>LambdaStack</code>. Hence, it is imperative to ensure the sequence is correctly arranged, with the target function being established before its corresponding trigger function.</p>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/lambda_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-50">50</a></span>
-<span class="normal"><a href="#__codelineno-14-51">51</a></span>
-<span class="normal"><a href="#__codelineno-14-52">52</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-14-50" name="__codelineno-14-50"></a>        <span class="c1"># Chat</span>
-<a id="__codelineno-14-51" name="__codelineno-14-51"></a>        <span class="n">SendConnectionIdConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-<a id="__codelineno-14-52" name="__codelineno-14-52"></a>        <span class="n">ConnectConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/lambda_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-12-50">50</a></span>
+<span class="normal"><a href="#__codelineno-12-51">51</a></span>
+<span class="normal"><a href="#__codelineno-12-52">52</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-12-50" name="__codelineno-12-50"></a>        <span class="c1"># Chat</span>
+<a id="__codelineno-12-51" name="__codelineno-12-51"></a>        <span class="n">SendConnectionIdConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+<a id="__codelineno-12-52" name="__codelineno-12-52"></a>        <span class="n">ConnectConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="sending-messages">Sending Messages</h2>
 <p>Once a connection is established, we can be sending messages in real time to each channel. So let's create the function that will send the messages.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>forge function send_message --description &quot;Send messages to sender and recipient&quot; --websocket --belongs-to &quot;chat&quot; --no-tests
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>forge function send_message --description &quot;Send messages to sender and recipient&quot; --websocket --belongs-to &quot;chat&quot; --no-tests
 </code></pre></div>
 <p>Below is the updated layout of our folder structure.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>functions
-<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>└── chat
-<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    ├── connect
-<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    │   ├── __init__.py
-<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    │   ├── config.py
-<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    │   └── main.py
-<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    ├── send_connection_id
-<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>    │   ├── __init__.py
-<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>    │   ├── config.py
-<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>    │   └── main.py
-<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    ├── send_message
-<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>    │   ├── __init__.py
-<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>    │   ├── config.py
-<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>    │   └── main.py
-<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>    └── utils
-<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>        └── __init__.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>functions
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>└── chat
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    ├── connect
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    │   ├── __init__.py
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    │   ├── config.py
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    │   └── main.py
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    ├── send_connection_id
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    │   ├── __init__.py
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    │   ├── config.py
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    │   └── main.py
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    ├── send_message
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    │   ├── __init__.py
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>    │   ├── config.py
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>    │   └── main.py
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>    └── utils
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>        └── __init__.py
 </code></pre></div>
 <p>Like the previous functions, this one will be very simple. It will accept a connection ID for posting messages, using the channel ID as the sender ID. Additionally, it will forward the same messages to both channels, ensuring that clients can maintain a message history across both channels.</p>
-<div class="highlight"><span class="filename">functions/chat/send_message/main.py</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">import</span> <span class="nn">json</span>
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kn">import</span> <span class="nn">os</span>
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="kn">import</span> <span class="nn">boto3</span>
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
-<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
-<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>    <span class="c1"># Retrieve the URL for posting messages to connected clients from the environment variables</span>
-<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    <span class="n">POST_TO_CONNECTION_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;POST_TO_CONNECTION_URL&quot;</span><span class="p">)</span>
-<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>
-<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>    <span class="c1"># Create a client for the API Gateway Management API, specifying the endpoint URL</span>
-<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>    <span class="n">apigtw_management</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
-<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>        <span class="s2">&quot;apigatewaymanagementapi&quot;</span><span class="p">,</span>
-<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>        <span class="n">endpoint_url</span><span class="o">=</span><span class="n">POST_TO_CONNECTION_URL</span><span class="p">,</span>
-<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>    <span class="p">)</span>
-<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>
-<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>    <span class="c1"># Retrieve the connection ID of the sender from the request context</span>
-<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>    <span class="n">sender_id</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;requestContext&quot;</span><span class="p">][</span><span class="s2">&quot;connectionId&quot;</span><span class="p">]</span>
-<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>
-<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>    <span class="c1"># Parse the incoming message and the recipient ID from the Lambda event body</span>
-<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>    <span class="n">message</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">])[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span>
-<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>    <span class="n">recipient_id</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">])[</span><span class="s2">&quot;recipient_id&quot;</span><span class="p">]</span>
-<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>
-<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a>    <span class="c1"># Iterate over both the sender and recipient connection IDs</span>
-<a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a>    <span class="k">for</span> <span class="n">connection_id</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sender_id</span><span class="p">,</span> <span class="n">recipient_id</span><span class="p">]:</span>
-<a id="__codelineno-17-26" name="__codelineno-17-26" href="#__codelineno-17-26"></a>        <span class="n">apigtw_management</span><span class="o">.</span><span class="n">post_to_connection</span><span class="p">(</span>
-<a id="__codelineno-17-27" name="__codelineno-17-27" href="#__codelineno-17-27"></a>            <span class="n">ConnectionId</span><span class="o">=</span><span class="n">connection_id</span><span class="p">,</span>
-<a id="__codelineno-17-28" name="__codelineno-17-28" href="#__codelineno-17-28"></a>            <span class="n">Data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span> <span class="s2">&quot;sender_id&quot;</span><span class="p">:</span> <span class="n">sender_id</span><span class="p">,</span> <span class="s2">&quot;recipient_id&quot;</span><span class="p">:</span> <span class="n">recipient_id</span><span class="p">}),</span>
-<a id="__codelineno-17-29" name="__codelineno-17-29" href="#__codelineno-17-29"></a>        <span class="p">)</span>
-<a id="__codelineno-17-30" name="__codelineno-17-30" href="#__codelineno-17-30"></a>
-<a id="__codelineno-17-31" name="__codelineno-17-31" href="#__codelineno-17-31"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
+<div class="highlight"><span class="filename">functions/chat/send_message/main.py</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">import</span> <span class="nn">json</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kn">import</span> <span class="nn">os</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kn">import</span> <span class="nn">boto3</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="c1"># Retrieve the URL for posting messages to connected clients from the environment variables</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    <span class="n">POST_TO_CONNECTION_URL</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;POST_TO_CONNECTION_URL&quot;</span><span class="p">)</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    <span class="c1"># Create a client for the API Gateway Management API, specifying the endpoint URL</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    <span class="n">apigtw_management</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>        <span class="s2">&quot;apigatewaymanagementapi&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>        <span class="n">endpoint_url</span><span class="o">=</span><span class="n">POST_TO_CONNECTION_URL</span><span class="p">,</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>    <span class="p">)</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>    <span class="c1"># Retrieve the connection ID of the sender from the request context</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>    <span class="n">sender_id</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;requestContext&quot;</span><span class="p">][</span><span class="s2">&quot;connectionId&quot;</span><span class="p">]</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>    <span class="c1"># Parse the incoming message and the recipient ID from the Lambda event body</span>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>    <span class="n">message</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">])[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span>
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a>    <span class="n">recipient_id</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">])[</span><span class="s2">&quot;recipient_id&quot;</span><span class="p">]</span>
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a>    <span class="c1"># Iterate over both the sender and recipient connection IDs</span>
+<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>    <span class="k">for</span> <span class="n">connection_id</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sender_id</span><span class="p">,</span> <span class="n">recipient_id</span><span class="p">]:</span>
+<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a>        <span class="n">apigtw_management</span><span class="o">.</span><span class="n">post_to_connection</span><span class="p">(</span>
+<a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a>            <span class="n">ConnectionId</span><span class="o">=</span><span class="n">connection_id</span><span class="p">,</span>
+<a id="__codelineno-15-28" name="__codelineno-15-28" href="#__codelineno-15-28"></a>            <span class="n">Data</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span> <span class="s2">&quot;sender_id&quot;</span><span class="p">:</span> <span class="n">sender_id</span><span class="p">,</span> <span class="s2">&quot;recipient_id&quot;</span><span class="p">:</span> <span class="n">recipient_id</span><span class="p">}),</span>
+<a id="__codelineno-15-29" name="__codelineno-15-29" href="#__codelineno-15-29"></a>        <span class="p">)</span>
+<a id="__codelineno-15-30" name="__codelineno-15-30" href="#__codelineno-15-30"></a>
+<a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">}</span>
 </code></pre></div>
 <p>Similar to the <code>SendConnectionId</code> function, it's necessary to pass the context from the <code>LambdaStack</code> to the <code>SendMessageConfig</code> class. This step enables our function to discern the appropriate stage for message dispatch.</p>
-<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/lambda_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-18-50">50</a></span>
-<span class="normal"><a href="#__codelineno-18-51">51</a></span>
-<span class="normal"><a href="#__codelineno-18-52">52</a></span>
-<span class="normal"><a href="#__codelineno-18-53">53</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-18-50" name="__codelineno-18-50"></a>        <span class="c1"># Chat</span>
-<a id="__codelineno-18-51" name="__codelineno-18-51"></a><span class="hll">        <span class="n">SendMessageConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-</span><a id="__codelineno-18-52" name="__codelineno-18-52"></a>        <span class="n">SendConnectionIdConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-<a id="__codelineno-18-53" name="__codelineno-18-53"></a>        <span class="n">ConnectConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/lambda_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-16-50">50</a></span>
+<span class="normal"><a href="#__codelineno-16-51">51</a></span>
+<span class="normal"><a href="#__codelineno-16-52">52</a></span>
+<span class="normal"><a href="#__codelineno-16-53">53</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-16-50" name="__codelineno-16-50"></a>        <span class="c1"># Chat</span>
+<a id="__codelineno-16-51" name="__codelineno-16-51"></a><span class="hll">        <span class="n">SendMessageConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+</span><a id="__codelineno-16-52" name="__codelineno-16-52"></a>        <span class="n">SendConnectionIdConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+<a id="__codelineno-16-53" name="__codelineno-16-53"></a>        <span class="n">ConnectConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p>Having the context available, we can now configure the send message function.</p>
-<div class="highlight"><span class="filename">functions/chat/send_message/config.py</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
-<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_iam</span> <span class="k">as</span> <span class="n">iam</span>
-<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
-<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">class</span> <span class="nc">SendMessageConfig</span><span class="p">:</span>
-<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="hll">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>
-<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
-<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SendMessage&quot;</span><span class="p">,</span>
-<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/chat&quot;</span><span class="p">,</span>
-<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Send messages to sender and recipient&quot;</span><span class="p">,</span>
-<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;send_message&quot;</span><span class="p">,</span>
-<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
-</span><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="hll">                <span class="s2">&quot;POST_TO_CONNECTION_URL&quot;</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">],</span>
-</span><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="hll">            <span class="p">},</span>
-</span><a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>        <span class="p">)</span>
-<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a>
-<a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">websockets</span><span class="o">.</span><span class="n">create_route</span><span class="p">(</span><span class="s2">&quot;sendMessage&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
-</span><a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a>
-<a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="hll">        <span class="n">function</span><span class="o">.</span><span class="n">add_to_role_policy</span><span class="p">(</span>
-</span><a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="hll">            <span class="n">iam</span><span class="o">.</span><span class="n">PolicyStatement</span><span class="p">(</span>
-</span><a id="__codelineno-19-22" name="__codelineno-19-22" href="#__codelineno-19-22"></a><span class="hll">                <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;execute-api:ManageConnections&quot;</span><span class="p">],</span>
-</span><a id="__codelineno-19-23" name="__codelineno-19-23" href="#__codelineno-19-23"></a><span class="hll">                <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;arn:aws:execute-api:*:*:*&quot;</span><span class="p">],</span>
-</span><a id="__codelineno-19-24" name="__codelineno-19-24" href="#__codelineno-19-24"></a><span class="hll">            <span class="p">)</span>
-</span><a id="__codelineno-19-25" name="__codelineno-19-25" href="#__codelineno-19-25"></a><span class="hll">        <span class="p">)</span>
+<div class="highlight"><span class="filename">functions/chat/send_message/config.py</span><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_iam</span> <span class="k">as</span> <span class="n">iam</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="k">class</span> <span class="nc">SendMessageConfig</span><span class="p">:</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="hll">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SendMessage&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/chat&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Send messages to sender and recipient&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;send_message&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
+</span><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="hll">                <span class="s2">&quot;POST_TO_CONNECTION_URL&quot;</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;post_to_connection_url&quot;</span><span class="p">],</span>
+</span><a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="hll">            <span class="p">},</span>
+</span><a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>        <span class="p">)</span>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">websockets</span><span class="o">.</span><span class="n">create_route</span><span class="p">(</span><span class="s2">&quot;sendMessage&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
+</span><a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a><span class="hll">        <span class="n">function</span><span class="o">.</span><span class="n">add_to_role_policy</span><span class="p">(</span>
+</span><a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a><span class="hll">            <span class="n">iam</span><span class="o">.</span><span class="n">PolicyStatement</span><span class="p">(</span>
+</span><a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="hll">                <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;execute-api:ManageConnections&quot;</span><span class="p">],</span>
+</span><a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a><span class="hll">                <span class="n">resources</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;arn:aws:execute-api:*:*:*&quot;</span><span class="p">],</span>
+</span><a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a><span class="hll">            <span class="p">)</span>
+</span><a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a><span class="hll">        <span class="p">)</span>
 </span></code></pre></div>
 <h2 id="deploying-the-functions">Deploying the Functions</h2>
 <p>Next, we'll commit our code and push it to GitHub, following these steps:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Send your changes to stage</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>git<span class="w"> </span>add<span class="w"> </span>.
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># Commit with a descriptive message</span>
-<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Serverless Real-Time Chat Application&quot;</span>
-<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>
-<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="c1"># Push changes to the &#39;dev&#39; branch</span>
-<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>dev
-<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>
-<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="c1"># Merge &#39;dev&#39; into &#39;staging&#39; and push</span>
-<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>git<span class="w"> </span>checkout<span class="w"> </span>staging
-<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>git<span class="w"> </span>merge<span class="w"> </span>dev
-<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>staging
-<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>
-<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="c1"># Finally, merge &#39;staging&#39; into &#39;main&#39; and push</span>
-<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
-<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a>git<span class="w"> </span>merge<span class="w"> </span>staging
-<a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Send your changes to stage</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Commit with a descriptive message</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Serverless Real-Time Chat Application&quot;</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1"># Push changes to the &#39;dev&#39; branch</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>dev
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="c1"># Merge &#39;dev&#39; into &#39;staging&#39; and push</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>git<span class="w"> </span>checkout<span class="w"> </span>staging
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>git<span class="w"> </span>merge<span class="w"> </span>dev
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>staging
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="c1"># Finally, merge &#39;staging&#39; into &#39;main&#39; and push</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>git<span class="w"> </span>merge<span class="w"> </span>staging
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 </code></pre></div>
 <p>This sequence guarantees that our code progresses through the development, staging, and ultimately, the production environments, triggering our three separate deployment pipelines in the process.</p>
 <p><img alt="Pipelines running" src="../images/three_example_pipelines.png" /></p>
@@ -1720,11 +1601,11 @@ if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1'))
 <p>You'll notice each connection has a unique ID. These IDs are crucial for directing messages to the correct recipient.</p>
 <h3 id="step-3-test-messaging-between-connections">Step 3: Test Messaging Between Connections</h3>
 <p>Choose one tab as the sender and use the other's connection ID as the recipient. You can send a message by inputting a JSON payload like the one below, substituting <code>$CONNECTION_ID</code> with the actual connection ID of the recipient:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">{</span>
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sendMessage&quot;</span><span class="p">,</span>
-<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
-<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nt">&quot;recipient_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$CONNECTION_ID&quot;</span>
-<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sendMessage&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="nt">&quot;recipient_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;$CONNECTION_ID&quot;</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="p">}</span>
 </code></pre></div>
 <p>If everything is configured correctly, you should observe the message appearing in real-time on both channels!</p>
 <p><img alt="alt text" src="../images/sender.png" />
