@@ -12,6 +12,6 @@ class FeedConfig:
             environment={"POSTS_TABLE_NAME": services.dynamodb.posts_table.table_name},
         )
 
-        services.api_gateway.create_endpoint("GET", "/feed", function, authorizer="sso")
+        services.api_gateway.create_endpoint("GET", "/feed", function, public=True)
 
         services.dynamodb.posts_table.grant_read_data(function)
