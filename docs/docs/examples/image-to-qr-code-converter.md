@@ -2,6 +2,7 @@
 
 In this part, we're going to cover how to make a function that turns images uploaded by users into QR codes. When a user sends a request, the image gets processed, saved on Amazon S3, and then sent to them via email so they can easily check out the results.
 
+The structure of the Lambda functions we plan to develop will be as follows:
 
 <p align="center">
   <img src="https://docs.lambda-forge.com/examples/images/qrcode-diagram.png" alt="alt text">

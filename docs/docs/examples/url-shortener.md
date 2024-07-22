@@ -2,6 +2,7 @@
 
 In this section, we will explore the development of a URL shortener. This utility enables users to input a lengthy URL, which the system then compresses into a more concise version.
 
+The setup for the Lambda functions we aim to develop will follow this structure:
 
 <p align="center">
   <img src="https://docs.lambda-forge.com/examples/images/url-shortener.png" alt="alt text">
@@ -66,12 +67,10 @@ Executing the command will result in the establishment of the following director
 ```
 functions
 └── urls
-    ├── shortener
-    │   ├── __init__.py
-    │   ├── config.py
-    │   ├── main.py
-    └── utils
-        └── __init__.py
+    └──  shortener
+       ├── __init__.py
+       ├── config.py
+       └──  main.py
 ```
 
 Now, let's implement it's functionality:
@@ -222,12 +221,10 @@ functions
     │   ├── __init__.py
     │   ├── config.py
     │   └── main.py
-    ├── shortener
-    │   ├── __init__.py
-    │   ├── config.py
-    │   └── main.py
-    └── utils
-        └── __init__.py
+    └── shortener
+        ├── __init__.py
+        ├── config.py
+        └── main.py
 ```
 
 Now, let's implement the redirect functionality.
