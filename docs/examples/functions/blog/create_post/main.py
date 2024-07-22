@@ -10,7 +10,8 @@ import boto3
 
 @dataclass
 class Input:
-    pass
+    title: str
+    file_content: str
 
 
 @dataclass

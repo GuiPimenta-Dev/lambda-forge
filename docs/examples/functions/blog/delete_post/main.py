@@ -16,7 +16,7 @@ class Input:
 
 @dataclass
 class Output:
-    message: str
+    pass
 
 
 def lambda_handler(event, context):

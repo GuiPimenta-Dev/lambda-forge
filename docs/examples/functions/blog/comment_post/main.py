@@ -14,12 +14,12 @@ class Path:
 
 @dataclass
 class Input:
-    pass
+    comment: str
 
 
 @dataclass
 class Output:
-    message: str
+    comment_id: str
 
 
 def lambda_handler(event, context):
