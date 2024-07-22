@@ -2,6 +2,7 @@
 
 In this section, we will develop a real-time chat application using WebSockets, facilitating instant communication. This solution is versatile and can be adapted to different scenarios that require fast, real-time interactions, such as the live chat application shown below.
 
+The architecture for the Lambda functions we are going to implement will be as follows:
 
 <p align="center">
   <img src="https://docs.lambda-forge.com/examples/images/chat-diagram.png" alt="alt text">
@@ -283,12 +284,10 @@ functions
     │   ├── __init__.py
     │   ├── config.py
     │   └── main.py
-    ├── send_message
-    │   ├── __init__.py
-    │   ├── config.py
-    │   └── main.py
-    └── utils
-        └── __init__.py
+    └── send_message
+        ├── __init__.py
+        ├── config.py
+        └── main.py
 ```
 
 Like the previous functions, this one will be very simple. It will accept a connection ID for posting messages, using the channel ID as the sender ID. Additionally, it will forward the same messages to both channels, ensuring that clients can maintain a message history across both channels.

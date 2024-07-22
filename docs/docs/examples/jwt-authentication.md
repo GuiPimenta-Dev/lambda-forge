@@ -4,6 +4,7 @@ In this section, we will develop a serverless authentication system using JWT au
 
 JWT authentication is a secure method for transmitting information between parties as a JSON object. To gain a deeper understanding of JWT tokens and their functionality, you can refer to the article [JSON Web Tokens](http://127.0.0.1:8000/articles/page6/).
 
+The design for the Lambda functions we intend to create will look like this:
 
 <p align="center">
   <img src="https://docs.lambda-forge.com/examples/images/auth.png" alt="alt text">
