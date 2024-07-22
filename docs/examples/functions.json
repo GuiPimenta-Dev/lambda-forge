@@ -312,7 +312,7 @@
                 "service": "api_gateway",
                 "trigger": "/feed",
                 "method": "GET",
-                "public": false
+                "public": true
             }
         ],
         "invocations": []
