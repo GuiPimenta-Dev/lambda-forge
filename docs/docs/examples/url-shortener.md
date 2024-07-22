@@ -3,6 +3,10 @@
 In this section, we will explore the development of a URL shortener. This utility enables users to input a lengthy URL, which the system then compresses into a more concise version.
 
 
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/url-shortener.png" alt="alt text">
+</p>
+
 ## Setting Up the DynamoDB Tables
 
 To begin, create three separate DynamoDB tables in the AWS Console to store URLs for different environments: `Dev-URLs`, `Staging-URLs`, and `Prod-URLs`.

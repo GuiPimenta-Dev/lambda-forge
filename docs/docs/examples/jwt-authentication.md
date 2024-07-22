@@ -4,6 +4,11 @@ In this section, we will develop a serverless authentication system using JWT au
 
 JWT authentication is a secure method for transmitting information between parties as a JSON object. To gain a deeper understanding of JWT tokens and their functionality, you can refer to the article [JSON Web Tokens](http://127.0.0.1:8000/articles/page6/).
 
+
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/auth.png" alt="alt text">
+</p>
+
 ## Setting Up the DynamoDB Tables
 
 To get started, we must create tables to store user credentials securely. For maximum decoupling of environments, proceed to your AWS console and create three separate tables, each designated for a specific stage: `Dev-Auth`, `Staging-Auth` and `Prod-Auth`.
@@ -39,14 +44,14 @@ Once you have obtained the ARNs for these tables, let's integrate them into the 
 
 Next, we'll create a new variable class within the DynamoDB class to reference our JWT tables.
 
-```python title="infra/services/dynamo_db.py" hl_lines="10-14" linenums="8"
-        self.urls_table = dynamo_db.Table.from_table_arn(
+```python title="infra/services/dynamodb.py" hl_lines="10-14" linenums="8"
+        self.urls_table = dynamodb.Table.from_table_arn(
             scope,
             "URLsTable",
             context.resources["arns"]["urls_table"],
         )
 
-        self.auth_table = dynamo_db.Table.from_table_arn(
+        self.auth_table = dynamodb.Table.from_table_arn(
             scope,
             "AuthTable",
             context.resources["arns"]["auth_table"],
@@ -71,7 +76,7 @@ infra
     ├── __init__.py
     ├── api_gateway.py
     ├── aws_lambda.py
-    ├── dynamo_db.py
+    ├── dynamodb.py
     ├── kms.py
     ├── layers.py
     ├── s3.py
@@ -162,12 +167,10 @@ This command generates a new function within the `auth` directory.
 ```
 functions
 └── auth
-    ├── signup
-    │   ├── __init__.py
-    │   ├── config.py
-    │   ├── main.py
-    └── utils
-        └── __init__.py
+    └── signup
+        ├── __init__.py
+        ├── config.py
+        └── main.py
 ```
 
 The signup functionality can be implemented as follows:
@@ -246,14 +249,14 @@ class SignUpConfig:
             description="Securely handle user registration with unique credentials.",
             directory="signup",
             environment={
-                "AUTH_TABLE_NAME": services.dynamo_db.auth_table.table_name,
+                "AUTH_TABLE_NAME": services.dynamodb.auth_table.table_name,
                 "KMS_KEY_ID": services.kms.auth_key.key_id,
             },
         )
 
         services.api_gateway.create_endpoint("POST", "/signup", function, public=True)
 
-        services.dynamo_db.auth_table.grant_read_write_data(function)
+        services.dynamodb.auth_table.grant_read_write_data(function)
 
         services.kms.auth_key.grant_encrypt(function)
 ```
@@ -275,12 +278,10 @@ functions
     │   ├── __init__.py
     │   ├── config.py
     │   └── main.py
-    ├── signup
-    │   ├── __init__.py
-    │   ├── config.py
-    │   └── main.py
-    └── utils
-        └── __init__.py
+    └── signup
+        ├── __init__.py
+        ├── config.py
+        └── main.py
 ```
 
 And now, it's implementation.
@@ -375,7 +376,7 @@ class SigninConfig:
             directory="signin",
             layers=[services.layers.sm_utils_layer, services.layers.pyjwt_layer],
             environment={
-                "AUTH_TABLE_NAME": services.dynamo_db.auth_table.table_name,
+                "AUTH_TABLE_NAME": services.dynamodb.auth_table.table_name,
                 "KMS_KEY_ID": services.kms.auth_key.key_id,
                 "JWT_SECRET_NAME": services.secrets_manager.jwt_secret.secret_name,
             },
@@ -383,7 +384,7 @@ class SigninConfig:
 
         services.api_gateway.create_endpoint("POST", "/signin", function, public=True)
 
-        services.dynamo_db.auth_table.grant_read_data(function)
+        services.dynamodb.auth_table.grant_read_data(function)
 
         services.kms.auth_key.grant_decrypt(function)
 
@@ -404,12 +405,10 @@ This command creates a new `jwt` authorizer under the `authorizers` folder.
 
 ```
 authorizers
-  ├── jwt
-  │   ├── __init__.py
-  │   ├── config.py
-  │   └── main.py
-  └── utils
-      └── __init__.py
+  └── jwt
+      ├── __init__.py
+      ├── config.py
+      └── main.py
 ```
 
 Now, let's proceed with the implementation.

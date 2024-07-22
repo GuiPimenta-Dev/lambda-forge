@@ -2,6 +2,11 @@
 
 In this part, we're going to cover how to make a function that turns images uploaded by users into QR codes. When a user sends a request, the image gets processed, saved on Amazon S3, and then sent to them via email so they can easily check out the results.
 
+
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/qrcode-diagram.png" alt="alt text">
+</p>
+
 ## Incorporating S3 Into the Service Class
 
 Let's start creating three distinct buckets, each dedicated to a specific stage: `Dev-Lambda-Forge-Images`, `Staging-Lambda-Forge-Images` and `Prod-Lambda-Forge-Images`.
@@ -49,7 +54,7 @@ infra
     ├── __init__.py
     ├── api_gateway.py
     ├── aws_lambda.py
-    ├── dynamo_db.py
+    ├── dynamodb.py
     ├── layers.py
     └── s3.py
 ```
@@ -58,7 +63,7 @@ Below showcases the updated structure of our Service class, now incorporating th
 
 ```python title="infra/services/__init__.py" hl_lines="14"
 from infra.services.s3 import S3
-from infra.services.dynamo_db import DynamoDB
+from infra.services.dynamodb import DynamoDB
 from infra.services.api_gateway import APIGateway
 from infra.services.aws_lambda import AWSLambda
 from infra.services.layers import Layers
@@ -69,7 +74,7 @@ class Services:
         self.api_gateway = APIGateway(scope, context)
         self.aws_lambda = AWSLambda(scope, context)
         self.layers = Layers(scope)
-        self.dynamo_db = DynamoDB(scope, context)
+        self.dynamodb = DynamoDB(scope, context)
         self.s3 = S3(scope, context)
 ```
 
@@ -78,6 +83,7 @@ Here is the newly established S3 class:
 ```python title="infra/services/s3"
 from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_s3_notifications
+from lambda_forge.trackers import invoke, trigger
 
 
 class S3:
@@ -90,12 +96,18 @@ class S3:
         # )
         ...
 
-    def create_trigger(self, bucket, function, stages=None):
-        if stages and self.context.stage not in stages:
-            return
-
+    @trigger(service="s3", trigger="bucket", function="function")
+    def create_trigger(self, bucket, function, event=s3.EventType.OBJECT_CREATED):
+        bucket = getattr(self, bucket)
         notifications = aws_s3_notifications.LambdaDestination(function)
-        bucket.add_event_notification(s3.EventType.OBJECT_CREATED, notifications)
+        bucket.add_event_notification(event, notifications)
+        bucket.grant_read(function)
+
+    @invoke(service="s3", resource="bucket", function="function")
+    def grant_write(self, bucket, function):
+        bucket = getattr(self, bucket)
+        bucket.grant_write(function)
+
 ```
 
 As seen, Forge has created the class with a helper method to streamline the creation of a trigger between a bucket and a lambda function.
@@ -133,7 +145,7 @@ infra
     ├── __init__.py
     ├── api_gateway.py
     ├── aws_lambda.py
-    ├── dynamo_db.py
+    ├── dynamodb.py
     ├── layers.py
     ├── s3.py
     └── secrets_manager.py
@@ -180,7 +192,18 @@ class SecretsManager:
 
 To convert the image into a qr code, we are going to use an external library called `qrcode`. Unlike more popular layers, we're dealing with a library for which AWS doesn't provide a public layer.
 
-To seamlessly incorporate this library, refer to the article [Deploying External Layers to AWS]() for guidance on deploying the qrcode library. Once you obtain the ARN of your deployed Lambda layer, simply add it to the Layers class.
+## Creating an External Library in Lambda Forge
+
+To create an external library in Lambda Forge, follow these steps:
+
+1. Run the following command:
+```sh
+forge layer --external qrcode
+```
+
+2. Lambda Forge will automatically deploy this layer to AWS and print out the ARN of the layer.
+
+3. Once you have the ARN of the layer, paste it into the `Layers` class.
 
 ```python title="infra/services/layers.py" hl_lines="8-12 14-18"
 from aws_cdk import aws_lambda as _lambda
@@ -311,7 +334,7 @@ class QrcodeConfig:
 
         services.api_gateway.create_endpoint("POST", "/images/qrcode", function, public=True)
 
-        services.s3.images_bucket.grant_write(function)
+        services.s3.grant_write("images_bucket", function)
 ```
 
 ## Implementing the Mailer Function
@@ -493,7 +516,7 @@ class MailerConfig:
         )
 
         services.s3.images_bucket.grant_read(function)
-        services.s3.create_trigger(services.s3.images_bucket, function)
+        services.s3.create_trigger("images_bucket", function)
 ```
 
 With our existing setup, we configure the environment variables and grant read permissions to the function for accessing the bucket. Additionally, we utilize Forge's helper method to establish a trigger that activates when an object is created in the bucket, invoking the function.
@@ -694,7 +717,7 @@ class MailerConfig:
         )
 
         services.s3.images_bucket.grant_read(function)
-        services.s3.create_trigger(services.s3.images_bucket, function)
+        services.s3.create_trigger("images_bucket", function)
 
         services.secrets_manager.gmail_secret.grant_read(function)
 ```

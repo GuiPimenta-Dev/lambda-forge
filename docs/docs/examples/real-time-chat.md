@@ -2,6 +2,11 @@
 
 In this section, we will develop a real-time chat application using WebSockets, facilitating instant communication. This solution is versatile and can be adapted to different scenarios that require fast, real-time interactions, such as the live chat application shown below.
 
+
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/chat-diagram.png" alt="alt text">
+</p>
+
 ## Incorporating the Websockets Class into the Services Class
 
 Traditionally, integrating WebSockets involves a significant amount of setup, including configuring the API and establishing various routes to initiate a connection. Fortunately, Forge simplifies this process considerably by offering a template where the connections are pre-configured and interconnected.
@@ -18,92 +23,12 @@ infra
     ├── __init__.py
     ├── api_gateway.py
     ├── aws_lambda.py
-    ├── dynamo_db.py
+    ├── dynamodb.py
     ├── kms.py
     ├── layers.py
     ├── s3.py
     ├── secrets_manager.py
     └── websockets.py
-```
-
-Unlike the service files we've encountered previously, the WebSockets class contains an extensive amount of boilerplate code, designed to streamline the process of connecting routes.
-
-```python title="infra/services/websockets.py"
-from aws_cdk import aws_iam as iam
-from aws_cdk.aws_lambda import CfnPermission
-from b_aws_websocket_api.ws_api import WsApi
-from b_aws_websocket_api.ws_deployment import WsDeployment
-from b_aws_websocket_api.ws_lambda_integration import WsLambdaIntegration
-from b_aws_websocket_api.ws_route import WsRoute
-from b_aws_websocket_api.ws_stage import WsStage
-
-
-class Websockets:
-    def __init__(self, scope, context, name=None) -> None:
-        self.scope = scope
-        self.context = context
-        self.name = name or context.name
-
-        self.websocket = WsApi(
-            scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-WebSocket",
-            name=f"{self.context.stage}-{self.name}-WebSocket",
-            route_selection_expression="$request.body.action",
-        )
-
-        self.stage = WsStage(
-            scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-WSS-Stage",
-            ws_api=self.websocket,
-            stage_name=context.stage.lower(),
-            auto_deploy=True,
-        )
-
-        self.deployment = WsDeployment(
-            scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-Deploy",
-            ws_stage=self.stage,
-        )
-
-        self.deployment.node.add_dependency(self.stage)
-
-    def create_route(self, route_key, function):
-        route_name = route_key.replace("$", "")
-
-        CfnPermission(
-            scope=self.scope,
-            id=f"{function}-{self.name}-{route_name}-Invoke",
-            action="lambda:InvokeFunction",
-            function_name=function.function_name,
-            principal="apigateway.amazonaws.com",
-        )
-
-        function.add_to_role_policy(
-            iam.PolicyStatement(
-                actions=["execute-api:ManageConnections"],
-                resources=["arn:aws:execute-api:*:*:*"],
-            )
-        )
-
-        integration = WsLambdaIntegration(
-            scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-Integration-{route_name}",
-            integration_name=f"{self.context.stage}-{self.name}-Integration-{route_name}",
-            ws_api=self.websocket,
-            function=function,
-        )
-
-        route = WsRoute(
-            scope=self.scope,
-            id=f"{self.context.stage}-{self.name}-Route-{route_name}",
-            ws_api=self.websocket,
-            route_key=route_key,
-            authorization_type="NONE",
-            route_response_selection_expression="$default",
-            target=f"integrations/{integration.ref}",
-        )
-
-        self.deployment.node.add_dependency(route)
 ```
 
 This class is crafted to simplify the traditionally complex process of creating, deploying, and integrating WebSocket APIs. It not only streamlines the setup but also manages the necessary permissions, enabling functions to seamlessly send messages through a WebSocket channel.
@@ -171,12 +96,10 @@ This command creates a new `send_connection_id` function within the `chat` direc
 functions
 └── chat
     ├── __init__.py
-    ├── send_connection_id
-    │   ├── __init__.py
-    │   ├── config.py
-    │   └── main.py
-    └── utils
-        └── __init__.py
+    └── send_connection_id
+        ├── __init__.py
+        ├── config.py
+        └── main.py
 ```
 
 This function is going to be very simple, it should simply receive an event with the connection id and send a message to the desired websocket channel.
@@ -263,12 +186,10 @@ functions
     │   ├── __init__.py
     │   ├── config.py
     │   └── main.py
-    ├── send_connection_id
-    │   ├── __init__.py
-    │   ├── config.py
-    │   └── main.py
-    └── utils
-        └── __init__.py
+    └── send_connection_id
+       ├── __init__.py
+       ├── config.py
+       └── main.py
 ```
 
 Let's move forward with its straightforward implementation, which will essentially involve invoking another function and passing along the connection ID.
@@ -276,7 +197,6 @@ Let's move forward with its straightforward implementation, which will essential
 ```python title="functions/chat/connect/main.py"
 import json
 import os
-
 import boto3
 
 
@@ -303,51 +223,8 @@ def lambda_handler(event, context):
 
 This function has a crucial dependency on another, requiring precise configuration to grant it the necessary permissions for invoking the target function and to correctly obtain its ARN.
 
-To manage such scenarios, the `AWSLambda` class maintains references to all functions it creates. This approach ensures these functions remain accessible for future interactions. Let's examine the AWSLambda class in more detail to understand how it achieves this.
+To manage such scenarios, the `AWSLambda` class maintains references to all functions it creates. This approach ensures these functions remain accessible for future interactions.
 
-```python title="infra/services/aws_lambda.py" hl_lines="11 38"
-from aws_cdk import Duration
-from aws_cdk.aws_lambda import Code, Function, Runtime
-from lambda_forge import Path, track
-from lambda_forge.interfaces import IAWSLambda
-
-
-class AWSLambda(IAWSLambda):
-    def __init__(self, scope, context) -> None:
-        self.scope = scope
-        self.context = context
-        self.functions = {}
-
-    @track
-    def create_function(
-        self,
-        name,
-        path,
-        description,
-        directory=None,
-        timeout=1,
-        layers=[],
-        environment={},
-    ):
-
-        function = Function(
-            scope=self.scope,
-            id=name,
-            description=description,
-            function_name=f"{self.context.stage}-{self.context.name}-{name}",
-            runtime=Runtime.PYTHON_3_9,
-            handler=Path.handler(directory),
-            environment=environment,
-            code=Code.from_asset(path=Path.function(path)),
-            layers=layers,
-            timeout=Duration.minutes(timeout),
-        )
-
-        self.functions[name] = function
-        return function
-```
-
-As shown above, It maintains a record of the created functions, cataloging them by name for referencing and management.
 
 With this context in mind, let's proceed to set up the connection handler.
 
