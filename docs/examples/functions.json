@@ -111,7 +111,12 @@
                 "public": true
             }
         ],
-        "invocations": []
+        "invocations": [
+            {
+                "service": "s3",
+                "resource": "images_bucket"
+            }
+        ]
     },
     {
         "name": "Hello",
