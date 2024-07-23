@@ -9,7 +9,7 @@ To enhance usability and the overall user experience, we've implemented a custom
 - **Prod** - `https://api.lambda-forge.com`
 
 
-With that being said, let's forge some Lambdas!
+With that in mind, let's kick off the project by running the command below:
 
 ```
 forge project --name lambda-forge-examples --repo-owner "$GITHUB-OWNER" --repo-name "$GITHUB-REPO" --bucket "$S3-BUCKET" --account "$AWS-ACCOUNT"
