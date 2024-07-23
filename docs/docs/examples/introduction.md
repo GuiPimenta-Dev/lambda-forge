@@ -15,6 +15,6 @@ With that being said, let's forge some Lambdas!
 forge project lambda-forge-examples --repo-owner "$GITHUB-OWNER" --repo-name "$GITHUB-REPO" --bucket "$S3-BUCKET"
 ```
 
-**Docs**: [https://api.lambda-forge.com/docs](https://examples.lambda-forge.com/docs).
+**API Docs**: [https://api.lambda-forge.com/docs](https://examples.lambda-forge.com/docs).
 
-**Source code**: [https://github.com/GuiPimenta-Dev/lambda-forge-examples](https://github.com/GuiPimenta-Dev/lambda-forge-examples)
+**Source code**: [https://github.com/GuiPimenta-Dev/lambda-forge/tree/master/docs/examples](https://github.com/GuiPimenta-Dev/lambda-forge/tree/master/docs/examples)
