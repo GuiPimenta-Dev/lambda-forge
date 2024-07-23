@@ -1,8 +1,9 @@
-from datetime import datetime
 import random
+from datetime import datetime
+
+import boto3
 import requests
 import sm_utils
-import boto3
 
 
 def send_typing(chat_id, bot_token):

@@ -1,6 +1,5 @@
 import aws_cdk as cdk
 from constructs import Construct
-
 from infra.stacks.lambda_stack import LambdaStack
 
 
