@@ -54,6 +54,26 @@ Using Large Language Models (LLMs), we have broken down the chat engagement of t
 
 </div>
 
+## Lucas Montano
+
+Lucas Montano is a Brazilian Youtuber that talks about the tech market in general.
+
+<div align="center">
+
+[BOLHA TECH #001](https://www.youtube.com/watch?v=dFwxqOoPsVw)
+
+<img height="750" src="https://img.youtube.com/vi/dFwxqOoPsVw/maxresdefault.jpg">
+
+</div>
+
+You can access the chat interaction analysis via the link below.
+
+<div align="center">
+
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=732114a2-4d50-4a80-8fcb-85d19fc57231](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=732114a2-4d50-4a80-8fcb-85d19fc57231)
+
+![alt text](assets/lucas-montano-analysis.png)
+</div>
 
 ## Fernanda Kipper
 
@@ -72,9 +92,9 @@ The analysis for the chat interactions can be found in the link below.
 <div align="center">
 
 [https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=e4c06bad-5f31-4678-8d17-95770390b192](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=e4c06bad-5f31-4678-8d17-95770390b192)
-</div>
 
 ![alt text](assets/fernanda-kipper-analysis.png)
+</div>
 
 ## Eduardo Mendes
 
