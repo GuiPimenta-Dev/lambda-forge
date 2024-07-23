@@ -1,5 +1,4 @@
 from aws_cdk import aws_apigateway as apigateway
-
 from lambda_forge.api_gateway import REST
 from lambda_forge.trackers import trigger
 
@@ -13,7 +12,6 @@ class APIGateway:
             deploy_options={"stage_name": context.stage.lower()},
             endpoint_types=[apigateway.EndpointType.REGIONAL],
             binary_media_types=["multipart/form-data"],
-            endpoint_export_name="BASE-URL",
             default_cors_preflight_options={
                 "allow_origins": ["*"],
                 "allow_methods": apigateway.Cors.ALL_METHODS,

@@ -10,8 +10,9 @@ class WebhookConfig:
             description="Lambda Forge telegram webhook",
             layers=[services.layers.requests_layer, services.layers.sm_utils_layer],
             environment={
-                "CHAT_ID": services.parameter_store.chat_id.string_value,
-            }
+                "MY_CHAT_ID": services.parameter_store.chat_id.string_value,
+                "TELEGRAM_TABLE_NAME": services.dynamodb.telegram_table.table_name,
+            },
         )
 
         services.api_gateway.create_endpoint("POST", "/webhook", function, public=True)
@@ -19,4 +20,4 @@ class WebhookConfig:
         services.secrets_manager.telegram_secret.grant_read(function)
         services.secrets_manager.authorizer_secret.grant_read(function)
 
-        
+        services.dynamodb.grant_write("telegram_table", function)

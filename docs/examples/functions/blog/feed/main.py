@@ -2,6 +2,7 @@ import json
 import os
 from dataclasses import dataclass
 from typing import List
+
 import boto3
 
 
@@ -9,12 +10,14 @@ import boto3
 class Input:
     pass
 
+
 @dataclass
 class User:
     email: str
     first_name: str
     last_name: str
     picture: str
+
 
 @dataclass
 class Comment:
@@ -25,6 +28,7 @@ class Comment:
     last_name: str
     picture: str
     created_at: str
+
 
 @dataclass
 class Post:
@@ -42,6 +46,7 @@ class Output:
     user: User
     feed: List[Post]
     last_evaluated_key: str
+
 
 def lambda_handler(event, context):
     dynamodb = boto3.resource("dynamodb")

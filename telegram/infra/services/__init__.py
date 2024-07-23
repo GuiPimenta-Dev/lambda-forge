@@ -1,3 +1,4 @@
+from infra.services.dynamodb import DynamoDB
 from infra.services.api_gateway import APIGateway
 from infra.services.aws_lambda import Lambda
 from infra.services.layers import Layers
@@ -12,3 +13,4 @@ class Services:
         self.secrets_manager = SecretsManager(scope, context)
         self.layers = Layers(scope)
         self.parameter_store = ParameterStore(scope, context)
+        self.dynamodb = DynamoDB(scope, context)

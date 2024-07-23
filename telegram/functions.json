@@ -12,6 +12,11 @@
                 "public": true
             }
         ],
-        "invocations": []
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "telegram_table"
+            }
+        ]
     }
 ]

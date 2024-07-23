@@ -7,4 +7,3 @@ class ParameterStore:
         self.chat_id = ssm.StringParameter.from_string_parameter_attributes(
             scope, "ChatIdParameter", parameter_name="chat-id"
         )
-        
