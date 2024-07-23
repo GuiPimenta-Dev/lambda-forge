@@ -10,17 +10,45 @@
 
 Lambda Forge is a Python framework that simplifies AWS Lambda function creation and deployment. It automates serverless management, letting developers focus on coding.
 
-<div align="center">
-        <a href="https://docs.lambda-forge.com/home/getting-started/" target="_blank">
-            <i class="fa fa-book"></i> Docs
-        </a> |
-        <a href="https://docs.lambda-forge.com/examples/introduction/" target="_blank">
-            <i class="fa fa-code"></i> Examples
-        </a> |
-        <a href="https://web.telegram.org/a/#6950159714" target="_blank">
-            <i class="fa fa-telegram"></i> Telegram
-        </a>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Lambda Forge Links</title>
+    <style>
+        .link-container {
+            text-align: center;
+        }
+        .link-container a {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="link-container">
+    <a href="https://docs.lambda-forge.com/home/getting-started/" target="_blank">
+        <i class="fas fa-book"></i> Docs
+    </a> |
+    <a href="https://docs.lambda-forge.com/examples/introduction/" target="_blank">
+        <i class="fas fa-code"></i> Examples
+    </a> |
+    <a href="https://web.telegram.org/a/#6950159714" target="_blank">
+        <i class="fas fa-telegram"></i> Telegram
+    </a>
+</div>
+
+<script>
+    // Ensure links open in a new tab
+    document.querySelectorAll('.link-container a').forEach(link => {
+        link.setAttribute('target', '_blank');
+    });
+</script>
+
+</body>
+</html>
 
 ## Features
 
