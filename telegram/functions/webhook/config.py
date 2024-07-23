@@ -9,9 +9,14 @@ class WebhookConfig:
             path="./functions/webhook",
             description="Lambda Forge telegram webhook",
             layers=[services.layers.requests_layer, services.layers.sm_utils_layer],
+            environment={
+                "CHAT_ID": services.parameter_store.chat_id.string_value,
+            }
         )
 
         services.api_gateway.create_endpoint("POST", "/webhook", function, public=True)
 
         services.secrets_manager.telegram_secret.grant_read(function)
         services.secrets_manager.authorizer_secret.grant_read(function)
+
+        

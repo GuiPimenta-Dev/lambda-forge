@@ -1,6 +1,6 @@
-from functions.webhook.config import WebhookConfig
 from aws_cdk import Stack
 from constructs import Construct
+from functions.webhook.config import WebhookConfig
 from infra.services import Services
 
 
