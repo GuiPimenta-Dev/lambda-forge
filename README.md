@@ -11,16 +11,17 @@
 Lambda Forge is a Python framework that simplifies AWS Lambda function creation and deployment. It automates serverless management, letting developers focus on coding.
 
 <div align="center">
-    <a href="https://docs.lambda-forge.com/home/getting-started/" target="_blank">
-         Docs
+    <a href="https://docs.lambda-forge.com/home/getting-started/" target="_blank" rel="noopener noreferrer">
+        <i class="fa fa-book"></i> Docs
     </a> |
-    <a href="https://docs.lambda-forge.com/examples/introduction/" target="_blank">
-         Examples
+    <a href="https://docs.lambda-forge.com/examples/introduction/" target="_blank" rel="noopener noreferrer">
+        <i class="fa fa-code"></i> Examples
     </a> |
-    <a href="https://web.telegram.org/a/#6950159714" target="_blank">
-        Telegram
+    <a href="https://web.telegram.org/a/#6950159714" target="_blank" rel="noopener noreferrer">
+        <i class="fa fa-telegram"></i> Telegram
     </a>
 </div>
+
 
 ## Features
 
