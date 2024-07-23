@@ -12,7 +12,7 @@ To enhance usability and the overall user experience, we've implemented a custom
 With that being said, let's forge some Lambdas!
 
 ```
-forge project lambda-forge-examples --repo-owner "$GITHUB-OWNER" --repo-name "$GITHUB-REPO" --bucket "$S3-BUCKET"
+forge project --name lambda-forge-examples --repo-owner "$GITHUB-OWNER" --repo-name "$GITHUB-REPO" --bucket "$S3-BUCKET" --account "$AWS-ACCOUNT"
 ```
 
 **API Docs**: [https://api.lambda-forge.com/docs](https://examples.lambda-forge.com/docs).
