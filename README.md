@@ -8,7 +8,7 @@
 
 <br>
 
-Lambda Forge is a versatile Python framework that simplifies AWS Lambda function creation and deployment. It automates serverless management, letting developers focus on coding.
+Lambda Forge is a Python framework that simplifies AWS Lambda function creation and deployment. It automates serverless management, letting developers focus on coding.
 
 <div align="center">
         <a href="https://docs.lambda-forge.com/home/getting-started/" target="_blank">
