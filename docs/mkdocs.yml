@@ -77,6 +77,8 @@ extra:
   generator: false
   social:
     - icon: fontawesome/brands/github
-      link: "https://github.com/GuiPimenta-Dev"
+      link: "https://github.com/GuiPimenta-Dev/lambda-forge"
     - icon: fontawesome/brands/linkedin
       link: "https://www.linkedin.com/in/guilhermealvespimenta/"
+    - icon: fontawesome/brands/telegram
+      link: "https://web.telegram.org/a/#6950159714"
