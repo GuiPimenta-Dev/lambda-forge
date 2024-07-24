@@ -11,6 +11,7 @@ class DynamoDB:
         self.telegram_table = dynamodb.Table(
             scope,
             id="Telegram",
+            table_name="Telegram",
             partition_key=dynamodb.Attribute(name="PK", type=dynamodb.AttributeType.STRING),
             sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
