@@ -27,4 +27,3 @@ This project was used with the official Lambda Forge documentation and is now po
 
 <br>
 
-Feel free to explore and contribute to this project to enhance its capabilities and performance.
