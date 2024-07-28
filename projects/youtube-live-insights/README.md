@@ -3,6 +3,8 @@
 
 This project is the MVP of a SaaS that utilizes Large Language Models (LLMs) to measure and analyze engagement levels in YouTube live streams. By focusing on interactions within the live chat, it identifies key moments in the video that can be transformed into engaging, shorter clips for YouTube.
 
+**Note**: The evaluation may vary based on the context provided to the LLM about the YouTuber in the prompt.
+
 It's a serverless project deployed on AWS using [Lambda Forge](https://github.com/GuiPimenta-Dev/lambda-forge).
 
 # Diagram
@@ -46,33 +48,18 @@ In the video below, Mano Deyvin reacts to various projects and portfolios submit
 
 Using Large Language Models (LLMs), we have broken down the chat engagement of this live stream into 10-minute intervals. Below, you can find a detailed analysis of the chat interactions during this specific live stream.
 
+The prompt used to generate the chart was:
+
+```
+Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is very focused on humor and on this specific video he is reacting to linkedins, portfolios and projects sent by his subscribers.
+```
+
 <div align="center">
 
-[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=559484e7-09b8-4dc7-a55c-cc4e0e810814](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=559484e7-09b8-4dc7-a55c-cc4e0e810814)
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=f498ab20-4929-4f89-a4b3-a400fc7c4d82](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=f498ab20-4929-4f89-a4b3-a400fc7c4d82)
 
 <img height="700" alt="Lambda Forge's Logo" src="assets/mano-deyvin-analysis.png">
 
-</div>
-
-## Lucas Montano
-
-Lucas Montano is a Brazilian Youtuber that talks about the tech market in general.
-
-<div align="center">
-
-[BOLHA TECH #001](https://www.youtube.com/watch?v=dFwxqOoPsVw)
-
-<img height="750" src="https://img.youtube.com/vi/dFwxqOoPsVw/maxresdefault.jpg">
-
-</div>
-
-You can access the chat interaction analysis via the link below.
-
-<div align="center">
-
-[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=732114a2-4d50-4a80-8fcb-85d19fc57231](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=732114a2-4d50-4a80-8fcb-85d19fc57231)
-
-![alt text](assets/lucas-montano-analysis.png)
 </div>
 
 ## Fernanda Kipper
@@ -87,18 +74,51 @@ In the video below, Fernanda Kipper teaches how to recreate the Medium with Angu
 
 </div>
 
+The prompt used to create the chart was:
+
+```
+Fernanda Kipper is a Brazilian YouTuber who runs a channel dedicated to teaching various frameworks and programming languages. She also conducts live coding sessions. In this particular live stream, she teaches how to recreate the Medium with Angular.
+```
+
 The analysis for the chat interactions can be found in the link below.
 
 <div align="center">
 
-[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=e4c06bad-5f31-4678-8d17-95770390b192](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=e4c06bad-5f31-4678-8d17-95770390b192)
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=973e44cb-4fc2-43b2-b4d5-5056586714db](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=973e44cb-4fc2-43b2-b4d5-5056586714db)
 
 ![alt text](assets/fernanda-kipper-analysis.png)
 </div>
 
+## Lucas Montano
+
+Lucas Montano is a Brazilian Youtuber that talks about the tech market in general.
+
+<div align="center">
+
+[🚨🚨 BOLHA TECH (feat Galego) #006 🚨🚨](https://www.youtube.com/watch?v=1nQRYmLgon4)
+
+<img height="750" src="https://img.youtube.com/vi/1nQRYmLgon4/maxresdefault.jpg">
+
+</div>
+
+The prompt used to generate the analysis was:
+
+```
+Lucas Montano is a Brazilian Youtuber that talk about the tech market in general. In this video he is focusing on the tech market with AI.
+```
+
+You can access the chat interaction analysis via the link below.
+
+<div align="center">
+
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=967e823f-3c24-4f2c-9fde-00932fa09fd6](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=967e823f-3c24-4f2c-9fde-00932fa09fd6)
+
+![alt text](assets/lucas-montano-analysis.png)
+</div>
+
 ## Eduardo Mendes
 
-In the video below, Eduardo Mendes teaches how the imports system works in Python.
+Eduardo Mendes has a channel on Youtube to teach Python to its subscribers. In the video below, he teaches how the imports system works in Python.
 
 <div align="center">
 
@@ -108,11 +128,17 @@ In the video below, Eduardo Mendes teaches how the imports system works in Pytho
 
 </div>
 
+The prompt used to generate this chart was:
+
+```
+Eduardo Mendes is a Brazilian Youtuber that has a channel focused on teaching Python. In this specific live he teaches about how the imports system works in Python.
+```
+
 The analysis for the chat interactions can be found in the link below.
 
 <div align="center">
 
-[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=0789152f-ba55-4c7b-8e29-bd77124c9ca8](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=0789152f-ba55-4c7b-8e29-bd77124c9ca8)
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=0c103613-01bd-4363-89e3-094b94f3353c](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=0c103613-01bd-4363-89e3-094b94f3353c)
 
 ![alt text](assets/eduardo-mendes-analysis.png)
 

@@ -10,6 +10,7 @@ class CreateChartConfig:
             path="./functions/chart",
             description="Parse the transcription",
             directory="create_chart",
+            timeout=10,
             environment={
                 "TRANSCRIPT_QUEUE_URL": services.sqs.workers_queue.queue_url,
                 "CHAT_TABLE_NAME": services.dynamodb.chats_table.table_name,
