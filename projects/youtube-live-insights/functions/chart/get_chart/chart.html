@@ -57,6 +57,11 @@
             font-size: 18px;
             font-weight: bold;
         }
+        #total-messages {
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
         #messages-container {
             margin-top: 20px;
             width: 90%;
@@ -138,6 +143,7 @@
         <div id="chartjs-tooltip" class="chartjs-tooltip"></div>
     </div>
     <div id="interval-container"></div>
+    <div id="total-messages">Mensagens: 0 / 0</div>
     <div id="filter-container">
         <select id="sentimentFilter" onchange="filterMessages()">
             <option value="all">Todos</option>
@@ -159,7 +165,7 @@
         </table>
     </div>
     <script>
-        const data = '{{ data }}'
+        const data = '{{ data }}';
 
         const translateSentimentTable = (sentiment) => {
             switch (sentiment) {
@@ -329,30 +335,36 @@
                             const index = points[0].index;
                             const msgContainer = document.getElementById('messages-table-body');
                             const intervalContainer = document.getElementById('interval-container');
+                            const totalMessagesContainer = document.getElementById('total-messages');
 
                             msgContainer.innerHTML = '';
 
-                            if (index > 0) {
-                                const previousHour = labels[index - 1];
-                                const currentHour = labels[index];
-                                intervalContainer.textContent = `${previousHour} - ${currentHour}`;
-                            } else {
-                                intervalContainer.textContent = `Início - ${labels[index]}`;
+                            let startIndex = index > 0 ? index - 1 : 0;
+                            let endIndex = index;
+
+                            const previousHour = labels[startIndex];
+                            const currentHour = labels[endIndex];
+                            intervalContainer.textContent = `${previousHour} - ${currentHour}`;
+
+                            let totalMessages = 0;
+
+                            for (let i = startIndex; i <= endIndex; i++) {
+                                messages[i].forEach(msgObj => {
+                                    const row = document.createElement('tr');
+                                    const messageCell = document.createElement('td');
+                                    const sentimentCell = document.createElement('td');
+
+                                    messageCell.textContent = msgObj.message;
+                                    sentimentCell.textContent = translateSentimentTable(msgObj.sentiment.Sentiment);
+
+                                    row.appendChild(messageCell);
+                                    row.appendChild(sentimentCell);
+                                    msgContainer.appendChild(row);
+                                    totalMessages++;
+                                });
                             }
 
-                            messages[index].forEach(msgObj => {
-                                const row = document.createElement('tr');
-                                const messageCell = document.createElement('td');
-                                const sentimentCell = document.createElement('td');
-
-                                messageCell.textContent = msgObj.message;
-                                sentimentCell.textContent = translateSentimentTable(msgObj.sentiment.Sentiment);
-
-                                row.appendChild(messageCell);
-                                row.appendChild(sentimentCell);
-                                msgContainer.appendChild(row);
-                            });
-
+                            totalMessagesContainer.textContent = `Mensagens: ${totalMessages} / ${getTotalMessages()}`;
                             filterMessages(); // Aplicar o filtro após atualizar a tabela
                         }
                     }
@@ -364,6 +376,7 @@
             const index = 0; 
             const msgContainer = document.getElementById('messages-table-body');
             const intervalContainer = document.getElementById('interval-container');
+            const totalMessagesContainer = document.getElementById('total-messages');
 
             msgContainer.innerHTML = '';
 
@@ -374,6 +387,8 @@
             } else {
                 intervalContainer.textContent = `Início - ${labels[index]}`;
             }
+
+            let totalMessages = 0;
 
             messages[index].forEach(msgObj => {
                 const row = document.createElement('tr');
@@ -386,22 +401,33 @@
                 row.appendChild(messageCell);
                 row.appendChild(sentimentCell);
                 msgContainer.appendChild(row);
+                totalMessages++;
             });
 
+            totalMessagesContainer.textContent = `Mensagens: ${totalMessages} / ${getTotalMessages()}`;
             filterMessages(); // Aplicar o filtro após carregar as mensagens iniciais
+        }
+
+        function getTotalMessages() {
+            return messages.reduce((total, msgArray) => total + msgArray.length, 0);
         }
 
         function filterMessages() {
             const filterValue = document.getElementById('sentimentFilter').value;
             const rows = document.querySelectorAll('#messages-table-body tr');
+            let visibleMessageCount = 0;
             rows.forEach(row => {
                 const sentimentCell = row.cells[1].textContent;
                 if (filterValue === 'all' || sentimentCell === translateSentimentTable(filterValue)) {
                     row.style.display = '';
+                    visibleMessageCount++;
                 } else {
                     row.style.display = 'none';
                 }
             });
+
+            const totalMessagesContainer = document.getElementById('total-messages');
+            totalMessagesContainer.textContent = `Mensagens: ${visibleMessageCount} / ${getTotalMessages()}`;
         }
 
         window.onload = () => {
