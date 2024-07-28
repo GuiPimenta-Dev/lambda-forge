@@ -1,8 +1,9 @@
 from infra.services import Services
+import aws_cdk.aws_iam as iam
 
 
 class ChartWorkerConfig:
-    def __init__(self, services: Services) -> None:
+    def __init__(self, services: Services, scope) -> None:
 
         function = services.aws_lambda.create_function(
             name="ChartWorker",
@@ -24,6 +25,10 @@ class ChartWorkerConfig:
         services.sqs.create_trigger("workers_queue", function)
 
         services.s3.large_payload_bucket.grant_read_write(function)
+        
+        comprehend_policy = iam.PolicyStatement(actions=["comprehend:*"], resources=["*"], effect=iam.Effect.ALLOW)
+
+        function.role.attach_inline_policy(iam.Policy(scope, "ComprehendPolicy", statements=[comprehend_policy]))
 
         services.dynamodb.grant_write("transcriptions_table", function)
         services.dynamodb.chats_table.grant_read_data(function)

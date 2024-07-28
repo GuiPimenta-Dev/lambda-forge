@@ -31,5 +31,5 @@ class LambdaStack(Stack):
 
         # Chart
         GetChartConfig(self.services)
-        ChartWorkerConfig(self.services)
+        ChartWorkerConfig(self.services, self)
         CreateChartConfig(self.services)

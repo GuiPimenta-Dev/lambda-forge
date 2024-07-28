@@ -1,13 +1,35 @@
 import json
 import os
 
-import sm_utils
 from openai import OpenAI
+
+
+import json
+
+import boto3
+
+
+def get_secret(secret_name: str):
+
+    # Initialize the Secrets Manager client
+    sm_client = boto3.client("secretsmanager")
+
+    # Retrieve the secret value from Secrets Manager
+    response = sm_client.get_secret_value(SecretId=secret_name)
+
+    # Handle scenarios where the secret is stored as plain text instead of JSON.
+    try:
+        secret = json.loads(response["SecretString"])
+
+    except json.JSONDecodeError:
+        secret = response["SecretString"]
+
+    return secret
 
 
 def analyse_with_openai(author_summary, messages):
     OPENAPI_KEY_SECRET_NAME = os.environ.get("OPENAPI_KEY_SECRET_NAME", "OPEN_API_KEY")
-    api_key = sm_utils.get_secret(OPENAPI_KEY_SECRET_NAME)
+    api_key = get_secret(OPENAPI_KEY_SECRET_NAME)
     client = OpenAI(api_key=api_key)
 
     current_dir = os.path.dirname(os.path.realpath(__file__))
