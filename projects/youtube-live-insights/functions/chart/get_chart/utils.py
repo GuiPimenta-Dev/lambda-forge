@@ -10,13 +10,13 @@ def query_all_items(table, partition_key, interval):
         if last_evaluated_key:
             response = table.query(
                 KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(f"{partition_key}#INTERVAL={interval}"),
-                ProjectionExpression="SK, rating, messages, chat_summary, reason",
+                ProjectionExpression="SK, rating, messages, neutral, positive, negative, chat_summary, reason",
                 ExclusiveStartKey=last_evaluated_key,
             )
         else:
             response = table.query(
                 KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(f"{partition_key}#INTERVAL={interval}"),
-                ProjectionExpression="SK, rating, messages, chat_summary, reason",
+                ProjectionExpression="SK, rating, messages,  neutral, positive, negative, chat_summary, reason",
             )
 
         items.extend(response["Items"])

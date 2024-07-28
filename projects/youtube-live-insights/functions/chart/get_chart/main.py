@@ -43,7 +43,7 @@ def lambda_handler(event, context):
     interval = int(event["queryStringParameters"].get("interval", 10))
 
     dynamodb = boto3.resource("dynamodb")
-    TRANSCRIPTIONS_TABLE_NAME = os.environ.get("TRANSCRIPTIONS_TABLE_NAME")
+    TRANSCRIPTIONS_TABLE_NAME = os.environ.get("TRANSCRIPTIONS_TABLE_NAME", "Prod-Live-Insights-Live-Transcriptions")
     VIDEOS_TABLE_NAME = os.environ.get("VIDEOS_TABLE_NAME", "Dev-Videos")
 
     transcriptions_table = dynamodb.Table(TRANSCRIPTIONS_TABLE_NAME)

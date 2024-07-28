@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,8 +17,8 @@
             overflow: hidden;
         }
         #chart-container {
-            width: 80%;
-            max-width: 1200px;
+            width: 100%;
+            max-width: 1000px;
             background: white;
             padding: 20px;
             border-radius: 8px;
@@ -40,7 +40,7 @@
         }
         .chartjs-tooltip {
             display: none;
-            max-width: 300px;
+            max-width: 200px; /* Tamanho fixo do tooltip */
             white-space: pre-wrap;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -50,7 +50,7 @@
             pointer-events: none;
             padding: 10px;
             font-size: 12px;
-            text-align: left; 
+            text-align: left;
         }
         #interval-container {
             margin-top: 10px;
@@ -59,7 +59,7 @@
         }
         #messages-container {
             margin-top: 20px;
-            width: 80%;
+            width: 90%;
             max-width: 1200px;
             background: white;
             padding: 20px;
@@ -69,9 +69,57 @@
             flex-grow: 1;
             overflow-y: auto;
         }
-        .message {
-            padding: 5px 0;
-            border-bottom: 1px solid #ddd;
+        #filter-container {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .controls button {
+            margin: 0 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        #btnNota {
+            background-color: rgba(75, 192, 192, 1);
+        }
+        #btnNeutral {
+            background-color: rgba(192, 192, 75, 1);
+        }
+        #btnPositive {
+            background-color: rgba(75, 192, 75, 1);
+        }
+        #btnNegative {
+            background-color: rgba(192, 75, 75, 1);
+        }
+        .controls button:hover {
+            opacity: 0.8;
+        }
+        .controls button.active {
+            opacity: 1;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -80,133 +128,241 @@
         <div class="video-title" id="video-title">
             <a href="" target="_blank"></a>
         </div>
+        <div class="controls">
+            <button id="btnNota" class="active" onclick="showChart('nota')">Nota</button>
+            <button id="btnNeutral" onclick="showChart('neutral')">Neutro</button>
+            <button id="btnPositive" onclick="showChart('positive')">Positivo</button>
+            <button id="btnNegative" onclick="showChart('negative')">Negativo</button>
+        </div>
         <canvas id="ratingChart"></canvas>
         <div id="chartjs-tooltip" class="chartjs-tooltip"></div>
     </div>
     <div id="interval-container"></div>
-    <div id="messages-container"></div>
+    <div id="filter-container">
+        <select id="sentimentFilter" onchange="filterMessages()">
+            <option value="all">Todos</option>
+            <option value="NEUTRAL">Neutro</option>
+            <option value="POSITIVE">Positivo</option>
+            <option value="NEGATIVE">Negativo</option>
+        </select>
+    </div>
+    <div id="messages-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Mensagem</th>
+                    <th>Sentimento</th>
+                </tr>
+            </thead>
+            <tbody id="messages-table-body">
+            </tbody>
+        </table>
+    </div>
     <script>
         const data = '{{ data }}'
 
+        const translateSentimentTable = (sentiment) => {
+            switch (sentiment) {
+                case 'NEUTRAL':
+                    return 'Neutro';
+                case 'POSITIVE':
+                    return 'Positivo';
+                case 'NEGATIVE':
+                    return 'Negativo';
+                case 'MIXED':
+                    return 'Misto';
+                default:
+                    return sentiment;
+            }
+        };
+
+        const translateSentimentTooltip = (sentiment) => {
+            switch (sentiment) {
+                case 'neutral':
+                    return 'Neutro';
+                case 'positive':
+                    return 'Positivo';
+                case 'negative':
+                    return 'Negativo';
+                case 'mixed':
+                    return 'Misto';
+                default:
+                    return sentiment;
+            }
+        };
+
         const labels = data.data.map(item => item.hour);
         const ratings = data.data.map(item => parseInt(item.rating));
+        const neutrals = data.data.map(item => item.neutral);
+        const positives = data.data.map(item => item.positive);
+        const negatives = data.data.map(item => item.negative);
         const chatSummaries = data.data.map(item => item.chat_summary);
         const reasons = data.data.map(item => item.reason);
         const messages = data.data.map(item => item.messages);
 
+        let chart;
         const chartData = {
-            labels: labels,
-            datasets: [{
-                label: 'Chat Ratings',
+            nota: {
+                label: 'Nota',
                 data: ratings,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderWidth: 1
-            }]
-        };
-
-        const config = {
-            type: 'line',
-            data: chartData,
-            options: {
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                        },
-                        beginAtZero: true,
-                        max: 10
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false 
-                    },
-                    tooltip: {
-                        enabled: false,
-                        external: function(context) {
-                            const tooltipEl = document.getElementById('chartjs-tooltip');
-                            const tooltipModel = context.tooltip;
-
-                            if (tooltipModel.opacity === 0) {
-                                tooltipEl.style.opacity = 0;
-                                tooltipEl.style.display = 'none';
-                                return;
-                            }
-
-                            tooltipEl.style.display = 'block';
-
-                            tooltipEl.classList.remove('above', 'below', 'no-transform');
-                            tooltipEl.classList.add('no-transform');
-
-                            if (tooltipModel.body) {
-                                const index = tooltipModel.dataPoints[0].dataIndex;
-                                const rating = ratings[index];
-                                const reason = reasons[index];
-                                const chatSummary = chatSummaries[index];
-
-                                let innerHtml = `<div><strong>Nota: ${rating}</strong></div>`;
-                                innerHtml += `<br>`;
-                                innerHtml += `<div><strong>${reason}</strong></div>`;
-                                innerHtml += `<br>`;
-                                innerHtml += `<div><strong>${chatSummary}</strong></div>`;
-
-                                tooltipEl.innerHTML = innerHtml;
-                            }
-
-                            const position = context.chart.canvas.getBoundingClientRect();
-                            tooltipEl.style.opacity = 1;
-                            tooltipEl.style.position = 'absolute';
-                            tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
-                            tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
-                            tooltipEl.style.fontFamily = tooltipModel.options.bodyFont.family;
-                            tooltipEl.style.fontSize = tooltipModel.options.bodyFont.size + 'px';
-                            tooltipEl.style.fontStyle = tooltipModel.options.bodyFont.style;
-                            tooltipEl.style.padding = tooltipModel.options.padding + 'px ' + tooltipModel.options.padding + 'px';
-                        }
-                    }
-                },
-                onClick: (e) => {
-                    const points = ratingChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-                    if (points.length) {
-                        const index = points[0].index;
-                        const msgContainer = document.getElementById('messages-container');
-                        const intervalContainer = document.getElementById('interval-container');
-
-                        msgContainer.innerHTML = '';
-
-                        if (index > 0) {
-                            const previousHour = labels[index - 1];
-                            const currentHour = labels[index];
-                            intervalContainer.textContent = `${previousHour} - ${currentHour}`;
-                        } else {
-                            intervalContainer.textContent = `Início - ${labels[index]}`;
-                        }
-
-                        messages[index].forEach(msg => {
-                            const msgDiv = document.createElement('div');
-                            msgDiv.className = 'message';
-                            msgDiv.textContent = msg;
-                            msgContainer.appendChild(msgDiv);
-                        });
-                    }
-                }
+                borderWidth: 1,
+                yAxisMax: 10
+            },
+            neutral: {
+                label: 'Neutro',
+                data: neutrals,
+                borderColor: 'rgba(192, 192, 75, 1)',
+                backgroundColor: 'rgba(192, 192, 75, 0.2)',
+                borderWidth: 1,
+                yAxisMax: Math.max(...neutrals) + 5
+            },
+            positive: {
+                label: 'Positivo',
+                data: positives,
+                borderColor: 'rgba(75, 192, 75, 1)',
+                backgroundColor: 'rgba(75, 192, 75, 0.2)',
+                borderWidth: 1,
+                yAxisMax: Math.max(...positives) + 5
+            },
+            negative: {
+                label: 'Negativo',
+                data: negatives,
+                borderColor: 'rgba(192, 75, 75, 1)',
+                backgroundColor: 'rgba(192, 75, 75, 0.2)',
+                borderWidth: 1,
+                yAxisMax: Math.max(...negatives) + 5
             }
         };
 
-        const ratingChart = new Chart(
-            document.getElementById('ratingChart'),
-            config
-        );
+        const showChart = (type) => {
+            if (chart) {
+                chart.destroy();
+            }
+            document.querySelectorAll('.controls button').forEach(button => button.classList.remove('active'));
+            document.getElementById(`btn${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.add('active');
+
+            chart = new Chart(document.getElementById('ratingChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [chartData[type]]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                            },
+                            beginAtZero: true,
+                            max: chartData[type].yAxisMax
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: false,
+                            external: function(context) {
+                                const tooltipEl = document.getElementById('chartjs-tooltip');
+                                const tooltipModel = context.tooltip;
+
+                                if (tooltipModel.opacity === 0) {
+                                    tooltipEl.style.opacity = 0;
+                                    tooltipEl.style.display = 'none';
+                                    return;
+                                }
+
+                                tooltipEl.style.display = 'block';
+
+                                tooltipEl.classList.remove('above', 'below', 'no-transform');
+                                tooltipEl.classList.add('no-transform');
+
+                                if (tooltipModel.body) {
+                                    const index = tooltipModel.dataPoints[0].dataIndex;
+
+                                    let innerHtml = '';
+
+                                    if (type === 'nota') {
+                                        const rating = ratings[index];
+                                        const reason = reasons[index];
+                                        const chatSummary = chatSummaries[index];
+                                        innerHtml = `<div><strong>Nota: ${rating}</strong></div>`;
+                                        innerHtml += `<br>`;
+                                        innerHtml += `<div><strong>Razão: ${reason}</strong></div>`;
+                                        innerHtml += `<br>`;
+                                        innerHtml += `<div><strong>Resumo: ${chatSummary}</strong></div>`;
+                                    } else {
+                                        const sentimentValue = context.tooltip.dataPoints[0].raw;
+                                        innerHtml = `<div><strong>${translateSentimentTooltip(type)}: ${sentimentValue}</strong></div>`;
+                                    }
+
+                                    tooltipEl.innerHTML = innerHtml;
+                                }
+
+                                const position = context.chart.canvas.getBoundingClientRect();
+                                tooltipEl.style.opacity = 1;
+                                tooltipEl.style.position = 'absolute';
+                                tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+                                tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+                                tooltipEl.style.fontFamily = tooltipModel.options.bodyFont.family;
+                                tooltipEl.style.fontSize = tooltipModel.options.bodyFont.size + 'px';
+                                tooltipEl.style.fontStyle = tooltipModel.options.bodyFont.style;
+                                tooltipEl.style.padding = tooltipModel.options.padding + 'px ' + tooltipModel.options.padding + 'px';
+                                tooltipEl.style.maxWidth = '300px'; // Tamanho fixo do tooltip
+                                tooltipEl.style.whiteSpace = 'pre-wrap';
+                                tooltipEl.style.wordWrap = 'break-word';
+                                tooltipEl.style.overflowWrap = 'break-word';
+                            }
+                        }
+                    },
+                    onClick: (e) => {
+                        const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+                        if (points.length) {
+                            const index = points[0].index;
+                            const msgContainer = document.getElementById('messages-table-body');
+                            const intervalContainer = document.getElementById('interval-container');
+
+                            msgContainer.innerHTML = '';
+
+                            if (index > 0) {
+                                const previousHour = labels[index - 1];
+                                const currentHour = labels[index];
+                                intervalContainer.textContent = `${previousHour} - ${currentHour}`;
+                            } else {
+                                intervalContainer.textContent = `Início - ${labels[index]}`;
+                            }
+
+                            messages[index].forEach(msgObj => {
+                                const row = document.createElement('tr');
+                                const messageCell = document.createElement('td');
+                                const sentimentCell = document.createElement('td');
+
+                                messageCell.textContent = msgObj.message;
+                                sentimentCell.textContent = translateSentimentTable(msgObj.sentiment.Sentiment);
+
+                                row.appendChild(messageCell);
+                                row.appendChild(sentimentCell);
+                                msgContainer.appendChild(row);
+                            });
+
+                            filterMessages(); // Aplicar o filtro após atualizar a tabela
+                        }
+                    }
+                }
+            });
+        };
 
         function loadInitialMessages() {
             const index = 0; 
-            const msgContainer = document.getElementById('messages-container');
+            const msgContainer = document.getElementById('messages-table-body');
             const intervalContainer = document.getElementById('interval-container');
 
             msgContainer.innerHTML = '';
@@ -219,11 +375,32 @@
                 intervalContainer.textContent = `Início - ${labels[index]}`;
             }
 
-            messages[index].forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message';
-                msgDiv.textContent = msg;
-                msgContainer.appendChild(msgDiv);
+            messages[index].forEach(msgObj => {
+                const row = document.createElement('tr');
+                const messageCell = document.createElement('td');
+                const sentimentCell = document.createElement('td');
+
+                messageCell.textContent = msgObj.message;
+                sentimentCell.textContent = translateSentimentTable(msgObj.sentiment.Sentiment);
+
+                row.appendChild(messageCell);
+                row.appendChild(sentimentCell);
+                msgContainer.appendChild(row);
+            });
+
+            filterMessages(); // Aplicar o filtro após carregar as mensagens iniciais
+        }
+
+        function filterMessages() {
+            const filterValue = document.getElementById('sentimentFilter').value;
+            const rows = document.querySelectorAll('#messages-table-body tr');
+            rows.forEach(row => {
+                const sentimentCell = row.cells[1].textContent;
+                if (filterValue === 'all' || sentimentCell === translateSentimentTable(filterValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
             });
         }
 
@@ -243,6 +420,7 @@
             videoTitleElement.href = data.video.url;
 
             loadInitialMessages();
+            showChart('nota'); // Inicialmente mostrar o gráfico de Nota
         };
     </script>
 </body>

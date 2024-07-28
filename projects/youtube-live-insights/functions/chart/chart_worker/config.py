@@ -25,7 +25,7 @@ class ChartWorkerConfig:
         services.sqs.create_trigger("workers_queue", function)
 
         services.s3.large_payload_bucket.grant_read_write(function)
-        
+
         comprehend_policy = iam.PolicyStatement(actions=["comprehend:*"], resources=["*"], effect=iam.Effect.ALLOW)
 
         function.role.attach_inline_policy(iam.Policy(scope, "ComprehendPolicy", statements=[comprehend_policy]))

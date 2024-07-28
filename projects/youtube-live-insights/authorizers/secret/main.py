@@ -21,6 +21,7 @@ def get_secret(secret_name: str):
 
     return secret
 
+
 def lambda_handler(event, context):
 
     secret = event["headers"].get("secret")
