@@ -50,6 +50,21 @@
         ]
     },
     {
+        "name": "AskQuestion",
+        "path": "./functions/rag/ask_question",
+        "description": "anything",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/ask",
+                "method": "GET",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
         "name": "AskQuestionsToLLM",
         "path": "./functions/rag/ask_questions",
         "description": "ask for llm",

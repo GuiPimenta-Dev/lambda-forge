@@ -1,5 +1,4 @@
 from functions.rag.ask_question.config import AskQuestionConfig
-from functions.ask_question.config import AskQuestionConfig
 from authorizers.secret.config import SecretAuthorizerConfig
 from aws_cdk import Stack
 from constructs import Construct
@@ -28,6 +27,3 @@ class LambdaStack(Stack):
         AskQuestionConfig(self.services)
         AskQuestionsConfig(self.services)
         CreateVectorsConfig(self.services)
-
-        # AskQuestion
-        AskQuestionConfig(self.services)
