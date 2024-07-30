@@ -13,15 +13,15 @@ from . import utils
 def lambda_handler(event, context):
 
     query = event["queryStringParameters"]["query"]
-
-    PINECONE_INDEX_NAME = os.environ.get("PINECONE_INDEX_NAME", "lambda-forge-telegram")
+    index_name =  event["queryStringParameters"].get("index_name", "lambda-forge-telegram")
+    
     PINECONE_API_KEY = sm_utils.get_secret("PINECONE_API_KEY")
     OPENAI_API_KEY = sm_utils.get_secret("OPEN_API_KEY")
     os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
     pinecone = Pinecone(api_key=PINECONE_API_KEY)
-    index = pinecone.Index(PINECONE_INDEX_NAME)
+    index = pinecone.Index(index_name)
     embed_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 
     prompt = utils.augment_prompt(index, embed_model, query)

@@ -17,7 +17,6 @@ class CreateVectorsConfig:
                 services.layers.tiktoken_layer,
             ],
             environment={
-                "PINECONE_INDEX_NAME": "lambda-forge-telegram",
                 "VISITED_URLS_TABLE_NAME": services.dynamodb.visited_urls_table.table_name,
             },
         )

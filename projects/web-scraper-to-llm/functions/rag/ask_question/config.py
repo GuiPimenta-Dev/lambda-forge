@@ -15,6 +15,6 @@ class AskQuestionConfig:
             ],
         )
 
-        services.api_gateway.create_endpoint("GET", "/ask", function)
+        services.api_gateway.create_endpoint("GET", "/ask", function, public=True)
 
         services.secrets_manager.openai_api_secret.grant_read(function)
