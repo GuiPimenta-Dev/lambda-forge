@@ -1,0 +1,121 @@
+[
+    {
+        "name": "SecretAuthorizer",
+        "path": "./authorizers/secret",
+        "description": "An authorizer based on a secret",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
+        "name": "StartDownload",
+        "path": "./functions/download/starter",
+        "description": "Start the process",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/start",
+                "method": "POST",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "sqs",
+                "resource": "downloads_queue"
+            }
+        ]
+    },
+    {
+        "name": "GetVideo",
+        "path": "./functions/download/get_video",
+        "description": "Download a YouTube video and Stores it on S3",
+        "timeout": 900,
+        "triggers": [
+            {
+                "service": "sqs",
+                "trigger": "downloads_queue"
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "videos_table"
+            },
+            {
+                "service": "sns",
+                "resource": "videos_topic"
+            }
+        ]
+    },
+    {
+        "name": "GetChat",
+        "path": "./functions/download/get_chat",
+        "description": "Get Live chat messages and stores on DynamoDB",
+        "timeout": 900,
+        "triggers": [
+            {
+                "service": "sns",
+                "trigger": "videos_topic"
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "chats_table"
+            }
+        ]
+    },
+    {
+        "name": "GetChart",
+        "path": "./functions/chart/get_chart",
+        "description": "Rate interactions based on transcription and chat",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/chart",
+                "method": "GET",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "ChartWorker",
+        "path": "./functions/chart/chart_worker",
+        "description": "Worker to create the chart from the chat messages in background",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "sqs",
+                "trigger": "workers_queue"
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "transcriptions_table"
+            }
+        ]
+    },
+    {
+        "name": "CreateChart",
+        "path": "./functions/chart/create_chart",
+        "description": "Parse the transcription",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "sqs",
+                "trigger": "create_chart_queue"
+            }
+        ],
+        "invocations": [
+            {
+                "service": "sqs",
+                "resource": "workers_queue"
+            }
+        ]
+    }
+]
