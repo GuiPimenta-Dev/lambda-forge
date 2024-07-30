@@ -1,5 +1,5 @@
 
-# Youtube Live Insights With Sentiments Analysis
+# Youtube Live Insights With Sentiment Analysis
 
 This project is the MVP of a SaaS that utilizes Large Language Models (LLMs) to measure and analyze engagement levels in YouTube live streams. By focusing on interactions within the live chat, it identifies key moments in the video that can be transformed into engaging, shorter clips for YouTube.
 
