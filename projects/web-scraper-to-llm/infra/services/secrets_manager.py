@@ -21,3 +21,9 @@ class SecretsManager:
             id="AuthorizerSecret",
             secret_complete_arn="arn:aws:secretsmanager:us-east-2:211125768252:secret:youtube-live-insights-zgUYte",
         )
+
+        self.textual_telegram_secret = sm.Secret.from_secret_complete_arn(
+            scope,
+            id="TextualTelegramSecret",
+            secret_complete_arn="arn:aws:secretsmanager:us-east-2:211125768252:secret:TEXTUAL-TELEGRAM-TOKEN-1n6ypV",
+        )

@@ -7,7 +7,8 @@ def test_lambda_handler():
 
     event = {
         "queryStringParameters": {
-            "query": "how to make Hello World in lambda forge?",
+            "query": "What is Textual?",
+            "index_name": "textualize"
         }
     }
     response = lambda_handler(event, None)

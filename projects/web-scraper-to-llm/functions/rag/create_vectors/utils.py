@@ -51,7 +51,7 @@ def query_all_data_from_dynamo(table_name, partition_key_value):
 
 def store_knowledge_in_pinecone(index, data, embed_model):
     data = pd.DataFrame(data)
-    batch_size = 100
+    batch_size = 5
     for i in tqdm(range(0, len(data), batch_size)):
         i_end = min(len(data), i + batch_size)
         batch = data.iloc[i:i_end]
@@ -68,7 +68,12 @@ def store_knowledge_in_pinecone(index, data, embed_model):
                         "url": x["SK"]["S"],
                     }
                 )
-            except:
-                pass
+            except Exception as e:
+                print(f"Error processing item {x}: {e}")
+                continue
         embeds = embed_model.embed_documents(texts)
-        index.upsert(vectors=zip(ids, embeds, metadata))
+        try:
+            index.upsert(vectors=zip(ids, embeds, metadata))
+        except Exception as e:
+            print(f"Error upserting batch: {e}")
+            continue

@@ -1,11 +1,13 @@
+import json
 from .main import lambda_handler
 
 
 def test_llm_lambda_handler():
     event = {
-        "body": {
-            "job_id": "0da893aa-7fc0-4c0a-9d5a-dd2528f98a73",
-        }
+        "body": json.dumps({
+            "job_id": "c5dd8327-64ed-48d4-a3a7-b9a64f5c85c9",
+            "index_name": "textualize"
+        })
     }
 
     response = lambda_handler(event, None)

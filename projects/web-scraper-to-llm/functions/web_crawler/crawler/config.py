@@ -12,6 +12,7 @@ class CrawlerConfig:
             dead_letter_queue_enabled=True,
             dead_letter_queue=services.sqs.crawler_queue_dlq,
             layers=[services.layers.requests_layer, services.layers.bs4_layer],
+            timeout=15,
             environment={
                 "VISITED_URLS_TABLE_NAME": services.dynamodb.visited_urls_table.table_name,
                 "CRAWLER_QUEUE_URL": services.sqs.crawler_queue.queue_url,
@@ -23,3 +24,5 @@ class CrawlerConfig:
 
         services.dynamodb.grant_write("visited_urls_table", function)
         services.dynamodb.visited_urls_table.grant_read_data(function)
+
+        services.dynamodb.visited_urls_table.grant(function, "dynamodb:BatchGetItem")

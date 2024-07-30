@@ -31,7 +31,7 @@
         "name": "Crawler",
         "path": "./functions/web_crawler/crawler",
         "description": "crawl the websites",
-        "timeout": 60,
+        "timeout": 900,
         "triggers": [
             {
                 "service": "sqs",
@@ -59,7 +59,7 @@
                 "service": "api_gateway",
                 "trigger": "/ask",
                 "method": "GET",
-                "public": false
+                "public": true
             }
         ],
         "invocations": []
@@ -90,6 +90,21 @@
                 "trigger": "/vectors",
                 "method": "POST",
                 "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "Textual",
+        "path": "./functions/rag/textual",
+        "description": "Lambda Forge telegram webhook for Textual",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/textual",
+                "method": "POST",
+                "public": true
             }
         ],
         "invocations": []

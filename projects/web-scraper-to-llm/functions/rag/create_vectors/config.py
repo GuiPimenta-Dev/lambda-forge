@@ -1,4 +1,5 @@
 from aws_cdk import aws_iam as iam
+
 from infra.services import Services
 
 
@@ -15,6 +16,7 @@ class CreateVectorsConfig:
                 services.layers.langchain_all_layer,
                 services.layers.pinecone_client_layer,
                 services.layers.tiktoken_layer,
+                services.layers.pandas_layer,
             ],
             environment={
                 "VISITED_URLS_TABLE_NAME": services.dynamodb.visited_urls_table.table_name,

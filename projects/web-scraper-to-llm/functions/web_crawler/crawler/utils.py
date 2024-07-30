@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import time
+import time
 from urllib.parse import urljoin
 
 import boto3
@@ -38,6 +38,9 @@ def get_content_from_page(url):
 
 
 def get_non_visited_urls(urls, job_id):
+    if not urls:
+        return []
+
     dynamodb = boto3.client("dynamodb")
     VISITED_URLS_TABLE_NAME = os.getenv("VISITED_URLS_TABLE_NAME", "VisitedURLs")
     BATCH_SIZE = 100  # Maximum number of keys to send in each batch
@@ -67,6 +70,10 @@ def get_non_visited_urls(urls, job_id):
                 .get(VISITED_URLS_TABLE_NAME, {})
                 .get("Keys", [])
             )
+
+            # Break out of the loop if there are no unprocessed keys
+            if not unprocessed_keys:
+                break
 
     non_visited_urls = list(non_visited_urls)
     print(f"Non visited urls: {non_visited_urls}")
