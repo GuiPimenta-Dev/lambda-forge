@@ -140,7 +140,9 @@ def parse_dtclass(dtclass):
             required.append(i)
 
         if "Literal" in type_:
-            data = j.type.__args__[0].__args__ if "Optional" in type_ else j.type.__args__
+            data = (
+                j.type.__args__[0].__args__ if "Optional" in type_ else j.type.__args__
+            )
             enum = list(data)
             if isinstance(data[0], str):
                 swagger_type = "string"
@@ -176,12 +178,18 @@ def create_response_object(operation_id):
     return {
         "200": {
             "description": "Successful response",
-            "content": {"application/json": {"schema": {"$ref": f"#/components/schemas/{operation_id}Output"}}},
+            "content": {
+                "application/json": {
+                    "schema": {"$ref": f"#/components/schemas/{operation_id}Output"}
+                }
+            },
         }
     }
 
 
-def update_parameters_for_get_method(paths, endpoint, method, schemas, data, path_params):
+def update_parameters_for_get_method(
+    paths, endpoint, method, schemas, data, path_params
+):
     """Updates the parameters for GET requests."""
     operation_id = data["operationId"]
     input_name = f"{operation_id}Input"
@@ -208,9 +216,13 @@ def parse_path(paths, schemas):
             path_params = schemas.get(f"{operation_id}Path")
 
             if method == "get":
-                update_parameters_for_get_method(paths, endpoint, method, schemas, data, path_params)
+                update_parameters_for_get_method(
+                    paths, endpoint, method, schemas, data, path_params
+                )
             else:
-                update_request_body_for_other_methods(paths, endpoint, method, data, path_params)
+                update_request_body_for_other_methods(
+                    paths, endpoint, method, data, path_params
+                )
 
             paths[endpoint][method]["responses"] = create_response_object(operation_id)
 
@@ -256,7 +268,11 @@ def parse_get_properties(schema):
 
 def parse_post_properties(schema_name):
     return {
-        "content": {"application/json": {"schema": {"$ref": f"#/components/schemas/{schema_name}"}}},
+        "content": {
+            "application/json": {
+                "schema": {"$ref": f"#/components/schemas/{schema_name}"}
+            }
+        },
     }
 
 

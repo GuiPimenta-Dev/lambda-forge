@@ -13,7 +13,9 @@ from . import Live, LiveApiGtw, LiveEventBridge, LiveS3, LiveSNS, LiveSQS
 printer = Printer()
 
 
-def create_api_gateway_trigger(account, region, project, function_arn, selected_function, endpoint, method):
+def create_api_gateway_trigger(
+    account, region, project, function_arn, selected_function, endpoint, method
+):
     live_apigtw = LiveApiGtw(account, region, printer, project, endpoint)
     trigger = live_apigtw.create_trigger(function_arn, selected_function, method)
     return trigger
@@ -72,7 +74,9 @@ def run_live(log_file, include, exclude):
     try:
         printer.start_spinner("Synthesizing CDK")
         with open(os.devnull, "w") as devnull:
-            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+            subprocess.run(
+                ["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True
+            )
             printer.stop_spinner()
 
     except Exception as e:
@@ -83,7 +87,9 @@ def run_live(log_file, include, exclude):
     functions = json.load(open("functions.json", "r"))
 
     if exclude:
-        functions = [function for function in functions if function["name"] not in exclude]
+        functions = [
+            function for function in functions if function["name"] not in exclude
+        ]
 
     if include:
         functions = [function for function in functions if function["name"] in include]
@@ -114,7 +120,9 @@ def run_live(log_file, include, exclude):
                 time.sleep(4)
                 for function_trigger in function["triggers"]:
 
-                    function_arn = f"arn:aws:lambda:{region}:{account}:function:{function_name}"
+                    function_arn = (
+                        f"arn:aws:lambda:{region}:{account}:function:{function_name}"
+                    )
 
                     if function_trigger["service"] == "api_gateway":
                         trigger = create_api_gateway_trigger(
@@ -129,7 +137,9 @@ def run_live(log_file, include, exclude):
 
                     if function_trigger["service"] == "sns":
                         topic = f"Live-{project}-{function_trigger['trigger']}"
-                        trigger = create_sns_trigger(account, region, function_arn, function_name, topic)
+                        trigger = create_sns_trigger(
+                            account, region, function_arn, function_name, topic
+                        )
 
                     if function_trigger["service"] == "sqs":
                         queue = f"Live-{project}-{function_trigger['trigger']}"
@@ -137,11 +147,15 @@ def run_live(log_file, include, exclude):
 
                     if function_trigger["service"] == "s3":
                         bucket = f"live-{project.lower()}-{function_trigger['trigger'].replace('_', '-').replace(' ', '-').lower()}"
-                        trigger = create_s3_trigger(region, account, function_arn, bucket)
+                        trigger = create_s3_trigger(
+                            region, account, function_arn, bucket
+                        )
 
                     if function_trigger["service"] == "event_bridge":
                         bus = f"Live-{project}-{function_trigger['trigger']}"
-                        trigger = create_event_bridge_trigger(region, account, function_arn, bus)
+                        trigger = create_event_bridge_trigger(
+                            region, account, function_arn, bus
+                        )
 
                     live.attach_trigger(function_name, trigger)
 
@@ -182,10 +196,16 @@ def run_live(log_file, include, exclude):
 
             functions = json.load(open("functions.json", "r"))
             if exclude:
-                functions = [function for function in functions if function["name"] not in exclude]
+                functions = [
+                    function
+                    for function in functions
+                    if function["name"] not in exclude
+                ]
 
             if include:
-                functions = [function for function in functions if function["name"] in include]
+                functions = [
+                    function for function in functions if function["name"] in include
+                ]
 
         if choice == "Exit":
             if platform.system() == "Windows":

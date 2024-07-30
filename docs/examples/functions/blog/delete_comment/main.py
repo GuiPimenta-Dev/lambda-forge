@@ -36,7 +36,9 @@ def lambda_handler(event, context):
     post = posts_table.get_item(Key={"PK": post_id}).get("Item")
     comments = post.get("comments", [])
 
-    comment = next((comment for comment in comments if comment["comment_id"] == comment_id), None)
+    comment = next(
+        (comment for comment in comments if comment["comment_id"] == comment_id), None
+    )
     if comment["email"] != email:
         return {
             "statusCode": 403,

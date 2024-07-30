@@ -26,7 +26,9 @@ def videos_topic(sns):
     yield sns
 
 
-def test_it_should_download_a_video_and_trigger_the_correct_events(videos_table, videos_topic):
+def test_it_should_download_a_video_and_trigger_the_correct_events(
+    videos_table, videos_topic
+):
 
     event = {
         "Records": [
@@ -45,7 +47,9 @@ def test_it_should_download_a_video_and_trigger_the_correct_events(videos_table,
     lambda_handler(event, None)
 
     video_on_table = simplify_dynamodb_item(
-        videos_table.get_item(TableName="table", Key={"PK": {"S": "5Zw0taVl2l0"}})["Item"]
+        videos_table.get_item(TableName="table", Key={"PK": {"S": "5Zw0taVl2l0"}})[
+            "Item"
+        ]
     )
 
     assert video_on_table == {

@@ -19,6 +19,10 @@ def lambda_handler(event, context):
     payload = {"connection_id": connection_id}
 
     # Invoke the target Lambda function asynchronously
-    lambda_client.invoke(FunctionName=TARGET_FUNCTION_ARN, InvocationType="Event", Payload=json.dumps(payload))
+    lambda_client.invoke(
+        FunctionName=TARGET_FUNCTION_ARN,
+        InvocationType="Event",
+        Payload=json.dumps(payload),
+    )
 
     return {"statusCode": 200}

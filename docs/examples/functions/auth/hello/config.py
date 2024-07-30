@@ -11,4 +11,6 @@ class HelloConfig:
             directory="hello",
         )
 
-        services.api_gateway.create_endpoint("GET", "/hello", function, authorizer="jwt")
+        services.api_gateway.create_endpoint(
+            "GET", "/hello", function, authorizer="jwt"
+        )

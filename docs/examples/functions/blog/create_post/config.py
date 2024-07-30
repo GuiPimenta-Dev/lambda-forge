@@ -12,6 +12,8 @@ class CreatePostConfig:
             environment={"POSTS_TABLE_NAME": services.dynamodb.posts_table.table_name},
         )
 
-        services.api_gateway.create_endpoint("POST", "/posts", function, authorizer="sso")
+        services.api_gateway.create_endpoint(
+            "POST", "/posts", function, authorizer="sso"
+        )
 
         services.dynamodb.grant_write("posts_table", function)

@@ -50,7 +50,9 @@ def get_non_visited_urls(urls, job_id):
         for i in range(0, len(unprocessed_keys), BATCH_SIZE):
             batch_keys = unprocessed_keys[i : i + BATCH_SIZE]
             try:
-                response = dynamodb.batch_get_item(RequestItems={VISITED_URLS_TABLE_NAME: {"Keys": batch_keys}})
+                response = dynamodb.batch_get_item(
+                    RequestItems={VISITED_URLS_TABLE_NAME: {"Keys": batch_keys}}
+                )
             except dynamodb.exceptions.ClientError as e:
                 print(f"[ERROR] {e}")
                 time.sleep(1)  # Sleep briefly to avoid retry storms
@@ -60,7 +62,11 @@ def get_non_visited_urls(urls, job_id):
             for item in items:
                 non_visited_urls.discard(item["SK"]["S"])
 
-            unprocessed_keys = response.get("UnprocessedKeys", {}).get(VISITED_URLS_TABLE_NAME, {}).get("Keys", [])
+            unprocessed_keys = (
+                response.get("UnprocessedKeys", {})
+                .get(VISITED_URLS_TABLE_NAME, {})
+                .get("Keys", [])
+            )
 
     non_visited_urls = list(non_visited_urls)
     print(f"Non visited urls: {non_visited_urls}")
@@ -90,7 +96,9 @@ def save_batch_in_dynamo(table, contents, job_id, timestamp, source_url, root_ur
             batch.put_item(Item=item)
 
 
-def send_batch_to_queue(sqs_client, queue_url, non_visited_urls, timestamp, job_id, source_url, root_url):
+def send_batch_to_queue(
+    sqs_client, queue_url, non_visited_urls, timestamp, job_id, source_url, root_url
+):
     BATCH_SIZE = 10
     for i in range(0, len(non_visited_urls), BATCH_SIZE):
         batch = non_visited_urls[i : i + BATCH_SIZE]

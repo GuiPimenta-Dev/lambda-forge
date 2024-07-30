@@ -12,7 +12,9 @@ def create_diagram(json_input, output_file):
 
         for function in json_input:
             function_name = function["name"]
-            folder_path = "/".join(function["path"].split("/")[:-1])  # Extract folder path
+            folder_path = "/".join(
+                function["path"].split("/")[:-1]
+            )  # Extract folder path
 
             if folder_path not in folder_clusters:
                 folder_clusters[folder_path] = {}
@@ -30,17 +32,23 @@ def create_diagram(json_input, output_file):
                 trigger_name = trigger["trigger"]
                 if service == "eventbridge":
                     if trigger_name not in folder_clusters[folder_path]:
-                        folder_clusters[folder_path][trigger_name] = Eventbridge(trigger_name)
+                        folder_clusters[folder_path][trigger_name] = Eventbridge(
+                            trigger_name
+                        )
                     trigger_node = folder_clusters[folder_path][trigger_name]
                 elif service == "api_gateway":
                     trigger_name = f"{trigger['method'].upper()} {trigger_name}"
                     if trigger_name not in folder_clusters[folder_path]:
-                        folder_clusters[folder_path][trigger_name] = APIGateway(trigger_name)
+                        folder_clusters[folder_path][trigger_name] = APIGateway(
+                            trigger_name
+                        )
                     trigger_node = folder_clusters[folder_path][trigger_name]
                 elif service == "wss":
                     trigger_name = f"WSS {trigger_name}"
                     if trigger_name not in folder_clusters[folder_path]:
-                        folder_clusters[folder_path][trigger_name] = APIGateway(trigger_name)
+                        folder_clusters[folder_path][trigger_name] = APIGateway(
+                            trigger_name
+                        )
                     trigger_node = folder_clusters[folder_path][trigger_name]
                 elif service == "sqs":
                     if trigger_name not in folder_clusters[folder_path]:
@@ -56,7 +64,9 @@ def create_diagram(json_input, output_file):
                     trigger_node = folder_clusters[folder_path][trigger_name]
                 elif service == "dynamodb":
                     if trigger_name not in folder_clusters[folder_path]:
-                        folder_clusters[folder_path][trigger_name] = Dynamodb(trigger_name)
+                        folder_clusters[folder_path][trigger_name] = Dynamodb(
+                            trigger_name
+                        )
                     trigger_node = folder_clusters[folder_path][trigger_name]
                 else:
                     continue
@@ -68,7 +78,9 @@ def create_diagram(json_input, output_file):
                 resource_id = invocation["resource"]
                 if service == "dynamodb":
                     if resource_id not in folder_clusters[folder_path]:
-                        folder_clusters[folder_path][resource_id] = Dynamodb(resource_id)
+                        folder_clusters[folder_path][resource_id] = Dynamodb(
+                            resource_id
+                        )
                     invocation_node = folder_clusters[folder_path][resource_id]
                 elif service == "s3":
                     if resource_id not in folder_clusters[folder_path]:

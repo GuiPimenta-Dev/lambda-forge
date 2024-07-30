@@ -12,7 +12,13 @@ def test_authorizer_should_pass_with_correct_secret():
     assert response == {
         "policyDocument": {
             "Version": "2012-10-17",
-            "Statement": [{"Action": "execute-api:Invoke", "Effect": "allow", "Resource": event["methodArn"]}],
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Effect": "allow",
+                    "Resource": event["methodArn"],
+                }
+            ],
         },
     }
 
@@ -28,6 +34,12 @@ def test_authorizer_should_fail_with_invalid_secret():
     assert response == {
         "policyDocument": {
             "Version": "2012-10-17",
-            "Statement": [{"Action": "execute-api:Invoke", "Effect": "deny", "Resource": event["methodArn"]}],
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Effect": "deny",
+                    "Resource": event["methodArn"],
+                }
+            ],
         },
     }

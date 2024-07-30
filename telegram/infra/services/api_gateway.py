@@ -22,12 +22,31 @@ class APIGateway:
 
         self.rest = REST(scope=scope, api=api, context=context)
 
-    @trigger(service="api_gateway", trigger="path", function="function", extra=["method", "public"])
+    @trigger(
+        service="api_gateway",
+        trigger="path",
+        function="function",
+        extra=["method", "public"],
+    )
     def create_endpoint(self, method, path, function, public=False, authorizer=None):
-        self.rest.create_endpoint(method=method, path=path, function=function, public=public, authorizer=authorizer)
+        self.rest.create_endpoint(
+            method=method,
+            path=path,
+            function=function,
+            public=public,
+            authorizer=authorizer,
+        )
 
     def create_authorizer(self, function, name, default=False):
         self.rest.create_authorizer(authorizer=function, name=name, default=default)
 
-    def create_docs(self, endpoint, artifact, authorizer=None, public=False, stages=None):
-        self.rest.create_docs(endpoint=endpoint, artifact=artifact, authorizer=authorizer, public=public, stages=stages)
+    def create_docs(
+        self, endpoint, artifact, authorizer=None, public=False, stages=None
+    ):
+        self.rest.create_docs(
+            endpoint=endpoint,
+            artifact=artifact,
+            authorizer=authorizer,
+            public=public,
+            stages=stages,
+        )

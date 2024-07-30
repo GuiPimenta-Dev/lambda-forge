@@ -42,7 +42,9 @@ class Printer:
     def spinner_task(self, color="white"):
         spinner_symbols = itertools.cycle(["-", "\\", "|", "/"])
         while self.spinner["running"]:
-            sys.stdout.write(f"\r{color}{next(spinner_symbols)}   {self.spinner['legend']}\033[0m")
+            sys.stdout.write(
+                f"\r{color}{next(spinner_symbols)}   {self.spinner['legend']}\033[0m"
+            )
             sys.stdout.write("\033[?25l")
             sys.stdout.flush()
             time.sleep(0.1)
@@ -57,12 +59,16 @@ class Printer:
             sys.stdout.flush()
 
     def change_spinner_legend(self, legend):
-        previous_legend_length = len(self.spinner["legend"]) + 4 if self.spinner["legend"] else 0
+        previous_legend_length = (
+            len(self.spinner["legend"]) + 4 if self.spinner["legend"] else 0
+        )
         sys.stdout.write("\r" + " " * previous_legend_length)
         sys.stdout.flush()
         self.spinner["legend"] = legend
 
-    def print(self, message, color="white", pre_break_lines=None, post_break_lines=None):
+    def print(
+        self, message, color="white", pre_break_lines=None, post_break_lines=None
+    ):
         if pre_break_lines:
             print("\n" * pre_break_lines)
 

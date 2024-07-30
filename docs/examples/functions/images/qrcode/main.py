@@ -26,7 +26,9 @@ def lambda_handler(event, context):
     url = body.get("url")
 
     # Retrieve the S3 bucket name from environment variables
-    bucket_name = os.environ.get("BUCKET_NAME", "live-lambda-forge-examples-images-bucket")
+    bucket_name = os.environ.get(
+        "BUCKET_NAME", "live-lambda-forge-examples-images-bucket"
+    )
 
     # Generate QR code from the image
     qr = qrcode.QRCode()

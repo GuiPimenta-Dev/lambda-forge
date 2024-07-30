@@ -14,7 +14,9 @@ class LiveSQS:
 
     def create_queue(self, name):
         queue_url = self.sqs.create_queue(QueueName=name)["QueueUrl"]
-        response = self.sqs.get_queue_attributes(QueueUrl=queue_url, AttributeNames=["QueueArn"])
+        response = self.sqs.get_queue_attributes(
+            QueueUrl=queue_url, AttributeNames=["QueueArn"]
+        )
         return queue_url, response["Attributes"]["QueueArn"]
 
     def subscribe(self, function_arn, queue_url, queue_arn):
@@ -25,11 +27,15 @@ class LiveSQS:
         }
 
         try:
-            self.iam = self.iam.attach_policy_to_lambda(policy, function_arn, "Live-SQS-Policy")
+            self.iam = self.iam.attach_policy_to_lambda(
+                policy, function_arn, "Live-SQS-Policy"
+            )
         except:
             pass
 
-        self.sqs.set_queue_attributes(QueueUrl=queue_url, Attributes={"VisibilityTimeout": "900"})
+        self.sqs.set_queue_attributes(
+            QueueUrl=queue_url, Attributes={"VisibilityTimeout": "900"}
+        )
 
         self.lambda_client.create_event_source_mapping(
             EventSourceArn=queue_arn, FunctionName=function_arn, Enabled=True

@@ -15,7 +15,9 @@ class StagingStack(cdk.Stack):
     def __init__(self, scope: Construct, context, **kwargs) -> None:
         super().__init__(scope, context.create_id("Stack"), **kwargs)
 
-        source = CodePipelineSource.git_hub(f"{context.repo['owner']}/{context.repo['name']}", "staging")
+        source = CodePipelineSource.git_hub(
+            f"{context.repo['owner']}/{context.repo['name']}", "staging"
+        )
 
         pipeline = pipelines.CodePipeline(
             self,
@@ -24,7 +26,9 @@ class StagingStack(cdk.Stack):
             synth=pipelines.ShellStep("Synth", input=source, commands=["cdk synth"]),
             code_build_defaults=pipelines.CodeBuildOptions(
                 build_environment=codebuild.BuildEnvironment(
-                    build_image=codebuild.LinuxBuildImage.from_docker_registry(ECR.LATEST),
+                    build_image=codebuild.LinuxBuildImage.from_docker_registry(
+                        ECR.LATEST
+                    ),
                 )
             ),
         )
@@ -36,7 +40,9 @@ class StagingStack(cdk.Stack):
         coverage = steps.coverage()
         validate_docs = steps.validate_docs()
         validate_integration_tests = steps.validate_integration_tests()
-        validate_todo = steps.custom_step(name="ValidateTodo", commands=["python infra/scripts/validate_todo.py"])
+        validate_todo = steps.custom_step(
+            name="ValidateTodo", commands=["python infra/scripts/validate_todo.py"]
+        )
 
         # post
         redoc = steps.redoc()
@@ -47,7 +53,13 @@ class StagingStack(cdk.Stack):
 
         pipeline.add_stage(
             DeployStage(self, context),
-            pre=[unit_tests, coverage, validate_integration_tests, validate_docs, validate_todo],
+            pre=[
+                unit_tests,
+                coverage,
+                validate_integration_tests,
+                validate_docs,
+                validate_todo,
+            ],
             post=[
                 redoc,
                 swagger,

@@ -33,7 +33,10 @@ def lambda_handler(event, context):
 
     # Validate that the initial number is less than the end number
     if min_number >= max_number:
-        return {"statusCode": 400, "body": json.dumps({"message": "min_number must be less than max_number"})}
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"message": "min_number must be less than max_number"}),
+        }
 
     # Generate a unique game ID using uuid
     game_id = str(uuid.uuid4())

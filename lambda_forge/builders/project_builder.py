@@ -72,18 +72,44 @@ class ProjectBuilder(FileService):
         self.copy_folders("lambda_forge", "scaffold", "")
         if self.minimal:
             self.copy_file("lambda_forge", "stacks/minimal/app.py", "")
-            self.copy_file("lambda_forge", "stacks/minimal/stack.py", "infra/stacks/stack.py")
+            self.copy_file(
+                "lambda_forge", "stacks/minimal/stack.py", "infra/stacks/stack.py"
+            )
 
         else:
             if self.no_docs:
                 self.copy_file("lambda_forge", "stacks/no_docs/app.py", "")
-                self.copy_file("lambda_forge", "stacks/no_docs/prod_stack.py", "infra/stacks/prod_stack.py")
-                self.copy_file("lambda_forge", "stacks/no_docs/dev_stack.py", "infra/stacks/dev_stack.py")
-                self.copy_file("lambda_forge", "stacks/no_docs/staging_stack.py", "infra/stacks/staging_stack.py")
+                self.copy_file(
+                    "lambda_forge",
+                    "stacks/no_docs/prod_stack.py",
+                    "infra/stacks/prod_stack.py",
+                )
+                self.copy_file(
+                    "lambda_forge",
+                    "stacks/no_docs/dev_stack.py",
+                    "infra/stacks/dev_stack.py",
+                )
+                self.copy_file(
+                    "lambda_forge",
+                    "stacks/no_docs/staging_stack.py",
+                    "infra/stacks/staging_stack.py",
+                )
             else:
                 self.copy_file("lambda_forge", "stacks/default/app.py", "")
-                self.copy_file("lambda_forge", "stacks/default/prod_stack.py", "infra/stacks/prod_stack.py")
-                self.copy_file("lambda_forge", "stacks/default/dev_stack.py", "infra/stacks/dev_stack.py")
-                self.copy_file("lambda_forge", "stacks/default/staging_stack.py", "infra/stacks/staging_stack.py")
+                self.copy_file(
+                    "lambda_forge",
+                    "stacks/default/prod_stack.py",
+                    "infra/stacks/prod_stack.py",
+                )
+                self.copy_file(
+                    "lambda_forge",
+                    "stacks/default/dev_stack.py",
+                    "infra/stacks/dev_stack.py",
+                )
+                self.copy_file(
+                    "lambda_forge",
+                    "stacks/default/staging_stack.py",
+                    "infra/stacks/staging_stack.py",
+                )
 
         self.make_file("", "cdk.json", self.cdk)

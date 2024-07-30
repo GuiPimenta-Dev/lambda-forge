@@ -23,6 +23,8 @@ class GetChartConfig:
         function.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["dynamodb:Query"],
-                resources=[f"{services.dynamodb.transcriptions_table.table_arn}/index/*"],
+                resources=[
+                    f"{services.dynamodb.transcriptions_table.table_arn}/index/*"
+                ],
             )
         )

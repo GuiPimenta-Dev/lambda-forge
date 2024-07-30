@@ -184,7 +184,9 @@ def create_project(
 
     project_builder = ProjectBuilder.a_project(name, no_docs, minimal)
 
-    project_builder = project_builder.with_cdk(repo_owner, repo_name, account, region, bucket).build()
+    project_builder = project_builder.with_cdk(
+        repo_owner, repo_name, account, region, bucket
+    ).build()
 
     if no_docs is False:
         DocsBuilder.a_doc().with_config().with_lambda_stack().build()
@@ -193,11 +195,15 @@ def create_project(
 @forge.command()
 @click.argument("name")
 @click.option("--description", required=True, help="Description for the endpoint")
-@click.option("--method", required=False, help="HTTP method for the endpoint", default="GET")
+@click.option(
+    "--method", required=False, help="HTTP method for the endpoint", default="GET"
+)
 @click.option("--belongs-to", help="Folder name you want to share code accross lambdas")
 @click.option("--endpoint", help="Endpoint for the API Gateway")
 @click.option("--no-api", help="Do not create an API Gateway endpoint", is_flag=True)
-@click.option("--websocket", help="Function is going to be used for websockets", is_flag=True)
+@click.option(
+    "--websocket", help="Function is going to be used for websockets", is_flag=True
+)
 @click.option(
     "--no-tests",
     help="Do not create unit tests and integration tests files",
@@ -210,7 +216,9 @@ def create_project(
     is_flag=True,
     default=False,
 )
-def function(name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public):
+def function(
+    name, description, method, belongs_to, endpoint, no_api, websocket, no_tests, public
+):
     """
     Creates a Lambda function with a predefined structure and API Gateway integration.
 
@@ -245,7 +253,9 @@ def create_function(
     public=False,
 ):
 
-    function_builder = FunctionBuilder.a_function(name, description).with_config(belongs)
+    function_builder = FunctionBuilder.a_function(name, description).with_config(
+        belongs
+    )
 
     if no_api is True:
         function_builder = function_builder.with_main()
@@ -260,7 +270,11 @@ def create_function(
     else:
         endpoint = endpoint or belongs or name
         if no_tests is True:
-            function_builder = function_builder.with_endpoint(endpoint).with_api(http_method, public).with_main()
+            function_builder = (
+                function_builder.with_endpoint(endpoint)
+                .with_api(http_method, public)
+                .with_main()
+            )
         else:
             function_builder = (
                 function_builder.with_endpoint(endpoint)
@@ -565,7 +579,9 @@ def deploy(stack, all):
     default="diagram.png",
 )
 @click.option("-i", "--include", help="Comma-separated files to watch", default=None)
-@click.option("-e", "--exclude", help="Comma-separated files to not watch", default=None)
+@click.option(
+    "-e", "--exclude", help="Comma-separated files to not watch", default=None
+)
 def diagram(output_file, include, exclude):
     """
     Create a diagram of the project in png format
@@ -577,7 +593,9 @@ def diagram(output_file, include, exclude):
     try:
         printer.start_spinner("Synthesizing CDK")
         with open(os.devnull, "w") as devnull:
-            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
+            subprocess.run(
+                ["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True
+            )
 
     except Exception as e:
         printer.print(str(e), "red", 1, 1)
@@ -586,7 +604,9 @@ def diagram(output_file, include, exclude):
 
     functions = json.load(open("functions.json", "r"))
     if exclude:
-        functions = [function for function in functions if function["name"] not in exclude]
+        functions = [
+            function for function in functions if function["name"] not in exclude
+        ]
 
     if include:
         functions = [function for function in functions if function["name"] in include]
@@ -619,7 +639,9 @@ def test(test_type):
         subprocess.run(["pytest", "-k", "integration", "."], check=True)
 
     elif test_type == "coverage":
-        subprocess.run(["coverage", "run", "-m", "pytest", "-k", "unit", "."], check=True)
+        subprocess.run(
+            ["coverage", "run", "-m", "pytest", "-k", "unit", "."], check=True
+        )
         subprocess.run(["coverage", "report"], check=True)
 
     elif test_type == "all":

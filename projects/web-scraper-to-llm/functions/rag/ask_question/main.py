@@ -5,9 +5,11 @@ from langchain_openai import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
 import os
 
+
 @dataclass
 class Input:
     pass
+
 
 @dataclass
 class Output:
@@ -18,17 +20,17 @@ def lambda_handler(event, context):
 
     query = event["queryStringParameters"]["query"]
     OPENAI_API_KEY = sm_utils.get_secret("OPEN_API_KEY")
-    
+
     chat = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model="gpt-3.5-turbo")
     messages = [
         SystemMessage(content="You are a helpful assistant."),
         HumanMessage(content=query),
     ]
-    
+
     res = chat(messages)
 
     return {
         "statusCode": 200,
         "body": json.dumps({"response": res.content}),
-        "headers": {"Access-Control-Allow-Origin": "*"}
+        "headers": {"Access-Control-Allow-Origin": "*"},
     }

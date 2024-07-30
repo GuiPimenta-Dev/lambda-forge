@@ -31,18 +31,24 @@ class FileService:
         with open(path, "r") as f:
             return f.readlines()
 
-    def copy_file(self, package_name, resource_name: str, full_destination: str) -> None:
+    def copy_file(
+        self, package_name, resource_name: str, full_destination: str
+    ) -> None:
         dst = Path(self.root_dir) / full_destination
         src = resources.files(package_name) / resource_name
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
 
-    def copy_folders(self, package_name: str, resource_name: str, destination: str) -> None:
+    def copy_folders(
+        self, package_name: str, resource_name: str, destination: str
+    ) -> None:
         dst = Path(self.root_dir) / destination
         src = resources.files(package_name) / resource_name
         dst.mkdir(parents=True, exist_ok=True)
         for src_path in src.glob("**/*"):
             if src_path.is_file():
                 dst_path = dst / src_path.relative_to(src)
-                dst_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure parent directory exists
+                dst_path.parent.mkdir(
+                    parents=True, exist_ok=True
+                )  # Ensure parent directory exists
                 shutil.copy2(src_path, dst_path)

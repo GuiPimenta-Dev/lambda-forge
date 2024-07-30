@@ -26,9 +26,13 @@ class ChartWorkerConfig:
 
         services.s3.large_payload_bucket.grant_read_write(function)
 
-        comprehend_policy = iam.PolicyStatement(actions=["comprehend:*"], resources=["*"], effect=iam.Effect.ALLOW)
+        comprehend_policy = iam.PolicyStatement(
+            actions=["comprehend:*"], resources=["*"], effect=iam.Effect.ALLOW
+        )
 
-        function.role.attach_inline_policy(iam.Policy(scope, "ComprehendPolicy", statements=[comprehend_policy]))
+        function.role.attach_inline_policy(
+            iam.Policy(scope, "ComprehendPolicy", statements=[comprehend_policy])
+        )
 
         services.dynamodb.grant_write("transcriptions_table", function)
         services.dynamodb.chats_table.grant_read_data(function)

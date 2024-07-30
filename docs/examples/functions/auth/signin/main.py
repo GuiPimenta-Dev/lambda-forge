@@ -22,7 +22,9 @@ def decrypt_with_kms(ciphertext_blob: bytes, kms_key_id: str) -> str:
     kms_client = boto3.client("kms")
 
     # Then you can pass the decoded string to the decrypt method
-    response = kms_client.decrypt(CiphertextBlob=bytes(ciphertext_blob), KeyId=kms_key_id)
+    response = kms_client.decrypt(
+        CiphertextBlob=bytes(ciphertext_blob), KeyId=kms_key_id
+    )
     return response["Plaintext"].decode()
 
 

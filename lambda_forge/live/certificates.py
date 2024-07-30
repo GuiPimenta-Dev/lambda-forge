@@ -59,7 +59,9 @@ class CertificateGenerator:
         }
 
         try:
-            response = self.iot_client.create_policy(policyName=policy_name, policyDocument=json.dumps(policy_document))
+            response = self.iot_client.create_policy(
+                policyName=policy_name, policyDocument=json.dumps(policy_document)
+            )
         except ClientError as e:
             if e.response["Error"]["Code"] == "ResourceAlreadyExistsException":
                 pass

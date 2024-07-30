@@ -10,7 +10,9 @@ class SendConnectionIdConfig:
             path="./functions/chat",
             description="Sends the connection id to the client when a connection is made",
             directory="send_connection_id",
-            environment={"POST_TO_CONNECTION_URL": context.resources["post_to_connection_url"]},
+            environment={
+                "POST_TO_CONNECTION_URL": context.resources["post_to_connection_url"]
+            },
         )
 
         function.add_to_role_policy(

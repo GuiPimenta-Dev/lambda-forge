@@ -39,7 +39,9 @@ def lambda_handler(event, context):
 
     contents = utils.get_content_from_urls(non_visited_urls)
 
-    utils.save_batch_in_dynamo(visited_urls_table, contents, job_id, timestamp, source_url, root_url)
+    utils.save_batch_in_dynamo(
+        visited_urls_table, contents, job_id, timestamp, source_url, root_url
+    )
     utils.send_batch_to_queue(
         sqs_client,
         CRAWLER_QUEUE_URL,

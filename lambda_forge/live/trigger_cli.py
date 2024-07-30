@@ -70,7 +70,9 @@ def run_trigger():
                 )
 
             if service == "SNS":
-                initial_text = json.dumps({"topic_arn": "", "message": {}, "subject": {}}, indent=2)
+                initial_text = json.dumps(
+                    {"topic_arn": "", "message": {}, "subject": {}}, indent=2
+                )
                 data = click.edit(text=initial_text)
                 data = json.loads(data)
                 if not data.get("topic_arn"):
@@ -95,10 +97,14 @@ def run_trigger():
                     continue
 
                 sqs = boto3.client("sqs", region_name=region)
-                sqs.send_message(QueueUrl=data["queue_url"], MessageBody=str(data["message"]))
+                sqs.send_message(
+                    QueueUrl=data["queue_url"], MessageBody=str(data["message"])
+                )
 
             if service == "S3":
-                initial_text = json.dumps({"bucket_name": "", "file_path": "", "metadata": {}}, indent=2)
+                initial_text = json.dumps(
+                    {"bucket_name": "", "file_path": "", "metadata": {}}, indent=2
+                )
                 data = click.edit(text=initial_text)
                 data = json.loads(data)
                 if not data.get("bucket_name") or not data.get("file_path"):

@@ -40,7 +40,9 @@ class REST:
                 self.scope,
                 id=f"{name}-Authorizer",
                 handler=authorizer,
-                identity_sources=[apigateway.IdentitySource.context("identity.sourceIp")],
+                identity_sources=[
+                    apigateway.IdentitySource.context("identity.sourceIp")
+                ],
                 results_cache_ttl=Duration.seconds(0),
             )
         except:
@@ -48,7 +50,9 @@ class REST:
 
         self.__authorizers[name] = authorizer
 
-    def create_docs(self, endpoint, artifact, authorizer=None, public=False, stages=None):
+    def create_docs(
+        self, endpoint, artifact, authorizer=None, public=False, stages=None
+    ):
 
         if stages and self.context.stage not in stages:
             return
@@ -110,9 +114,13 @@ class REST:
 
     def __create_resource(self, endpoint):
         resources = list(filter(None, endpoint.split("/")))
-        resource = self.api.root.get_resource(resources[0]) or self.api.root.add_resource(resources[0])
+        resource = self.api.root.get_resource(
+            resources[0]
+        ) or self.api.root.add_resource(resources[0])
         for subresource in resources[1:]:
-            resource = resource.get_resource(subresource) or resource.add_resource(subresource)
+            resource = resource.get_resource(subresource) or resource.add_resource(
+                subresource
+            )
         return resource
 
     def __get_authorizer(self, public, authorizer):
@@ -121,7 +129,9 @@ class REST:
         else:
             authorizer_name = authorizer or self.__default_authorizer
             if not authorizer_name:
-                raise ValueError("No default authorizer set and no authorizer provided.")
+                raise ValueError(
+                    "No default authorizer set and no authorizer provided."
+                )
 
             authorizer = self.__authorizers.get(authorizer_name)
             if authorizer is None:

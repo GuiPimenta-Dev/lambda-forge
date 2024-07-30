@@ -10,6 +10,8 @@ class HelloWorldConfig:
             description="A simple hello world",
         )
 
-        services.api_gateway.create_endpoint("GET", "/hello_world", function, public=True)
+        services.api_gateway.create_endpoint(
+            "GET", "/hello_world", function, public=True
+        )
 
         services.sns.create_trigger("hello_world_topic", function)

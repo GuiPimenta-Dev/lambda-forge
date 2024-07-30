@@ -4,7 +4,9 @@ from lambda_forge.trackers import reset
 
 
 class Context:
-    def __init__(self, stage, name, repo, region, account, bucket, resources, minimal) -> None:
+    def __init__(
+        self, stage, name, repo, region, account, bucket, resources, minimal
+    ) -> None:
         self.stage = stage
         self.name = name
         self.repo = repo

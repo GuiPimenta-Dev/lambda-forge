@@ -16,7 +16,10 @@ class LiveSNS:
         existent_topics = self.sns.list_topics()
         topics = existent_topics["Topics"]
         for topic in topics:
-            if topic["TopicArn"] == f"arn:aws:sns:{self.region}:{self.account}:{topic_name}":
+            if (
+                topic["TopicArn"]
+                == f"arn:aws:sns:{self.region}:{self.account}:{topic_name}"
+            ):
                 return topic["TopicArn"]
 
         return self.sns.create_topic(Name=topic_name)["TopicArn"]

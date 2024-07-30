@@ -11,7 +11,12 @@ def lambda_handler(event, context):
         first_name = decoded_token.get("given_name")
         last_name = decoded_token.get("family_name")
         email = decoded_token.get("email")
-        context = {"picture": picture, "first_name": first_name, "last_name": last_name, "email": email}
+        context = {
+            "picture": picture,
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+        }
 
     except:
         effect = "deny"

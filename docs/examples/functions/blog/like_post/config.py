@@ -12,7 +12,9 @@ class LikePostConfig:
             environment={"POSTS_TABLE_NAME": services.dynamodb.posts_table.table_name},
         )
 
-        services.api_gateway.create_endpoint("POST", "/posts/{post_id}/like", function, authorizer="sso")
+        services.api_gateway.create_endpoint(
+            "POST", "/posts/{post_id}/like", function, authorizer="sso"
+        )
 
         services.dynamodb.grant_write("posts_table", function)
         services.dynamodb.posts_table.grant_read_data(function)

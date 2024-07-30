@@ -10,7 +10,9 @@ from decimal import Decimal
 def lambda_handler(event, context):
 
     dynamodb = boto3.resource("dynamodb")
-    TRANSCRIPTIONS_TABLE_NAME = os.environ.get("TRANSCRIPTIONS_TABLE_NAME", "Dev-Transcriptions")
+    TRANSCRIPTIONS_TABLE_NAME = os.environ.get(
+        "TRANSCRIPTIONS_TABLE_NAME", "Dev-Transcriptions"
+    )
     transcriptions_table = dynamodb.Table(TRANSCRIPTIONS_TABLE_NAME)
 
     body = json.loads(event["Records"][0]["body"])
@@ -40,24 +42,47 @@ def lambda_handler(event, context):
     else:
         response = utils.analyse_with_openai(author_summary, messages)
 
-    comprehend = boto3.client('comprehend')
+    comprehend = boto3.client("comprehend")
     messages_with_sentiments = []
-    
+
     batch_size = 25
-    
+
     # Process messages in batches
     for i in range(0, len(messages), batch_size):
-        sentiment_batch = messages[i:i + batch_size]
-        sentiments = comprehend.batch_detect_sentiment(TextList=sentiment_batch, LanguageCode="pt")["ResultList"]
+        sentiment_batch = messages[i : i + batch_size]
+        sentiments = comprehend.batch_detect_sentiment(
+            TextList=sentiment_batch, LanguageCode="pt"
+        )["ResultList"]
         for message, sentiment in zip(sentiment_batch, sentiments):
-            sentiment['SentimentScore'] = {k: Decimal(str(v)) for k, v in sentiment['SentimentScore'].items()}
-            messages_with_sentiments.append({"message": message, "sentiment": sentiment})
-    
+            sentiment["SentimentScore"] = {
+                k: Decimal(str(v)) for k, v in sentiment["SentimentScore"].items()
+            }
+            messages_with_sentiments.append(
+                {"message": message, "sentiment": sentiment}
+            )
 
-    neutral = len([message for message in messages_with_sentiments if message["sentiment"]["Sentiment"] == "NEUTRAL"])
-    positive = len([message for message in messages_with_sentiments if message["sentiment"]["Sentiment"] == "POSITIVE"])
-    negative = len([message for message in messages_with_sentiments if message["sentiment"]["Sentiment"] == "NEGATIVE"])
-    
+    neutral = len(
+        [
+            message
+            for message in messages_with_sentiments
+            if message["sentiment"]["Sentiment"] == "NEUTRAL"
+        ]
+    )
+    positive = len(
+        [
+            message
+            for message in messages_with_sentiments
+            if message["sentiment"]["Sentiment"] == "POSITIVE"
+        ]
+    )
+    negative = len(
+        [
+            message
+            for message in messages_with_sentiments
+            if message["sentiment"]["Sentiment"] == "NEGATIVE"
+        ]
+    )
+
     transcriptions_table.put_item(
         Item={
             "PK": f"{video_id}#INTERVAL={interval}",

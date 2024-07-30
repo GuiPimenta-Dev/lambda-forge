@@ -58,7 +58,12 @@ def lambda_handler(event, context):
     last_name = event["requestContext"]["authorizer"]["last_name"]
     picture = event["requestContext"]["authorizer"]["picture"]
 
-    user = {"email": email, "first_name": first_name, "last_name": last_name, "picture": picture}
+    user = {
+        "email": email,
+        "first_name": first_name,
+        "last_name": last_name,
+        "picture": picture,
+    }
 
     LIMIT = 10
     query = event.get("queryStringParameters", {})
@@ -76,7 +81,9 @@ def lambda_handler(event, context):
     try:
         response = posts_table.scan(**scan_params)
 
-        feed = sorted(response.get("Items", []), key=lambda x: x["created_at"], reverse=True)[:LIMIT]
+        feed = sorted(
+            response.get("Items", []), key=lambda x: x["created_at"], reverse=True
+        )[:LIMIT]
 
         last_evaluated_key = response.get("LastEvaluatedKey", None)
         if last_evaluated_key:
@@ -100,12 +107,18 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "body": json.dumps(body),
-            "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"},
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+            },
         }
 
     except Exception as e:
         return {
             "statusCode": 500,
             "body": json.dumps({"message": str(e)}),
-            "headers": {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json"},
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json",
+            },
         }

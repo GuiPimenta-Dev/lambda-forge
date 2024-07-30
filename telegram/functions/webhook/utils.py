@@ -24,7 +24,9 @@ def get_answer_to_question(question):
 
     response = requests.request("GET", url, headers=headers, params=querystring)
     print(f"Response from answering a question: {response.json()}")
-    return response.json().get("response", "I'm sorry, I don't know the answer to that question.")
+    return response.json().get(
+        "response", "I'm sorry, I don't know the answer to that question."
+    )
 
 
 def send_message(chat_id, text, bot_token):

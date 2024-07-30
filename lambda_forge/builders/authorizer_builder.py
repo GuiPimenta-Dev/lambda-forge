@@ -14,10 +14,16 @@ class AuthorizerBuilder(FileService):
         self.description = description
         self.belongs = belongs
         self.no_tests = no_tests
-        self.pascal_name = "".join(word.capitalize() for word in self.authorizer_name.split("_"))
+        self.pascal_name = "".join(
+            word.capitalize() for word in self.authorizer_name.split("_")
+        )
         if not self.pascal_name.endswith("Authorizer"):
             self.pascal_name += "Authorizer"
-        self.secret = "".join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=52))
+        self.secret = "".join(
+            random.choices(
+                string.ascii_lowercase + string.ascii_uppercase + string.digits, k=52
+            )
+        )
 
     def with_config(self, default=False):
         self.config = f"""from infra.services import Services
@@ -129,7 +135,9 @@ def test_authorizer_should_fail_with_invalid_secret():
         if folder in self.lambda_stack:
             return self
 
-        self.lambda_stack.insert(0, f"from {folder}.config import {self.pascal_name}Config\n")
+        self.lambda_stack.insert(
+            0, f"from {folder}.config import {self.pascal_name}Config\n"
+        )
 
         comment = "".join(word.capitalize() for word in self.belongs.split("_"))
 
@@ -141,7 +149,11 @@ def test_authorizer_should_fail_with_invalid_secret():
             )
         except:
             services_index = next(
-                (i for i, line in enumerate(self.lambda_stack) if "Services(self" in line),
+                (
+                    i
+                    for i, line in enumerate(self.lambda_stack)
+                    if "Services(self" in line
+                ),
                 -1,
             )
             self.lambda_stack.insert(services_index + 1, f"\n")

@@ -12,7 +12,9 @@ from lambda_forge.live.certificates import CertificateGenerator
 
 
 class LiveLambda:
-    def __init__(self, function_name, region, timeout, iot_endpoint, account, printer) -> None:
+    def __init__(
+        self, function_name, region, timeout, iot_endpoint, account, printer
+    ) -> None:
         self.function_name = function_name
         self.region = region
         self.timeout = timeout
@@ -85,7 +87,11 @@ class LiveLambda:
         assume_role_policy_document = {
             "Version": "2012-10-17",
             "Statement": [
-                {"Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"},
+                {
+                    "Effect": "Allow",
+                    "Principal": {"Service": "lambda.amazonaws.com"},
+                    "Action": "sts:AssumeRole",
+                },
             ],
         }
 
@@ -119,9 +125,13 @@ class LiveLambda:
         return layer_arn
 
     def __delete_lambda(self, stub_name):
-        function_arn = f"arn:aws:lambda:{self.region}:{self.account}:function:{stub_name}"
+        function_arn = (
+            f"arn:aws:lambda:{self.region}:{self.account}:function:{stub_name}"
+        )
         try:
-            mappings = self.lambda_client.list_event_source_mappings(FunctionName=function_arn)
+            mappings = self.lambda_client.list_event_source_mappings(
+                FunctionName=function_arn
+            )
             for mapping in mappings["EventSourceMappings"]:
                 self.lambda_client.delete_event_source_mapping(UUID=mapping["UUID"])
 

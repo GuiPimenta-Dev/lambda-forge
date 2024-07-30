@@ -36,6 +36,12 @@ def lambda_handler(event, context):
     batches = utils.group_chat_by_interval(partition_key=video_id, interval=interval)
 
     for index, batch in enumerate(batches):
-        utils.send_message_to_sqs(video_id, batch, batches, interval, index, min_messages, prompt)
+        utils.send_message_to_sqs(
+            video_id, batch, batches, interval, index, min_messages, prompt
+        )
 
-    return {"statusCode": 200, "body": json.dumps({"message": "ok!"}), "headers": {"Access-Control-Allow-Origin": "*"}}
+    return {
+        "statusCode": 200,
+        "body": json.dumps({"message": "ok!"}),
+        "headers": {"Access-Control-Allow-Origin": "*"},
+    }

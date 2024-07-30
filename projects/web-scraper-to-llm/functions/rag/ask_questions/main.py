@@ -13,8 +13,10 @@ from . import utils
 def lambda_handler(event, context):
 
     query = event["queryStringParameters"]["query"]
-    index_name =  event["queryStringParameters"].get("index_name", "lambda-forge-telegram")
-    
+    index_name = event["queryStringParameters"].get(
+        "index_name", "lambda-forge-telegram"
+    )
+
     PINECONE_API_KEY = sm_utils.get_secret("PINECONE_API_KEY")
     OPENAI_API_KEY = sm_utils.get_secret("OPEN_API_KEY")
     os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
@@ -25,7 +27,9 @@ def lambda_handler(event, context):
     embed_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 
     prompt = utils.augment_prompt(index, embed_model, query)
-    chat = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model="gpt-3.5-turbo")
+    chat = ChatOpenAI(
+        openai_api_key=os.environ["OPENAI_API_KEY"], model="gpt-3.5-turbo"
+    )
 
     messages = [
         SystemMessage(content="You are a helpful assistant."),

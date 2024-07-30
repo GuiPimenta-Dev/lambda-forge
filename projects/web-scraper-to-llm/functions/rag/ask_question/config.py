@@ -1,5 +1,6 @@
 from infra.services import Services
 
+
 class AskQuestionConfig:
     def __init__(self, services: Services) -> None:
 

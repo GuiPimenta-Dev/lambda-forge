@@ -8,12 +8,10 @@ from lambda_forge.trackers import invoke, trigger
 class DynamoDB:
     def __init__(self, scope, context) -> None:
 
-        self.visited_urls_table = dynamodb.Table(
+        self.visited_urls_table = dynamodb.Table.from_table_arn(
             scope,
-            "ScrapedURLs",
-            partition_key=dynamodb.Attribute(name="PK", type=dynamodb.AttributeType.STRING),
-            sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
-            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            "VisitedURLs",
+            table_arn="arn:aws:dynamodb:us-east-2:211125768252:table/VisitedURLs",
         )
 
     @trigger(service="dynamodb", trigger="table", function="function")

@@ -104,8 +104,12 @@ class CodeBuildSteps:
             file_path = wiki["file_path"]
             title = wiki["title"].title()
             favicon = wiki.get("favicon", "favicon.png")
-            commands.append(f"python generate_wiki.py '{file_path}' '{title}' '{favicon}'")
-            commands.append(f"aws s3 cp {title}.html s3://{self.bucket}/{title.lower()}.html")
+            commands.append(
+                f"python generate_wiki.py '{file_path}' '{title}' '{favicon}'"
+            )
+            commands.append(
+                f"aws s3 cp {title}.html s3://{self.bucket}/{title.lower()}.html"
+            )
 
         return self.codebuild.create_step(
             name=name,

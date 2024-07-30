@@ -15,7 +15,13 @@ def lambda_handler(event, context):
     policy = {
         "policyDocument": {
             "Version": "2012-10-17",
-            "Statement": [{"Action": "execute-api:Invoke", "Effect": effect, "Resource": event["methodArn"]}],
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Effect": effect,
+                    "Resource": event["methodArn"],
+                }
+            ],
         },
     }
     return policy

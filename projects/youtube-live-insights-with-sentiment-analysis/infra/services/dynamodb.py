@@ -24,7 +24,9 @@ class DynamoDB:
             scope,
             "TranscriptionsTable",
             table_name=f"{context.stage}-{context.name}-Live-Transcriptions",
-            partition_key=dynamodb.Attribute(name="PK", type=dynamodb.AttributeType.STRING),
+            partition_key=dynamodb.Attribute(
+                name="PK", type=dynamodb.AttributeType.STRING
+            ),
             sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
             stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
         )

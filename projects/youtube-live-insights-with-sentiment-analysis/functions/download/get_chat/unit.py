@@ -38,7 +38,9 @@ def test_it_should_save_all_messages_on_dynamo_db(chats_table):
     while True:
         if not "LastEvaluatedKey" in scan:
             break
-        scan = chats_table.scan(TableName="table", ExclusiveStartKey=scan["LastEvaluatedKey"])
+        scan = chats_table.scan(
+            TableName="table", ExclusiveStartKey=scan["LastEvaluatedKey"]
+        )
         scanned_items += len(scan["Items"])
 
     assert scanned_items == number_of_messages

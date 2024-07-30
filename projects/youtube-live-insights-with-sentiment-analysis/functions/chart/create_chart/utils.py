@@ -14,11 +14,17 @@ def query_all_items(table, partition_key):
     while True:
         if last_evaluated_key:
             response = table.query(
-                KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(partition_key),
+                KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(
+                    partition_key
+                ),
                 ExclusiveStartKey=last_evaluated_key,
             )
         else:
-            response = table.query(KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(partition_key))
+            response = table.query(
+                KeyConditionExpression=boto3.dynamodb.conditions.Key("PK").eq(
+                    partition_key
+                )
+            )
 
         items.extend(response["Items"])
 
@@ -30,7 +36,9 @@ def query_all_items(table, partition_key):
     return items
 
 
-def send_message_to_sqs(video_id, batch, batches, interval, index, min_messages, prompt):
+def send_message_to_sqs(
+    video_id, batch, batches, interval, index, min_messages, prompt
+):
     TRANSCRIPT_QUEUE_URL = os.environ.get("TRANSCRIPT_QUEUE_URL")
     BUCKET_NAME = "gui-docs"
 
@@ -46,7 +54,9 @@ def send_message_to_sqs(video_id, batch, batches, interval, index, min_messages,
         }
 
         s3_key = upload_to_s3(payload, BUCKET_NAME)
-        message_body = json.dumps({"s3_bucket": BUCKET_NAME, "s3_key": s3_key}, default=str)
+        message_body = json.dumps(
+            {"s3_bucket": BUCKET_NAME, "s3_key": s3_key}, default=str
+        )
 
         sqs = boto3.client("sqs")
 
@@ -67,7 +77,11 @@ def upload_to_s3(data, bucket_name):
 
 
 def round_time(dt, interval):
-    discard = timedelta(minutes=dt.minute % int(interval), seconds=dt.second, microseconds=dt.microsecond)
+    discard = timedelta(
+        minutes=dt.minute % int(interval),
+        seconds=dt.second,
+        microseconds=dt.microsecond,
+    )
     return dt - discard
 
 
