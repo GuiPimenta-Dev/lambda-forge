@@ -61,6 +61,34 @@ Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is 
 
 </div>
 
+## Lucas Montano
+
+Lucas Montano is a Brazilian Youtuber that talks about the tech market in general.
+
+<div align="center">
+
+[🚨🚨 BOLHA TECH (feat Galego) #006 🚨🚨](https://www.youtube.com/watch?v=1nQRYmLgon4)
+
+<img height="750" src="https://img.youtube.com/vi/1nQRYmLgon4/maxresdefault.jpg">
+
+</div>
+
+The prompt used to generate the analysis was:
+
+```
+Lucas Montano is a Brazilian Youtuber that talk about the tech market in general. In this video he is focusing on the tech market with AI.
+```
+
+You can access the chat interaction analysis via the link below.
+
+<div align="center">
+
+[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=967e823f-3c24-4f2c-9fde-00932fa09fd6](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=967e823f-3c24-4f2c-9fde-00932fa09fd6)
+
+![alt text](assets/lucas-montano-analysis.png)
+</div>
+
+
 ## Fernanda Kipper
 
 In the video below, Fernanda Kipper teaches how to recreate the Medium with Angular from scratch.
@@ -88,32 +116,6 @@ The analysis for the chat interactions can be found in the link below.
 ![alt text](assets/fernanda-kipper-analysis.png)
 </div>
 
-## Lucas Montano
-
-Lucas Montano is a Brazilian Youtuber that talks about the tech market in general.
-
-<div align="center">
-
-[🚨🚨 BOLHA TECH (feat Galego) #006 🚨🚨](https://www.youtube.com/watch?v=1nQRYmLgon4)
-
-<img height="750" src="https://img.youtube.com/vi/1nQRYmLgon4/maxresdefault.jpg">
-
-</div>
-
-The prompt used to generate the analysis was:
-
-```
-Lucas Montano is a Brazilian Youtuber that talk about the tech market in general. In this video he is focusing on the tech market with AI.
-```
-
-You can access the chat interaction analysis via the link below.
-
-<div align="center">
-
-[https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=967e823f-3c24-4f2c-9fde-00932fa09fd6](https://8haasqop5b.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=967e823f-3c24-4f2c-9fde-00932fa09fd6)
-
-![alt text](assets/lucas-montano-analysis.png)
-</div>
 
 ## Eduardo Mendes
 
