@@ -15,7 +15,7 @@ def send_typing(chat_id, bot_token):
 
 
 def get_answer_to_question(question):
-    url = "https://21r2uzrw97.execute-api.us-east-2.amazonaws.com/prod/question"
+    url = "https://hmabz24f3k.execute-api.us-east-2.amazonaws.com/prod/question"
 
     querystring = {"query": question}
 
