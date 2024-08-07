@@ -61,6 +61,30 @@ Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is 
 
 </div>
 
+In the video below, Mano Deyvin responds to questions and audio messages sent by his subscribers in a very sincere manner, without hesitation.
+
+<div align="center">
+
+[FQTC EP3 - Marmanjo de 26 anos querendo conselhos, eu não gosto de pessoas](https://www.youtube.com/watch?v=IysF7G-PBt0)
+
+<img height="750" src="https://img.youtube.com/vi/IysF7G-PBt0/maxresdefault.jpg">
+</div>
+
+The prompt used to generate the chart was:
+
+```
+Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is very focused on humor and on this specific video he is responding to questions and audios sent by his subscribers
+```
+
+<div align="center">
+
+[https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=25528cf4-eae2-4db9-b010-71b8516e1667](https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=25528cf4-eae2-4db9-b010-71b8516e1667)
+
+<img height="700" alt="Lambda Forge's Logo" src="assets/mano-deyvin-fqtc.png">
+
+</div>
+
+
 ## Eduardo Mendes
 
 Eduardo Mendes has a channel on Youtube to teach Python to its subscribers. In the video below, he teaches how the imports system works in Python.

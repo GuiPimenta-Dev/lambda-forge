@@ -53,3 +53,19 @@ def lambda_handler(event, context):
         TopicArn=VIDEOS_TOPIC_ARN,
         Message=json.dumps({"video_id": video_id, "url": url}),
     )
+
+event = {
+    "Records": [
+        {
+            "body": json.dumps(
+                {
+                    "url": "https://www.youtube.com/watch?v=IysF7G-PBt0",
+                    "video_id": "25528cf4-eae2-4db9-b010-71b8516e1667",
+                    "language": "pt-BR",
+                }
+            )
+        }
+    ]
+}
+
+lambda_handler(event, None)
