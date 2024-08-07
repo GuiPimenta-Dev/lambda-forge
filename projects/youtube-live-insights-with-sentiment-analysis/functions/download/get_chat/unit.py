@@ -12,7 +12,7 @@ def chats_table(sk_table):
     yield sk_table
 
 
-def test_it_should_save_all_messages_on_dynamo_db():
+def test_it_should_save_all_messages_on_dynamo_db(chats_table):
 
     event = {
         "Records": [
@@ -20,8 +20,8 @@ def test_it_should_save_all_messages_on_dynamo_db():
                 "Sns": {
                     "Message": json.dumps(
                         {
-                            "video_id": "25528cf4-eae2-4db9-b010-71b8516e1667",
-                            "url": "https://www.youtube.com/watch?v=IysF7G-PBt0",
+                            "video_id": "123",
+                            "url": "https://www.youtube.com/watch?v=9HQiTFZz0Gg",
                         }
                     )
                 }

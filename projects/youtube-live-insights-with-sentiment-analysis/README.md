@@ -61,6 +61,29 @@ Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is 
 
 </div>
 
+In the video below, Mano Deyvin reacts to Linkedin profiles with a professional tech recruiter.
+
+<div align="center">
+
+[EP6 - Reagindo Linkedin [feat. Gê recruiter]](https://www.youtube.com/watch?v=Tt5NFiPc3lI)
+
+<img height="750" src="https://img.youtube.com/vi/Tt5NFiPc3lI/maxresdefault.jpg">
+</div>
+
+The prompt used to generate the chart was:
+
+```
+Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is very focused on humor and on this specific video he is reacting to linkedin profiles sent by his subscribers.
+```
+
+<div align="center">
+
+[https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=8ad767c8-37c4-4c60-b172-6b4d1aa76f47](https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=8ad767c8-37c4-4c60-b172-6b4d1aa76f47)
+
+<img height="700" alt="Lambda Forge's Logo" src="assets/mano-deyvin-ge.png">
+
+</div>
+
 In the video below, Mano Deyvin reacts to various projects and portfolios submitted by his subscribers, including Lambda Forge at the 2:28 mark.
 
 <div align="center">
