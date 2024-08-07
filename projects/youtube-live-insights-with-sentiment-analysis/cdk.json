@@ -52,7 +52,7 @@
         "live_chat_table_arn": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Live-Chat",
         "videos_table_arn": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Videos",
         "transcriptions_bucket_arn": "arn:aws:s3:::dev-cut-the-bullshit-transcriptions",
-        "videos_topic_arn": "arn:aws:sns:us-east-2:211125768252:Dev-Cut-The-Bullshit-Videos",
+        "videos_topic_arn": "arn:aws:sns:us-east-2:211125768252:Videos",
         "chats_table_arn": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Chats",
         "transcriptions_table_arn": "arn:aws:dynamodb:us-east-2:211125768252:table/Dev-Transcriptions"
       }

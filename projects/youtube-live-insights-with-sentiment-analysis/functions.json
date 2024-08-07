@@ -104,7 +104,7 @@
         "name": "CreateChart",
         "path": "./functions/chart/create_chart",
         "description": "Parse the transcription",
-        "timeout": 60,
+        "timeout": 600,
         "triggers": [
             {
                 "service": "sqs",
