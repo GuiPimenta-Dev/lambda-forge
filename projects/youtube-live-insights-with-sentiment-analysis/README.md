@@ -36,31 +36,6 @@ In this section, we analyze the chat interactions from a few Brazilian YouTubers
 
 ## Mano Deyvin
 
-In the video below, Mano Deyvin reacts to various projects and portfolios submitted by his subscribers, including Lambda Forge at the 2:28 mark.
-
-<div align="center">
-
-[reagindo projetos, portfólio, github, linkedin // SEJA MEMBRO](https://www.youtube.com/watch?v=5Zw0taVl2l0)
-
-<img height="750" src="https://img.youtube.com/vi/5Zw0taVl2l0/maxresdefault.jpg">
-</div>
-
-Using Large Language Models (LLMs), we have broken down the chat engagement of this live stream into 10-minute intervals. Below, you can find a detailed analysis of the chat interactions during this specific live stream.
-
-The prompt used to generate the chart was:
-
-```
-Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is very focused on humor and on this specific video he is reacting to linkedins, portfolios and projects sent by his subscribers.
-```
-
-<div align="center">
-
-[https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=01973ca7-af3c-45e1-8777-74049fe02f29](https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=01973ca7-af3c-45e1-8777-74049fe02f29)
-
-<img height="700" alt="Lambda Forge's Logo" src="assets/mano-deyvin-analysis.png">
-
-</div>
-
 In the video below, Mano Deyvin responds to questions and audio messages sent by his subscribers in a very sincere manner, without hesitation.
 
 <div align="center">
@@ -69,6 +44,8 @@ In the video below, Mano Deyvin responds to questions and audio messages sent by
 
 <img height="750" src="https://img.youtube.com/vi/IysF7G-PBt0/maxresdefault.jpg">
 </div>
+
+Using Large Language Models (LLMs), we have broken down the chat engagement of this live stream into 10-minute intervals. Below, you can find a detailed analysis of the chat interactions during this specific live stream.
 
 The prompt used to generate the chart was:
 
@@ -84,6 +61,29 @@ Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is 
 
 </div>
 
+In the video below, Mano Deyvin reacts to various projects and portfolios submitted by his subscribers, including Lambda Forge at the 2:28 mark.
+
+<div align="center">
+
+[reagindo projetos, portfólio, github, linkedin // SEJA MEMBRO](https://www.youtube.com/watch?v=5Zw0taVl2l0)
+
+<img height="750" src="https://img.youtube.com/vi/5Zw0taVl2l0/maxresdefault.jpg">
+</div>
+
+
+The prompt used to generate the chart was:
+
+```
+Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is very focused on humor and on this specific video he is reacting to linkedins, portfolios and projects sent by his subscribers.
+```
+
+<div align="center">
+
+[https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=01973ca7-af3c-45e1-8777-74049fe02f29](https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=01973ca7-af3c-45e1-8777-74049fe02f29)
+
+<img height="700" alt="Lambda Forge's Logo" src="assets/mano-deyvin-analysis.png">
+
+</div>
 
 ## Eduardo Mendes
 
