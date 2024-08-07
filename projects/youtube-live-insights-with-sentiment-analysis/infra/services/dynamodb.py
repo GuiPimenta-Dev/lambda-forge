@@ -19,17 +19,13 @@ class DynamoDB:
             "ChatsTable",
             context.resources["arns"]["chats_table_arn"],
         )
-
-        self.transcriptions_table = dynamodb.Table(
+        
+        self.transcriptions_table = dynamodb.Table.from_table_arn(
             scope,
             "TranscriptionsTable",
-            table_name=f"{context.stage}-{context.name}-Live-Transcriptions",
-            partition_key=dynamodb.Attribute(
-                name="PK", type=dynamodb.AttributeType.STRING
-            ),
-            sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
-            stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
+            "arn:aws:dynamodb:us-east-2:211125768252:table/Prod-Live-Insights-Live-Transcriptions",
         )
+
 
     @trigger(service="dynamodb", trigger="table", function="function")
     def create_trigger(self, table: str, function: lambda_.Function) -> None:

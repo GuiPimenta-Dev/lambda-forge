@@ -31,7 +31,6 @@ def process_and_save_chat(chat, video_id, table):
             "PK": video_id,
             "SK": sk,
             "message": message["message"],
-            "author": message["author"],
         }
 
         items_to_write.append(item)
