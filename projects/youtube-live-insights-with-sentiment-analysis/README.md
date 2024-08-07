@@ -80,7 +80,7 @@ Mano Deyvin is a Brazilian Youtuber that talks about tech stuff. His channel is 
 
 [https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=8ad767c8-37c4-4c60-b172-6b4d1aa76f47](https://9knrlssq2m.execute-api.us-east-2.amazonaws.com/prod/chart?video_id=8ad767c8-37c4-4c60-b172-6b4d1aa76f47)
 
-<img height="700" alt="Lambda Forge's Logo" src="assets/mano-deyvin-ge.png">
+<img height="700" alt="Lambda Forge's Logo" src="assets/mano-deyvin-ge-recruiter.png">
 
 </div>
 
