@@ -10,14 +10,14 @@ class SQS:
             scope,
             "CrawlerQueue",
             queue_name="CrawlerQueue",
-            visibility_timeout=Duration.seconds(300),
+            visibility_timeout=Duration.seconds(900),
         )
 
         self.crawler_queue_dlq = sqs.Queue(
             scope,
             "CrawlerQueueDLQ",
             queue_name="CrawlerQueueDLQ",
-            visibility_timeout=Duration.seconds(300),
+            visibility_timeout=Duration.seconds(900),
         )
 
     @trigger(service="sqs", trigger="queue", function="function")
