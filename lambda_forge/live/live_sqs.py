@@ -41,11 +41,7 @@ class LiveSQS:
             EventSourceArn=queue_arn, FunctionName=function_arn, Enabled=True
         )
 
-        trigger = {
-            "trigger": "SQS",
-            "url": queue_url,
-        }
-        return trigger
+        return queue_url
 
     def publish(self):
         message = click.prompt(click.style("Message", fg=(37, 171, 190)), type=str)

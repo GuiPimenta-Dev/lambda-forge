@@ -34,12 +34,7 @@ class LiveSNS:
         )
 
         self.sns.subscribe(TopicArn=topic_arn, Protocol="lambda", Endpoint=function_arn)
-
-        trigger = {
-            "trigger": "SNS",
-            "arn": topic_arn,
-        }
-        return trigger
+        return topic_arn
 
     def publish(self):
         self.printer.show_banner("SNS")

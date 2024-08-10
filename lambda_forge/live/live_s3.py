@@ -51,9 +51,7 @@ class LiveS3:
                     "LambdaFunctionConfigurations": [lambda_config]
                 },
             )
-
-            trigger = {"trigger": "S3", "bucket": bucket_name}
-            return trigger
+            return bucket_name
 
         except Exception as e:
             print(f"Error in subscribe method: {e}")

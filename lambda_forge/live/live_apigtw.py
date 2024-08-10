@@ -103,8 +103,7 @@ class LiveApiGtw:
             pass
 
         endpoint = self.__get_endpoint_url()
-        response = {"trigger": "API Gateway", "url": endpoint, "method": method}
-        return response
+        return f"{endpoint} ({method})"
 
     def __get_endpoint_url(self):
         endpoint_url = f"https://{self.root_id}.execute-api.{self.region}.amazonaws.com/{self.stage}/{self.urlpath}"

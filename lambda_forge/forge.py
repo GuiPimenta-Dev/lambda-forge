@@ -17,8 +17,9 @@ from lambda_forge.builders.layer_builder import LayerBuilder
 from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge.diagram import create_diagram
-from lambda_forge.live import log_cli, server_cli, trigger_cli
+from lambda_forge.live import server_cli
 from lambda_forge.printer import Printer
+
 
 printer = Printer()
 
@@ -450,11 +451,9 @@ AVAILABLE_TYPES = ["server", "logs", "trigger"]
 
 
 @forge.command()
-@click.argument("types", type=click.Choice(AVAILABLE_TYPES))
-@click.option("-l", "--log-file", help="Name of Log file", default="live.log")
-@click.option("-i", "--include", help="Include files to watch", default=None)
-@click.option("-e", "--exclude", help="Exclude files to watch", default=None)
-def live(types, log_file, include, exclude):
+@click.option("-i", "--include", help="Include functions to watch", default=None)
+@click.option("-e", "--exclude", help="Exclude functions to watch", default=None)
+def live(include, exclude):
     """
     Starts a live development environment for the specified Lambda function.
 
@@ -464,36 +463,13 @@ def live(types, log_file, include, exclude):
     The 'function_name' parameter must match the name of an existing Lambda function in the project.
     """
 
-    def handle_exit(signum, frame):
-        try:
-            if platform.system() == "Windows":
-                subprocess.run(["taskkill", "/F", "/IM", "live_server.py"], check=True)
-            else:
-                subprocess.run(["pkill", "-f", "live_server.py"], check=True)
-        except Exception as e:
-            pass
-
-    signal.signal(signal.SIGHUP, handle_exit)  # Terminal closed
-    signal.signal(signal.SIGINT, handle_exit)  # Ctrl+C
-    signal.signal(signal.SIGTERM, handle_exit)  # Termination signal
-
-    if types == "server":
-        try:
-            include = include.split(",") if include else None
-            exclude = exclude.split(",") if exclude else None
-            server_cli.run_live(log_file, include, exclude)
-        except:
-            handle_exit(None, None)
-
-    if types == "logs":
-        with open(log_file, "a") as f:
+    with open("live.log", "w") as f:
             f.write("")
-        log_cli.tail_f(log_file)
-
-    if types == "trigger":
-        trigger_cli.run_trigger()
-
-
+        
+    include = include.split(",") if include else None
+    exclude = exclude.split(",") if exclude else None
+    server_cli.run_live(include=include, exclude=exclude)
+    
 @forge.command()
 def doc():
     """

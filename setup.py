@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lambda_forge",
-    version="2.1.12",
+    version="2.1.29",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -23,6 +23,8 @@ setup(
         "inquirerpy==0.3.4",
         "tabulate==0.9.0",
         "diagrams==0.23.4",
+        "textual==0.75.1",
+        "textual-serve==1.0.3"
     ],
     include_package_data=True,
     package_data={
@@ -36,6 +38,7 @@ setup(
             "scaffold/**/**/*",
             "api_gateway/*",
             "live/*",
+            "live/**", 
             "stacks/*",
             "stacks/**/*",
         ],

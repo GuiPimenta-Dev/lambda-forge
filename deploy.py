@@ -40,7 +40,7 @@ def build_and_upload():
 
     """Builds the package and uploads it to TestPyPI."""
     subprocess.run(["python", "setup.py", "sdist", "bdist_wheel"], check=True)
-    subprocess.run(["twine", "upload", "--repository", "pypi", "dist/*"], check=True)
+    subprocess.run(["twine", "upload", "--repository", "testpypi", "dist/*"], check=True)
 
 
 def main():

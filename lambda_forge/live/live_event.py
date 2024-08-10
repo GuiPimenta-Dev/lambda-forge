@@ -42,5 +42,4 @@ class LiveEventBridge:
             Targets=[{"Id": "target1", "Arn": function_arn}],
         )
 
-        trigger = {"trigger": "Event Bridge", "bus": bus_name}
-        return trigger
+        return bus_name

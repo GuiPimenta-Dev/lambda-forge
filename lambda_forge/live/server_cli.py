@@ -1,21 +1,19 @@
 import json
 import os
-import platform
 import subprocess
 import time
 
 from InquirerPy import get_style, inquirer
+from lambda_forge.live.tui import launch_forge_tui
 
 from lambda_forge.printer import Printer
-
+from lambda_forge.live.tui.api.forge import ForgeAPI
 from . import Live, LiveApiGtw, LiveEventBridge, LiveS3, LiveSNS, LiveSQS
 
 printer = Printer()
 
 
-def create_api_gateway_trigger(
-    account, region, project, function_arn, selected_function, endpoint, method
-):
+def create_api_gateway_trigger(account, region, project, function_arn, selected_function, endpoint, method):
     live_apigtw = LiveApiGtw(account, region, printer, project, endpoint)
     trigger = live_apigtw.create_trigger(function_arn, selected_function, method)
     return trigger
@@ -51,8 +49,8 @@ def create_event_bridge_trigger(region, account, function_arn, bus_name):
     return trigger
 
 
-def run_live(log_file, include, exclude):
-    printer.show_banner("Live Server")
+def run_live(include=None, exclude=None):
+    printer.show_banner("Live Development")
 
     data = json.load(open("cdk.json", "r"))
     region = data["context"]["region"]
@@ -74,9 +72,7 @@ def run_live(log_file, include, exclude):
     try:
         printer.start_spinner("Synthesizing CDK")
         with open(os.devnull, "w") as devnull:
-            subprocess.run(
-                ["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True
-            )
+            subprocess.run(["cdk", "synth"], stdout=devnull, stderr=subprocess.STDOUT, check=True)
             printer.stop_spinner()
 
     except Exception as e:
@@ -87,129 +83,95 @@ def run_live(log_file, include, exclude):
     functions = json.load(open("functions.json", "r"))
 
     if exclude:
-        functions = [
-            function for function in functions if function["name"] not in exclude
-        ]
+        functions = [function for function in functions if function["name"] not in exclude]
 
     if include:
         functions = [function for function in functions if function["name"] in include]
 
-    live = Live(printer, log_file)
+    live = Live(printer, "live.log")
 
-    style = get_style(
-        {
-            "questionmark": "#25ABBE",
-            "input": "#25ABBE",
-            "pointer": "#25ABBE",
-            "question": "#ffffff",
-            "answered_question": "#25ABBE",
-            "pointer": "#25ABBE",
-            "answer": "white",
-            "answermark": "#25ABBE",
-        },
-        style_override=True,
-    )
+    server_functions = []
+    for function in functions:
+        try:
+            function_name = f"Live-{project}-{function['name']}"
+            printer.start_spinner(f"Creating Lambda Function {function_name}")
+            live.create_lambda(function_name, function["path"], function["timeout"])
+            time.sleep(4)
+            for function_trigger in function["triggers"]:
 
-    while True:
+                function_arn = f"arn:aws:lambda:{region}:{account}:function:{function_name}"
 
-        for function in functions:
-            try:
-                function_name = f"Live-{project}-{function['name']}"
-                printer.start_spinner(f"Creating Lambda Function {function_name}")
-                live.create_lambda(function_name, function["path"], function["timeout"])
-                time.sleep(4)
-                for function_trigger in function["triggers"]:
-
-                    function_arn = (
-                        f"arn:aws:lambda:{region}:{account}:function:{function_name}"
+                if function_trigger["service"] == "api_gateway":
+                    
+                    trigger = create_api_gateway_trigger(
+                        account,
+                        region,
+                        project,
+                        function_arn,
+                        function_name,
+                        function_trigger["trigger"],
+                        function_trigger["method"],
                     )
+                    server_function = {
+                        "service": "Api Gateway",
+                        "name": function_name,
+                        "type": "URL",
+                        "trigger": trigger
+                    }
+                    server_functions.append(server_function)
 
-                    if function_trigger["service"] == "api_gateway":
-                        trigger = create_api_gateway_trigger(
-                            account,
-                            region,
-                            project,
-                            function_arn,
-                            function_name,
-                            function_trigger["trigger"],
-                            function_trigger["method"],
-                        )
+                if function_trigger["service"] == "sns":
+                    topic = f"Live-{project}-{function_trigger['trigger']}"
+                    trigger = create_sns_trigger(account, region, function_arn, function_name, topic)
+                    server_function = {
+                        "service": "SNS",
+                        "name": function_name,
+                        "type": "Topic ARN",
+                        "trigger": trigger
+                    }
+                    server_functions.append(server_function)
 
-                    if function_trigger["service"] == "sns":
-                        topic = f"Live-{project}-{function_trigger['trigger']}"
-                        trigger = create_sns_trigger(
-                            account, region, function_arn, function_name, topic
-                        )
+                if function_trigger["service"] == "sqs":
+                    queue = f"Live-{project}-{function_trigger['trigger']}"
+                    trigger = create_sqs_trigger(region, function_arn, queue)
+                    server_function = {
+                        "service": "SQS",
+                        "name": function_name,
+                        "type": "Queue URL",
+                        "trigger": trigger
+                    }
+                    server_functions.append(server_function)
 
-                    if function_trigger["service"] == "sqs":
-                        queue = f"Live-{project}-{function_trigger['trigger']}"
-                        trigger = create_sqs_trigger(region, function_arn, queue)
+                if function_trigger["service"] == "s3":
+                    bucket = f"live-{project.lower()}-{function_trigger['trigger'].replace('_', '-').replace(' ', '-').lower()}"
+                    trigger = create_s3_trigger(region, account, function_arn, bucket)
+                    server_function = {
+                        "service": "S3",
+                        "name": function_name,
+                        "type": "Bucket Name",
+                        "trigger": trigger
+                    }
+                    server_functions.append(server_function)
 
-                    if function_trigger["service"] == "s3":
-                        bucket = f"live-{project.lower()}-{function_trigger['trigger'].replace('_', '-').replace(' ', '-').lower()}"
-                        trigger = create_s3_trigger(
-                            region, account, function_arn, bucket
-                        )
+                if function_trigger["service"] == "event_bridge":
+                    bus = f"Live-{project}-{function_trigger['trigger']}"
+                    trigger = create_event_bridge_trigger(region, account, function_arn, bus)
+                    server_function = {
+                        "service": "Event Bridge",
+                        "name": function_name,
+                        "type": "Bus Name",
+                        "trigger": trigger
+                    }
+                    server_functions.append(server_function)
 
-                    if function_trigger["service"] == "event_bridge":
-                        bus = f"Live-{project}-{function_trigger['trigger']}"
-                        trigger = create_event_bridge_trigger(
-                            region, account, function_arn, bus
-                        )
+                live.attach_trigger(function_name, trigger)
 
-                    live.attach_trigger(function_name, trigger)
+            printer.stop_spinner()
 
-                printer.stop_spinner()
-
-            except Exception as e:
-                printer.print(str(e), "red", 1, 1)
-                printer.stop_spinner()
-                exit()
-
-        live.intro()
-
-        printer.br()
-        options = ["Synth", "Exit"]
-
-        choice = inquirer.select(
-            message="Select an option: ",
-            style=style,
-            choices=options,
-        ).execute()
-
-        if platform.system() == "Windows":
-            subprocess.run(["taskkill", "/F", "/IM", "live_server.py"], check=True)
-        else:
-            subprocess.run(["pkill", "-f", "live_server.py"], check=True)
-
-        if choice == "Synth":
-            printer.show_banner("Live Server")
-            printer.start_spinner("Synthesizing CDK")
-            with open(os.devnull, "w") as devnull:
-                subprocess.run(
-                    ["cdk", "synth"],
-                    stdout=devnull,
-                    stderr=subprocess.STDOUT,
-                    check=True,
-                )
-                printer.stop_spinner()
-
-            functions = json.load(open("functions.json", "r"))
-            if exclude:
-                functions = [
-                    function
-                    for function in functions
-                    if function["name"] not in exclude
-                ]
-
-            if include:
-                functions = [
-                    function for function in functions if function["name"] in include
-                ]
-
-        if choice == "Exit":
-            if platform.system() == "Windows":
-                subprocess.run(["taskkill", "/F", "/IM", "live_server.py"], check=True)
-            else:
-                subprocess.run(["pkill", "-f", "live_server.py"], check=True)
+        except Exception as e:
+            printer.print(str(e), "red", 1, 1)
+            printer.stop_spinner()
             exit()
+    
+    ForgeAPI().set_functions(server_functions)
+    launch_forge_tui()
