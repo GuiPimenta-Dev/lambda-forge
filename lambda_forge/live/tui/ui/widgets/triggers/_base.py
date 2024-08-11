@@ -2,6 +2,7 @@ from typing import Dict
 from textual.app import ComposeResult, on
 from textual.widget import Widget
 from textual.widgets import Input, Select, Static, TextArea
+from lambda_forge.live.trigger_cli import run_trigger
 from ._result_window import ResultWindow
 from ._trigger_submit import TriggerSubmit
 
@@ -60,7 +61,7 @@ class TriggerBaseWidget(Static):
         if not self.parent:
             return {}
 
-        data = {}
+        data = dict(service=self.service)
 
         for widget in self.container_widget.children:
             if not widget.id:
@@ -73,14 +74,19 @@ class TriggerBaseWidget(Static):
             elif isinstance(widget, TextArea):
                 data[_id] = widget.text
             elif isinstance(widget, Select):
-                data[_id] = widget.value
+                data[_id] = str(widget.value) if widget.value != Select.BLANK else ""
 
         return data
 
     @on(TriggerSubmit.Pressed)
-    def run_trigger(self, event: TriggerSubmit.Pressed):
+    def run_trigger(self, _: TriggerSubmit.Pressed):
         data = self.get_input_values()
-        self.notify(str(data))
+        service = data.pop("service")
+
+        try:
+            run_trigger(service, data)
+        except Exception as e:
+            self.notify(str(e), severity="error")
 
     def compose(self) -> ComposeResult:
         yield from self.render_left()
