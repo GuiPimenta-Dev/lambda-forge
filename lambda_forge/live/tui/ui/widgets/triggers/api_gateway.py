@@ -32,5 +32,7 @@ class ApiGatewayContainer(TriggerBaseContainer):
 
 
 class ApiGateway(TriggerBaseWidget):
+    service = "Api Gateway"
+
     def render_left(self) -> ComposeResult:
         yield ApiGatewayContainer()

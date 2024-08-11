@@ -22,5 +22,7 @@ class SQSContainer(TriggerBaseContainer):
 
 
 class SQS(TriggerBaseWidget):
+    service = "SQS"
+
     def render_left(self) -> ComposeResult:
         yield SQSContainer()
