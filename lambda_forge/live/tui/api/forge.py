@@ -1,4 +1,6 @@
+from pathlib import Path
 from typing import List, Optional
+
 
 class ForgeAPI:
     _instance = None
@@ -14,5 +16,17 @@ class ForgeAPI:
 
     def set_functions(self, functions) -> None:
         for function in functions:
-            row = (function["name"], function["service"], function["type"], function["trigger"])
+            row = (
+                function["name"],
+                function["service"],
+                function["type"],
+                function["trigger"],
+            )
             self.rows.append(row)
+
+    def get_log_file_path(self) -> Path:
+        path = Path.home() / "live.log"
+        if not path.exists():
+            path.touch()
+
+        return path
