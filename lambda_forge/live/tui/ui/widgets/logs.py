@@ -12,6 +12,10 @@ from textual.widget import Widget
 from textual.widgets import OptionList
 from textual.widgets.option_list import Option
 
+from lambda_forge.live.tui.api.file_watcher import FileWatcher
+
+LOG_CHECK_INTERVAL = 2
+
 
 class SingleLog(Option):
 
@@ -97,6 +101,8 @@ class LogStream(Widget):
     def __init__(self, log_path: Path):
         super().__init__()
         self.log_path = log_path
+        self.watcher = FileWatcher(log_path)
+        self.set_interval(LOG_CHECK_INTERVAL, self.check_file)
 
     def compose(self) -> ComposeResult:
         yield OptionList()
@@ -104,16 +110,27 @@ class LogStream(Widget):
     def on_show(self):
         self.query_one(OptionList).focus()
 
+    def check_file(self):
+        if self.watcher.has_modified():
+            self.update_logs()
+
+    def update_logs(self):
+        self.log_list.clear_options()
+        with open(self.log_path, "r") as f:
+            for line in f.readlines():
+                self.log_list.add_option(
+                    SingleLog(
+                        line.strip(),
+                        self.get_component_rich_style,
+                    )
+                )
+
     @property
     def log_list(self) -> OptionList:
         return self.query_one(OptionList)
 
     async def on_mount(self):
-        with open(self.log_path, "r") as f:
-            for line in f.readlines():
-                self.log_list.add_option(
-                    SingleLog(line.strip(), self.get_component_rich_style)
-                )
+        self.update_logs()
 
     @on(OptionList.OptionSelected)
     def toggle_display(self, event: OptionList.OptionSelected):
@@ -134,3 +151,4 @@ class LogStream(Widget):
 
     def action_clear_logs(self):
         self.log_list.clear_options()
+        self.watcher.clear_file()
