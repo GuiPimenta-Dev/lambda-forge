@@ -25,7 +25,7 @@ class ForgeAPI:
             self.rows.append(row)
 
     def get_log_file_path(self) -> Path:
-        path = Path.home() / "live.log"
+        path = Path("live.log")
         if not path.exists():
             path.touch()
 
