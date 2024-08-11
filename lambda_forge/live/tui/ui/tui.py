@@ -1,12 +1,11 @@
 from textual.app import App
 from textual.binding import Binding
-from .screens import IndexScreen, LoadingScreen
+from .screens import IndexScreen
 
 
 class ForgeTUI(App):
     SCREENS = {
         "index": IndexScreen(),
-        "loader": LoadingScreen(),
     }
     CSS_PATH = "styles.css"
     BINDINGS = [
@@ -14,4 +13,4 @@ class ForgeTUI(App):
     ]
 
     def on_mount(self) -> None:
-        self.push_screen("loader")
+        self.push_screen("index")
