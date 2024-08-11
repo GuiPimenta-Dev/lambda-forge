@@ -78,6 +78,11 @@ class TriggerBaseWidget(Static):
 
         return data
 
+    def _add_history(self):
+        res = self.query_one(ResultWindow)
+        values = self.get_input_values()
+        res.add_history(values)
+
     @on(TriggerSubmit.Pressed)
     def run_trigger(self, _: TriggerSubmit.Pressed):
         data = self.get_input_values()
@@ -85,6 +90,7 @@ class TriggerBaseWidget(Static):
 
         try:
             run_trigger(service, data)
+            self._add_history()
         except Exception as e:
             self.notify(str(e), severity="error")
 
