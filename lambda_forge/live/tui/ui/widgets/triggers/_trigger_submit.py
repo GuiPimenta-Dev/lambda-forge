@@ -1,5 +1,7 @@
+from rich.console import RenderableType
 from textual.widgets import Button
 
 
 class TriggerSubmit(Button):
-    pass
+    def render(self) -> RenderableType:
+        return "Submit"
