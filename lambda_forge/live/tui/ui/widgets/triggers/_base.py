@@ -1,10 +1,10 @@
 from json import JSONDecodeError, loads
-from typing import Dict
+from typing import Dict, Optional
 from textual.app import ComposeResult, on
 from textual.widget import Widget
-from textual.widgets import Input, Select, Static, TextArea
+from textual.widgets import Input, OptionList, Select, Static, TextArea
 from lambda_forge.live.trigger_cli import run_trigger
-from ._result_window import ResultWindow
+from ._result_window import ResultWindow, RunHistoryItem
 from ._trigger_submit import TriggerSubmit
 
 
@@ -88,8 +88,11 @@ class TriggerBaseWidget(Static):
         res.add_history(values)
 
     @on(TriggerSubmit.Pressed)
-    def run_trigger(self, _: TriggerSubmit.Pressed):
-        data = self.get_input_values()
+    def _trigger_button_pressed(self, _: TriggerSubmit.Pressed):
+        self.run_trigger()
+
+    def run_trigger(self, params: Optional[Dict] = None):
+        data = params or self.get_input_values()
         service = data.pop("service")
 
         try:
@@ -97,6 +100,13 @@ class TriggerBaseWidget(Static):
             self._add_history()
         except Exception as e:
             self.notify(str(e), severity="error")
+
+    @on(OptionList.OptionSelected)
+    def re_run_trigger(self, event: OptionList.OptionSelected):
+        if not isinstance(event.option, RunHistoryItem):
+            raise ValueError("Invalid option")
+
+        self.run_trigger(event.option.history)
 
     def compose(self) -> ComposeResult:
         yield from self.render_left()
