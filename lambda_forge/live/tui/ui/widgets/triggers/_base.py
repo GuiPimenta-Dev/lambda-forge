@@ -2,7 +2,7 @@ from typing import Dict
 from textual.app import ComposeResult, on
 from textual.widget import Widget
 from textual.widgets import Input, Select, Static, TextArea
-from lambda_forge.live.trigger_cli import run_trigger
+from lambda_forge.live.trigger_cli import run_trigger, LambdaForgeTriggerError
 from ._result_window import ResultWindow
 from ._trigger_submit import TriggerSubmit
 
@@ -91,8 +91,10 @@ class TriggerBaseWidget(Static):
         try:
             run_trigger(service, data)
             self._add_history()
-        except Exception as e:
+        except LambdaForgeTriggerError as e:
             self.notify(str(e), severity="error")
+        except Exception as e:
+            raise e
 
     def compose(self) -> ComposeResult:
         yield from self.render_left()
