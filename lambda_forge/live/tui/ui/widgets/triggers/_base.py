@@ -1,3 +1,4 @@
+from json import JSONDecodeError, loads
 from typing import Dict
 from textual.app import ComposeResult, on
 from textual.widget import Widget
@@ -72,7 +73,10 @@ class TriggerBaseWidget(Static):
             if isinstance(widget, Input):
                 data[_id] = widget.value
             elif isinstance(widget, TextArea):
-                data[_id] = widget.text
+                try:
+                    data[_id] = loads(widget.text)
+                except JSONDecodeError:
+                    self.notify(f"Invalid JSON for {widget.id}", severity="error")
             elif isinstance(widget, Select):
                 data[_id] = str(widget.value) if widget.value != Select.BLANK else ""
 
