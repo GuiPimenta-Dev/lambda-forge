@@ -1,3 +1,4 @@
+from rich.panel import Panel
 from datetime import datetime
 from rich.align import Align
 from rich.table import Table
@@ -35,11 +36,16 @@ class RunHistoryItem(Option):
             align="center",
         )
 
-        t = Table(expand=True, show_header=False)
-        t.title = self.timestamp.strftime("%H:%M:%S")
+        t = Table.grid(expand=True)
         t.add_column("data", ratio=1)
         t.add_column("repeat", width=3)
         t.add_row(formatted, repeat_text)
+
+        t = Panel(
+            t,
+            title=self.timestamp.strftime("%H:%M:%S"),
+            title_align="left",
+        )
 
         self.set_prompt(t)
 
