@@ -1,3 +1,4 @@
+from datetime import datetime
 from rich.align import Align
 from rich.table import Table
 from rich.text import Text
@@ -11,6 +12,7 @@ class RunHistoryItem(Option):
     def __init__(self, history):
         super().__init__("")
         self.history = history
+        self.timestamp = datetime.now()
         self.refresh_option()
 
     def refresh_option(self):
@@ -34,6 +36,7 @@ class RunHistoryItem(Option):
         )
 
         t = Table(expand=True, show_header=False)
+        t.title = self.timestamp.strftime("%H:%M:%S")
         t.add_column("data", ratio=1)
         t.add_column("repeat", width=3)
         t.add_row(formatted, repeat_text)
