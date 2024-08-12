@@ -63,3 +63,5 @@ class ResultWindow(Widget):
 
     def add_history(self, history):
         self.history_list.add_option(RunHistoryItem(history))
+        self.history_list._options.reverse()
+        self.history_list._refresh_lines()
