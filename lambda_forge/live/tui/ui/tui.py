@@ -9,7 +9,7 @@ class ForgeTUI(App):
     }
     CSS_PATH = "styles.css"
     BINDINGS = [
-        Binding("ctrl+q", "quit", "Quit"),
+        Binding("q", "quit", "Quit"),
     ]
 
     def on_mount(self) -> None:
