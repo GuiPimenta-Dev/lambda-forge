@@ -82,10 +82,10 @@ class TriggerBaseWidget(Static):
 
         return data
 
-    def _add_history(self):
+    def _add_history(self, service: str, data: Dict):
         res = self.query_one(ResultWindow)
-        values = self.get_input_values()
-        res.add_history(values)
+        data = data | {"service": service}
+        res.add_history(data)
 
     @on(TriggerSubmit.Pressed)
     def _trigger_button_pressed(self, _: TriggerSubmit.Pressed):
@@ -97,7 +97,7 @@ class TriggerBaseWidget(Static):
 
         try:
             run_trigger(service, data)
-            self._add_history()
+            self._add_history(service, data)
         except Exception as e:
             self.notify(str(e), severity="error")
 
