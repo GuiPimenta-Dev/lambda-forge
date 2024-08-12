@@ -1,3 +1,4 @@
+from textual.binding import Binding
 from json import JSONDecodeError, loads
 from typing import Dict, Optional
 from textual.app import ComposeResult, on
@@ -39,6 +40,10 @@ class TriggerBaseWidget(Static):
         }
     } 
     """
+
+    BINDINGS = [
+        Binding("c", "clear_run_history", "Clear history"),
+    ]
 
     @property
     def container_widget(self) -> TriggerBaseContainer:
@@ -107,6 +112,10 @@ class TriggerBaseWidget(Static):
             raise ValueError("Invalid option")
 
         self.run_trigger(event.option.history)
+
+    def action_clear_run_history(self):
+        res = self.query_one(ResultWindow)
+        res.clear_history()
 
     def compose(self) -> ComposeResult:
         yield from self.render_left()

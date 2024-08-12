@@ -4,7 +4,6 @@ from rich.align import Align
 from rich.table import Table
 from rich.text import Text
 from textual.app import ComposeResult
-from textual.binding import Binding
 from textual.widget import Widget
 from textual.widgets import OptionList
 from textual.widgets.option_list import Option
@@ -61,10 +60,6 @@ class ResultWindow(Widget):
     }
     """
 
-    BINDINGS = [
-        Binding("c", "clear_run_history", "Clear history"),
-    ]
-
     @property
     def history_list(self) -> OptionList:
         return self.query_one(OptionList)
@@ -72,7 +67,7 @@ class ResultWindow(Widget):
     def compose(self) -> ComposeResult:
         yield OptionList()
 
-    def action_clear_run_history(self):
+    def clear_history(self):
         self.history_list.clear_options()
 
     def add_history(self, history):
