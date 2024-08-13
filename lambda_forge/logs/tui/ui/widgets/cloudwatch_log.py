@@ -1,13 +1,12 @@
 from textual.app import ComposeResult
-from textual.widget import Widget
-from textual.widgets import OptionList, TabPane
+from textual.widgets import OptionList, Static, TabPane
 from ...api.forge_logs import ForgeLogsAPI, LambdaGroup
 from .cloudwatch_single_log import CloudWatchSingleLog
 
 LOGS_UPDATE_INTERVAL = 3
 
 
-class CloudWatchLogs(Widget):
+class CloudWatchLogs(Static):
 
     @property
     def logs_api(self) -> ForgeLogsAPI:
