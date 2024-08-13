@@ -12,7 +12,7 @@ class Index(Screen):
         return self.app.logs_api
 
     def compose(self) -> ComposeResult:
-        with TabbedContent():
+        with TabbedContent(id="cloud_watch_logs"):
 
             for log_group in self.logs_api.get_lambdas():
                 with TabPane(log_group.group):
