@@ -1,5 +1,7 @@
+from collections import defaultdict
 from enum import Enum
 from typing import Dict, Iterable, List, Optional, Self
+from ._test_data import log_groups, cloudwatch_logs
 
 
 class LogType(Enum):
@@ -34,12 +36,22 @@ class CloudWatchLog:
 class ForgeLogsAPI:
     def __init__(self, params: Optional[Dict]) -> None:
         self.params = params
+        self.d = defaultdict(int)
 
     def get_lambdas(self) -> List[LambdaGroup]:
-        return []
+        return [LambdaGroup(group, name) for group, name in log_groups]
 
+    # NOTE: Implement this function (@gui)
     def _get_logs(self, lambda_group: str) -> List[Dict]:
-        return []
+        self.d[lambda_group] += 1
+
+        def _get_index(name):
+            return [i for i, _ in log_groups].index(name)
+
+        if _get_index(lambda_group) % 2 == 0:
+            return list(reversed(cloudwatch_logs))[0 : self.d[lambda_group]]
+        else:
+            return cloudwatch_logs[0 : self.d[lambda_group]]
 
     def get_logs(self, lambda_group: str) -> Iterable[CloudWatchLog]:
         logs = self._get_logs(lambda_group)
