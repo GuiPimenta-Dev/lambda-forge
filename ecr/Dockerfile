@@ -20,7 +20,7 @@ RUN npm --version
 # Install Node.js dependencies
 RUN apt-get update && apt-get install -y gnupg \
   && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
-  && apt-get install -y graphviz \
+  && apt-get install -y nodejs graphviz \
   && apt-get clean && rm -rf /var/lib/apt/lists/* \ 
   && npm install -g aws-cdk redoc-cli
 
