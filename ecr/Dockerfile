@@ -5,7 +5,7 @@ WORKDIR /lambda-forge
 COPY . /lambda-forge
 
 # Install nvm with Node.js and npm
-ENV NODE_VERSION=16.13.0
+ENV NODE_VERSION=18.18.0
 RUN apt-get update \
   && apt-get install -y curl jq 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -19,8 +19,6 @@ RUN npm --version
 
 # Install Node.js dependencies
 RUN apt-get update && apt-get install -y gnupg \
-  && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
-  && apt-get install -y nodejs=18.18.0 graphviz \
   && apt-get clean && rm -rf /var/lib/apt/lists/* \ 
   && npm install -g aws-cdk redoc-cli cdk-assets@2
 
