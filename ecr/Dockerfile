@@ -22,7 +22,10 @@ RUN apt-get update && apt-get install -y gnupg \
   && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
   && apt-get install -y nodejs graphviz \
   && apt-get clean && rm -rf /var/lib/apt/lists/* \ 
-  && npm install -g aws-cdk redoc-cli
+  && npm install -g aws-cdk redoc-cli cdk-assets@2
+
+RUN node --version
+RUN npm --version
 
 # Install Python dependencies
 RUN pip install --upgrade pip \
