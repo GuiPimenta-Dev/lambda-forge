@@ -18,11 +18,15 @@ ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 # Fix Node.js permissions
 RUN chmod +x /root/.nvm/versions/node/v${NODE_VERSION}/bin/node
 
-RUN node --version
-RUN npm --version
+# Update NPM to the latest version
+RUN npm install -g npm@latest
 
-# Install Node.js dependencies
+# Install Node.js dependencies as root user
+USER root
 RUN npm install -g aws-cdk cdk-assets@2 redoc-cli
+
+# Switch back to default user
+USER node
 
 # Install Python dependencies
 RUN pip install --upgrade pip \
