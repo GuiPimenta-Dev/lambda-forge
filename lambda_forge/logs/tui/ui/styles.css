@@ -19,7 +19,7 @@ $orange: #d08770;
 $green: #a3be8c;
 $magenta: #b48ead;
 
-ForgeHeader {
+ForgeLogsHeader {
   background: $background-light-1;
 
   .title {
@@ -75,10 +75,6 @@ Tab.-active {
 Tab.-active:hover {
     color: $blue;
 }
-
-/* Tabs:focus .underline--bar { */
-/*     background: $cyan 20%; */
-/* } */
 
 Underline > .underline--bar {
     background: $background-light-1;
