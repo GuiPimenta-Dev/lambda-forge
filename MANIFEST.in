@@ -1,2 +1,4 @@
 include lambda_forge/live/*
+include lambda_forge/logs/*
 recursive-include lambda_forge/live *
+recursive-include lambda_forge/logs *
