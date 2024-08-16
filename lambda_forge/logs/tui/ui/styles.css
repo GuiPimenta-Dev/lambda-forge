@@ -110,13 +110,13 @@ CloudWatchLogs > OptionList {
   background: $background;
 
     .option-list--option-highlighted {
-        background: $background;
-        color: $blue;
+        color: $background;
+        background: $blue;
     }
 
     .option-list--option-hover {
-        background: $background;
-        color: $blue;
+        color: $background;
+        background: $blue;
     }
 
     &:focus {

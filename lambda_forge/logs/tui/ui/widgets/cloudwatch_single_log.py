@@ -1,9 +1,6 @@
 from datetime import datetime
-from rich import box
 from rich.console import RenderableType
-from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text, TextType
 from textual.widgets.option_list import Option
 from ...api.forge_logs import CloudWatchLog
 
@@ -26,6 +23,7 @@ class CloudWatchSingleLog(Option):
             "%Y-%m-%d (%H:%M)"
         )
         table.add_row(timestamp, self.log.log_type.value, self.log.message)
+        table.add_row()
         self._set_prompt(table)
 
     def _set_prompt(self, prompt: RenderableType):
