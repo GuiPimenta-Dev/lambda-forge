@@ -7,6 +7,11 @@ LOGS_UPDATE_INTERVAL = 3
 
 
 class CloudWatchLogs(Static):
+    DEFAULT_CSS = """
+    CloudWatchLogs {
+        height: 1fr;
+    }
+    """
 
     @property
     def logs_api(self) -> ForgeLogsAPI:
