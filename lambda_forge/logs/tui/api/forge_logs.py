@@ -23,14 +23,14 @@ class CloudWatchLog:
     def __init__(self, log_type: LogType, message: str, timestamp: int) -> None:
         self.log_type = log_type
         self.message = message
-        self.timestamp = timestamp
+        self.timestamp = timestamp / 1000 # Convert to seconds
 
     @classmethod
     def parse(cls, timestamp: int, message: str) -> Self:
         log_type, message = message.split(" ", 1)
         log_type = LogType(log_type)
 
-        return cls(log_type, message, timestamp)
+        return cls(log_type, message, int(timestamp))
 
 
 class ForgeLogsAPI:
