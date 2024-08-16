@@ -39,4 +39,4 @@ cloudwatch_logs = [
         "timestamp": "1723345616747",
         "message": "[ERROR]    2024-08-11T03:06:56.747Z    a719c94f-0532-4394-b47d-28595a7b3105    Disconnect timed out",
     },
-]
+] * 2
