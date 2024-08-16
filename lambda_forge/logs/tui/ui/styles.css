@@ -104,7 +104,7 @@ TextArea .text-area-gutter {
   background: red;
 }
 
-LogStream > OptionList {
+CloudWatchLogs > OptionList {
 
   background: $background;
 
@@ -121,30 +121,6 @@ LogStream > OptionList {
     &:focus {
         border: none;
     }
-}
-
-ResultWindow {
-  background: $background;
-  border: heavy $blue;
-
-  OptionList {
-
-    &, &:focus {
-
-    background: $background;
-    border: tall $background;
-
-    .option-list--option-highlighted {
-      color: $blue;
-      background: $background;
-    }
-
-    .option-list--option-hover {
-      color: $frost;
-      background: $background;
-    }
-    }
-  }
 }
 
 Footer {
