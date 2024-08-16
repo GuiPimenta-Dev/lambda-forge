@@ -20,4 +20,4 @@ class Index(Screen):
 
     @on(TabbedContent.TabActivated)
     def _tab_activated(self, event: TabbedContent.TabActivated):
-        event.pane.query_one(CloudWatchLogs).reset_label()
+        event.pane.query_one(CloudWatchLogs).reset_logs()

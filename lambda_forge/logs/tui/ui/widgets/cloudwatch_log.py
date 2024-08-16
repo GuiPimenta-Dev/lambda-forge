@@ -19,16 +19,16 @@ class CloudWatchLogs(Static):
 
         raise ValueError("CloudWatchLogs must be a child of a TabPane")
 
-    def reset_label(self):
+    @property
+    def tabbed_content(self) -> TabbedContent:
+        return self.app.query_one("#cloud_watch_logs", expect_type=TabbedContent)
+
+    def reset_logs(self):
         self.new_logs.clear()
         self.update_tab_label()
 
     def update_tab_label(self):
-        tabbed_content = self.app.query_one(
-            "#cloud_watch_logs",
-            expect_type=TabbedContent,
-        )
-        tab_pane = tabbed_content.get_tab(self.parent_tab)
+        tab_pane = self.tabbed_content.get_tab(self.parent_tab)
         label = self.log_group.group
 
         if self.new_logs:
@@ -61,6 +61,9 @@ class CloudWatchLogs(Static):
 
         self.logs = all_logs
         self.update_tab_label()
+
+        if self.parent_tab.id == self.tabbed_content.active:
+            self.reset_logs()
 
     def compose(self) -> ComposeResult:
         yield OptionList()
