@@ -24,6 +24,7 @@ class CloudWatchLogs(Static):
         return self.app.query_one("#cloud_watch_logs", expect_type=TabbedContent)
 
     def reset_logs(self):
+        self.logs.extend(self.new_logs)
         self.new_logs.clear()
         self.update_tab_label()
 
@@ -56,10 +57,9 @@ class CloudWatchLogs(Static):
         if not self.new_logs:
             return
 
-        for log in self.new_logs:
+        for log in all_logs[len(self.log_list._options) :]:
             self.log_list.add_option(CloudWatchSingleLog(log))
 
-        self.logs = all_logs
         self.update_tab_label()
 
         if self.parent_tab.id == self.tabbed_content.active:
