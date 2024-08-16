@@ -1,7 +1,6 @@
-from typing import List
 from textual.app import ComposeResult
 from textual.widgets import OptionList, Static, TabPane, TabbedContent
-from ...api.forge_logs import CloudWatchLog, ForgeLogsAPI, LambdaGroup
+from ...api.forge_logs import ForgeLogsAPI, LambdaGroup
 from .cloudwatch_single_log import CloudWatchSingleLog
 
 LOGS_UPDATE_INTERVAL = 3
@@ -22,17 +21,21 @@ class CloudWatchLogs(Static):
 
     def reset_label(self):
         tabbed_content = self.app.query_one(
-            "#cloud_watch_logs", expect_type=TabbedContent
+            "#cloud_watch_logs",
+            expect_type=TabbedContent,
         )
         tab_pane = tabbed_content.get_tab(self.parent_tab)
         tab_pane.label = self.log_group.name
 
-    def update_tab_label(self, new_logs: List[CloudWatchLog]):
+    def update_tab_label(self):
+        if not self.new_logs:
+            return self.reset_label()
+
         tabbed_content = self.app.query_one(
             "#cloud_watch_logs", expect_type=TabbedContent
         )
         tab_pane = tabbed_content.get_tab(self.parent_tab)
-        tab_pane.label = f"{self.log_group.name} ({len(new_logs)})"
+        tab_pane.label = f"{self.log_group.name} ({len(self.new_logs)})"
 
     @property
     def log_list(self) -> OptionList:
@@ -41,6 +44,7 @@ class CloudWatchLogs(Static):
     def __init__(self, log_group: LambdaGroup):
         self.log_group = log_group
         self.logs = []
+        self.new_logs = []
         super().__init__(id=log_group.name.replace("/", "-"))
 
     def on_mount(self):
@@ -48,16 +52,17 @@ class CloudWatchLogs(Static):
 
     def update_logs(self):
         all_logs = list(self.logs_api.get_logs(self.log_group.name))
-        new_logs = all_logs[len(self.logs) :]
+        self.new_logs = all_logs[len(self.logs) :]
 
-        if not new_logs:
+        if not self.new_logs:
             return
 
-        for log in new_logs:
+        for log in self.new_logs:
             self.log_list.add_option(CloudWatchSingleLog(log))
 
         self.logs = all_logs
-        self.update_tab_label(new_logs)
+        self.update_tab_label()
+        self.new_logs.clear()
 
     def compose(self) -> ComposeResult:
         yield OptionList()
