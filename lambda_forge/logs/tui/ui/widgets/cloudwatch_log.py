@@ -67,3 +67,6 @@ class CloudWatchLogs(Static):
 
     def compose(self) -> ComposeResult:
         yield OptionList()
+
+    def on_show(self):
+        self.log_list.focus()
