@@ -21,5 +21,6 @@ class EventBridgeContainer(TriggerBaseContainer):
 
 
 class EventBridge(TriggerBaseWidget):
+    service = "Event Bridge"
     def render_left(self) -> ComposeResult:
         yield EventBridgeContainer()

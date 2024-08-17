@@ -1,8 +1,11 @@
-from typing import Dict
+from textual.binding import Binding
+from json import JSONDecodeError, loads
+from typing import Dict, Optional
 from textual.app import ComposeResult, on
 from textual.widget import Widget
-from textual.widgets import Input, Select, Static, TextArea
-from ._result_window import ResultWindow
+from textual.widgets import Input, OptionList, Select, Static, TextArea
+from lambda_forge.live.trigger_cli import run_trigger
+from ._result_window import ResultWindow, RunHistoryItem
 from ._trigger_submit import TriggerSubmit
 
 
@@ -38,6 +41,10 @@ class TriggerBaseWidget(Static):
     } 
     """
 
+    BINDINGS = [
+        Binding("c", "clear_run_history", "Clear history"),
+    ]
+
     @property
     def container_widget(self) -> TriggerBaseContainer:
         if not self.parent:
@@ -60,7 +67,7 @@ class TriggerBaseWidget(Static):
         if not self.parent:
             return {}
 
-        data = {}
+        data = dict(service=self.service)
 
         for widget in self.container_widget.children:
             if not widget.id:
@@ -71,16 +78,44 @@ class TriggerBaseWidget(Static):
             if isinstance(widget, Input):
                 data[_id] = widget.value
             elif isinstance(widget, TextArea):
-                data[_id] = widget.text
+                try:
+                    data[_id] = loads(widget.text)
+                except JSONDecodeError:
+                    self.notify(f"Invalid JSON for {widget.id}", severity="error")
             elif isinstance(widget, Select):
-                data[_id] = widget.value
+                data[_id] = str(widget.value) if widget.value != Select.BLANK else ""
 
         return data
 
+    def _add_history(self, service: str, data: Dict):
+        res = self.query_one(ResultWindow)
+        data = data | {"service": service}
+        res.add_history(data)
+
     @on(TriggerSubmit.Pressed)
-    def run_trigger(self, event: TriggerSubmit.Pressed):
-        data = self.get_input_values()
-        self.notify(str(data))
+    def _trigger_button_pressed(self, _: TriggerSubmit.Pressed):
+        self.run_trigger()
+
+    def run_trigger(self, params: Optional[Dict] = None):
+        data = params or self.get_input_values()
+        service = data.pop("service")
+
+        try:
+            run_trigger(service, data)
+            self._add_history(service, data)
+        except Exception as e:
+            self.notify(str(e), severity="error")
+
+    @on(OptionList.OptionSelected)
+    def re_run_trigger(self, event: OptionList.OptionSelected):
+        if not isinstance(event.option, RunHistoryItem):
+            raise ValueError("Invalid option")
+
+        self.run_trigger(event.option.history)
+
+    def action_clear_run_history(self):
+        res = self.query_one(ResultWindow)
+        res.clear_history()
 
     def compose(self) -> ComposeResult:
         yield from self.render_left()

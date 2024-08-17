@@ -36,7 +36,7 @@ class IndexScreen(Screen):
                 yield ServerTable()
 
             with TabPane("Logs", id="logs"):
-                yield LogStream("live.log")
+                yield LogStream(forge.get_log_file_path())
 
             with TabPane("Triggers", id="triggers"):
                 yield Triggers()

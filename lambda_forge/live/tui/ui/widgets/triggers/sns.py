@@ -25,5 +25,7 @@ class SNSContainer(TriggerBaseContainer):
 
 
 class SNS(TriggerBaseWidget):
+    service = "SNS"
+
     def render_left(self) -> ComposeResult:
         yield SNSContainer()

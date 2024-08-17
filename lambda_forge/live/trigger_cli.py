@@ -1,146 +1,94 @@
 import json
-import time
-
 import boto3
-import click
 import requests
-from InquirerPy import get_style, inquirer
-
-from lambda_forge.printer import Printer
-
-printer = Printer()
+from typing import Dict, Literal
 
 
-def run_trigger():
-    data = json.load(open("cdk.json", "r"))
-    region = data["context"].get("region")
+ServiceType = Literal["Api Gateway", "SNS", "SQS", "S3", "Event Bridge"]
+
+
+class LambdaForgeTriggerError(Exception):
+    pass
+
+
+def run_service_api_gateway(data: Dict, _: str):
+    if not data.get("url"):
+        raise LambdaForgeTriggerError("url is required")
+
+    requests.request(
+        data.get("method", "GET"),
+        data["url"],
+        params=data.get("params", {}),
+        headers=data.get("headers", {}),
+        data=data.get("body", {}),
+    )
+
+
+def run_service_sns(data: Dict, region: str):
+    if not data.get("topic_arn"):
+        raise LambdaForgeTriggerError("topic_arn is required")
+
+    sns = boto3.client("sns", region_name=region)
+    sns.publish(
+        TopicArn=data.get("topic_arn"),
+        Message=str(data.get("message")),
+        Subject=str(data.get("subject", {})),
+    )
+
+
+def run_service_sqs(data: Dict, region: str):
+    if not data.get("queue_url"):
+        raise LambdaForgeTriggerError("queue_url is required")
+
+    sqs = boto3.client("sqs", region_name=region)
+    sqs.send_message(QueueUrl=data["queue_url"], MessageBody=str(data["message"]))
+
+
+def run_service_s3(data: Dict, _: str):
+    if not data.get("bucket_name") or not data.get("file_path"):
+        raise LambdaForgeTriggerError("bucket_name and file_path are required")
+
+    filename = data["file_path"].split("/")[-1]
+    s3_client = boto3.client("s3")
+    with open(data["file_path"], "rb") as file:
+        s3_client.put_object(
+            Bucket=data["bucket_name"],
+            Key=filename,
+            Body=file,
+            Metadata=data.get("metadata", {}),
+        )
+
+
+def run_service_event_bridge(data: Dict, region: str):
+    if not data.get("bus_name"):
+        raise LambdaForgeTriggerError("bus_name is required")
+
+    event = {
+        "Source": "event.bridge",
+        "DetailType": "UserAction",
+        "Detail": json.dumps({"message": data["message"]}),
+        "EventBusName": data["bus_name"],
+    }
+    event_client = boto3.client("events", region_name=region)
+    event_client.put_events(Entries=[event])
+
+
+def run_trigger(service: ServiceType, data: Dict):
+    cdk_data = json.load(open("cdk.json", "r"))
+    region = cdk_data["context"].get("region")
 
     if not region:
-        printer.print("Region Not Found", "red", 1, 1)
-        exit()
+        raise ValueError("Region Not Found")
 
-    while True:
-        printer.show_banner("Live Trigger")
-        printer.br()
-        options = sorted(["Api Gateway", "SNS", "SQS", "S3", "Event Bridge"])
-        style = get_style(
-            {
-                "questionmark": "#25ABBE",
-                "input": "#25ABBE",
-                "pointer": "#25ABBE",
-                "question": "#ffffff",
-                "answered_question": "#25ABBE",
-                "pointer": "#25ABBE",
-                "answer": "white",
-                "answermark": "#25ABBE",
-            },
-            style_override=True,
-        )
-        service = inquirer.select(
-            message="Select a Trigger:",
-            style=style,
-            choices=options,
-        ).execute()
-
-        try:
-            if service == "Api Gateway":
-                initial_text = json.dumps(
-                    {
-                        "method": "GET",
-                        "url": "",
-                        "params": {},
-                        "body": {},
-                        "headers": {},
-                    },
-                    indent=2,
-                )
-                data = click.edit(text=initial_text)
-                data = json.loads(data)
-                if not data.get("url"):
-                    printer.print("url is required", "red", 1, 1)
-                    time.sleep(1)
-                    continue
-
-                requests.request(
-                    data.get("method", "GET"),
-                    data["url"],
-                    params=data.get("params", {}),
-                    headers=data.get("headers", {}),
-                    data=data.get("body", {}),
-                )
-
-            if service == "SNS":
-                initial_text = json.dumps(
-                    {"topic_arn": "", "message": {}, "subject": {}}, indent=2
-                )
-                data = click.edit(text=initial_text)
-                data = json.loads(data)
-                if not data.get("topic_arn"):
-                    printer.print("topic_arn is required", "red", 1, 1)
-                    time.sleep(1)
-                    continue
-
-                sns = boto3.client("sns", region_name=region)
-                sns.publish(
-                    TopicArn=data.get("topic_arn"),
-                    Message=str(data.get("message")),
-                    Subject=str(data.get("subject", {})),
-                )
-
-            if service == "SQS":
-                initial_text = json.dumps({"queue_url": "", "message": {}}, indent=2)
-                data = click.edit(text=initial_text)
-                data = json.loads(data)
-                if not data.get("queue_url"):
-                    printer.print("queue_url is required", "red", 1, 1)
-                    time.sleep(1)
-                    continue
-
-                sqs = boto3.client("sqs", region_name=region)
-                sqs.send_message(
-                    QueueUrl=data["queue_url"], MessageBody=str(data["message"])
-                )
-
-            if service == "S3":
-                initial_text = json.dumps(
-                    {"bucket_name": "", "file_path": "", "metadata": {}}, indent=2
-                )
-                data = click.edit(text=initial_text)
-                data = json.loads(data)
-                if not data.get("bucket_name") or not data.get("file_path"):
-                    printer.print("bucket_name and file_path are required", "red", 1, 1)
-                    time.sleep(1)
-                    continue
-
-                filename = data["file_path"].split("/")[-1]
-                s3_client = boto3.client("s3")
-                with open(data["file_path"], "rb") as file:
-                    s3_client.put_object(
-                        Bucket=data["bucket_name"],
-                        Key=filename,
-                        Body=file,
-                        Metadata=data.get("metadata", {}),
-                    )
-
-            if service == "Event Bridge":
-                initial_text = json.dumps({"bus_name": "", "message": {}}, indent=2)
-                data = click.edit(text=initial_text)
-                data = json.loads(data)
-                if not data.get("bus_name"):
-                    printer.print("bus_name is required", "red", 1, 1)
-                    time.sleep(1)
-                    continue
-
-                event = {
-                    "Source": "event.bridge",
-                    "DetailType": "UserAction",
-                    "Detail": json.dumps({"message": data["message"]}),
-                    "EventBusName": data["bus_name"],
-                }
-                event_client = boto3.client("events", region_name=region)
-                event_client.put_events(Entries=[event])
-
-        except Exception as e:
-            printer.print(str(e), "red", 1, 1)
-            time.sleep(4)
-            continue
+    if service == "Api Gateway":
+        run_service_api_gateway(data, region)
+    elif service == "SNS":
+        run_service_sns(data, region)
+    elif service == "SQS":
+        run_service_sqs(data, region)
+    elif service == "S3":
+        run_service_s3(data, region)
+    elif service == "Event Bridge":
+        run_service_event_bridge(data, region)
+    else:
+        raise LambdaForgeTriggerError("Service not found")

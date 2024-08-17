@@ -27,5 +27,7 @@ class S3Container(TriggerBaseContainer):
 
 
 class S3(TriggerBaseWidget):
+    service = "S3"
+
     def render_left(self) -> ComposeResult:
         yield S3Container()
