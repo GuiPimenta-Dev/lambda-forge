@@ -1,8 +1,6 @@
 import json
 import os
-import platform
 import re
-import signal
 import subprocess
 
 import boto3
@@ -19,6 +17,7 @@ from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge.diagram import create_diagram
 from lambda_forge.live import server_cli
 from lambda_forge.printer import Printer
+from lambda_forge.logs.launch_tui import launch_forge_logs_tui
 
 
 printer = Printer()
@@ -464,12 +463,32 @@ def live(include, exclude):
     """
 
     with open("live.log", "w") as f:
-            f.write("")
-        
+        f.write("")
+
     include = include.split(",") if include else None
     exclude = exclude.split(",") if exclude else None
     server_cli.run_live(include=include, exclude=exclude)
-    
+
+
+@forge.command()
+@click.option("-i", "--include", help="Include functions to watch", default=None)
+@click.option("-e", "--exclude", help="Exclude functions to watch", default=None)
+def logs(include, exclude):
+    """
+    Starts a Log Stream for the specified Lambda functions.
+
+    This command shows the logs of the specified Lambda functions in real-time
+    as an alternative to the AWS CloudWatch console.
+    """
+
+    with open("live.log", "w") as f:
+        f.write("")
+
+    include = include.split(",") if include else None
+    exclude = exclude.split(",") if exclude else None
+    launch_forge_logs_tui({"include": include, "exclude": exclude})
+
+
 @forge.command()
 def doc():
     """

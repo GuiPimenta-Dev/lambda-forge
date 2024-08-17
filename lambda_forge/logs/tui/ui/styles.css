@@ -1,0 +1,170 @@
+/* NORD THEME */
+
+$background: #2e3440;
+$background-light-1: #3b4252;
+$background-light-2: #434c5e;
+$background-light-3: #4c566a;
+
+$foreground: #d8dee9;
+$foreground-light-1: #e5e9f0;
+$foreground-light-2: #eceff4;
+
+$frost: #8fbcbb;
+$cyan: #88c0d0;
+$blue: #81a1c1;
+
+$red: #bf616a;
+$yellow: #ebcb8b;
+$orange: #d08770;
+$green: #a3be8c;
+$magenta: #b48ead;
+
+ForgeLogsHeader {
+  background: $background-light-1;
+
+  .title {
+    text-style: bold;
+    color: $cyan;
+  }
+
+  .subtitle {
+    text-style: italic;
+    color: $foreground 80%;
+  }
+}
+
+Screen, TabbedContent, TriggerBaseWidget {
+  background: $background;
+}
+
+
+ServerTable {
+  .table-header {
+    color: $blue;
+  }
+
+  .table-border {
+    color: $background-light-3;
+  }
+
+  .row-name {
+    color: $frost;
+  }
+
+  .row-service {
+    color: $cyan;
+  }
+
+  .row-type {
+    color: $magenta;
+
+  }
+
+  .row-trigger {
+    color: $foreground;
+  }
+}
+
+Tab {
+    color: $foreground;
+}
+Tab.-active {
+    text-style: bold;
+    color: $blue;
+}
+Tab.-active:hover {
+    color: $blue;
+}
+
+Underline > .underline--bar {
+    background: $background-light-1;
+    color: $cyan;
+}
+
+Input, TextArea {
+
+  & {
+    border: tall $background-light-1;
+  }
+
+  &:focus {
+    border: tall $blue;
+  }
+
+  &, &:focus {
+    background: $background;
+    border-title-align: right;
+    border-title-style: bold;
+    border-title-color: $foreground;
+    border-title-background: $blue;
+  }
+}
+
+TextArea .text-area-gutter {
+  background: red;
+}
+
+CloudWatchLogs > OptionList {
+
+  border: none;
+  background: $background;
+
+    .option-list--option-highlighted {
+        color: $background;
+        background: $blue;
+    }
+
+    .option-list--option-hover {
+        color: $background;
+        background: $blue;
+    }
+
+    &:focus {
+        border: none;
+    }
+}
+
+Footer {
+  background: $background;
+  color: $blue;
+}
+
+FooterKey {
+  background: $background;
+
+  .footer-key--key {
+    color: $cyan;
+  }
+  .footer-key--description {
+    color: $foreground;
+  }
+
+  .footer-key--description {
+      padding: 0 1 0 1;
+  }
+}
+
+Button {
+  border: tall $background;
+  background: $background-light-2;
+
+  &:hover {
+    background: $blue;
+    color: $foreground-light-2;
+  }
+
+  &:focus{
+    border: tall $blue;
+  }
+}
+
+
+* {
+  scrollbar-size: 0 1;
+  scrollbar-background: $background-light-3;
+  scrollbar-background-hover: $background-light-1;
+  scrollbar-background-active: $background-light-2;
+  scrollbar-color: $blue;
+  scrollbar-color-active: $cyan;
+  scrollbar-color-hover: $cyan;
+}
