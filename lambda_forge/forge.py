@@ -16,6 +16,7 @@ from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge.diagram import create_diagram
 from lambda_forge.live import server_cli
+from lambda_forge.logs.tail_logs import watch_logs_for_functions
 from lambda_forge.printer import Printer
 from lambda_forge.logs.launch_tui import launch_forge_logs_tui
 
@@ -691,6 +692,30 @@ def output():
 
     printer.br()
 
+
+@forge.command()
+@click.argument("stack")
+@click.option(
+    "--interval",
+    help="Query interval for the logs",
+    default=1,
+)
+def logs(stack, interval):
+    """
+    Query periodically the logs of the specified stack on AWS CloudWatch
+    """
+    result = subprocess.run(["cdk", "list"], capture_output=True, text=True)
+    stacks = result.stdout.splitlines()
+    printer.show_banner("Logs")
+    printer.br()
+
+    # Check if the specified stack is in the list of available stacks
+    if not any(stack.lower() in s.lower() for s in stacks):
+        printer.print(f"Stack '{stack}' not found in available stacks: {stacks}", "red")
+        exit()
+
+    functions = json.load(open("functions.json", "r"))
+    watch_logs_for_functions(functions=functions, log_file_path="logs.log", stack=stack, interval=interval)
 
 if __name__ == "__main__":
     forge()

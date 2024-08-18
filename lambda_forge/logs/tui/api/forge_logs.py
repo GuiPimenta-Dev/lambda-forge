@@ -1,6 +1,6 @@
 from collections import defaultdict
 from enum import Enum
-from typing import Dict, Iterable, List, Optional, Self
+from typing import Dict, Iterable, List, Optional
 from ._test_data import log_groups, cloudwatch_logs
 
 
@@ -26,7 +26,7 @@ class CloudWatchLog:
         self.timestamp = timestamp / 1000 # Convert to seconds
 
     @classmethod
-    def parse(cls, timestamp: int, message: str) -> Self:
+    def parse(cls, timestamp: int, message: str):
         log_type, message = message.split(" ", 1)
         log_type = LogType(log_type)
 
