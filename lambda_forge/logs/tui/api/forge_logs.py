@@ -1,8 +1,9 @@
 from collections import defaultdict
+from json import loads as json_loads
 from enum import Enum
 from typing import Dict, Iterable, List
-from ._test_data import log_groups, cloudwatch_logs
 from .log_watcher import watch_logs_for_functions
+from .lambda_fetcher import list_lambda_functions
 
 
 class LogType(Enum):
@@ -13,25 +14,24 @@ class LogType(Enum):
     INIT_START = "INIT_START"
 
 
-class LambdaGroup:
-    def __init__(self, name: str, group: str) -> None:
-        self.name = name
-        self.group = group
-
-
 class CloudWatchLog:
 
-    def __init__(self, log_type: LogType, message: str, timestamp: int) -> None:
+    def __init__(self, function_name, log_type, message, timestamp, is_error) -> None:
+        self.function_name = function_name
         self.log_type = log_type
         self.message = message
         self.timestamp = timestamp / 1000  # Convert to seconds
+        self.is_error = is_error
 
     @classmethod
-    def parse(cls, timestamp: int, message: str):
-        log_type, message = message.split(" ", 1)
-        log_type = LogType(log_type)
+    def parse(cls, log: Dict):
+        function_name = log["function_name"]
+        timestamp = log["timestamp"]
+        message = log["message"]
+        is_error = log["is_error"]
+        log_type = LogType(message.split(" ")[0])
 
-        return cls(log_type, message, int(timestamp))
+        return cls(function_name, log_type, message, timestamp, is_error)
 
 
 class ForgeLogsAPI:
@@ -48,26 +48,21 @@ class ForgeLogsAPI:
             self.stack,
         )
 
-    def get_lambdas(self) -> List[LambdaGroup]:
-        return [LambdaGroup(group, name) for group, name in log_groups]
+    def get_lambdas(self) -> List[str]:
+        return list_lambda_functions()
 
-    # NOTE: Implement this function (@gui)
-    def _get_logs(self, lambda_group: str) -> List[Dict]:
-        self.d[lambda_group] += 1
+    def _get_logs(self) -> List[CloudWatchLog]:
+        logs = []
 
-        def _get_index(name):
-            return [i for i, _ in log_groups].index(name)
+        with open(self.log_path, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                data = json_loads(line)
+                log_obj = CloudWatchLog.parse(data)
+                logs.append(log_obj)
 
-        if _get_index(lambda_group) % 2 == 0:
-            return list(reversed(cloudwatch_logs))[0 : self.d[lambda_group]]
-        else:
-            return cloudwatch_logs[0 : self.d[lambda_group]]
+        return logs
 
     def get_logs(self, lambda_group: str) -> Iterable[CloudWatchLog]:
-        logs = self._get_logs(lambda_group)
-
-        for log in logs:
-            yield CloudWatchLog.parse(
-                log["timestamp"],
-                log["message"],
-            )
+        logs = [i for i in self._get_logs() if i.function_name == lambda_group]
+        return logs
