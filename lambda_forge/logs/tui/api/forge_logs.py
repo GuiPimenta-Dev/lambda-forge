@@ -35,19 +35,17 @@ class CloudWatchLog:
 
 
 class ForgeLogsAPI:
-    def __init__(self, functions, log_path, stack, interval) -> None:
+    def __init__(self, functions, log_path, stack) -> None:
         self.functions = functions
         self.log_path = log_path
         self.stack = stack
-        self.interval = interval
         self.d = defaultdict(int)
 
-    def start_watcher(self):
+    def update_logs(self):
         watch_logs_for_functions(
             self.functions,
             self.log_path,
             self.stack,
-            self.interval,
         )
 
     def get_lambdas(self) -> List[LambdaGroup]:
