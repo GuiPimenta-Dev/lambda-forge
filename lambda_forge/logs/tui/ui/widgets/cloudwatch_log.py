@@ -1,3 +1,4 @@
+from rich.console import RenderableType
 from textual.app import ComposeResult
 from textual.widgets import OptionList, Static, TabPane, TabbedContent
 from ...api.forge_logs import ForgeLogsAPI
@@ -10,6 +11,7 @@ class CloudWatchLogs(Static):
     DEFAULT_CSS = """
     CloudWatchLogs {
         height: 1fr;
+        content-align: center middle;
     }
     """
 
@@ -72,6 +74,9 @@ class CloudWatchLogs(Static):
 
     def compose(self) -> ComposeResult:
         yield OptionList()
+
+    def render(self) -> RenderableType:
+        return "No logs available yet for this lambda function."
 
     def on_show(self):
         self.log_list.focus()
