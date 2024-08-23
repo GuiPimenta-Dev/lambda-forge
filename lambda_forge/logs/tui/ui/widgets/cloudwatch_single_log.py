@@ -19,9 +19,8 @@ class CloudWatchSingleLog(Option):
         table.add_column("log_type", width=10)
         table.add_column("message")
 
-        timestamp = datetime.fromtimestamp(self.log.timestamp).strftime(
-            "%Y-%m-%d (%H:%M)"
-        )
+        timestamp = self.log.timestamp.strftime("%Y-%m-%d (%H:%M)")
+
         table.add_row(timestamp, self.log.log_type.value, self.log.message)
         table.add_row()
         self._set_prompt(table)

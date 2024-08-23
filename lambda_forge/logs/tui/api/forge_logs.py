@@ -1,3 +1,4 @@
+from datetime import datetime
 from collections import defaultdict
 from json import loads as json_loads
 from enum import Enum
@@ -20,7 +21,7 @@ class CloudWatchLog:
         self.function_name = function_name
         self.log_type = log_type
         self.message = message
-        self.timestamp = timestamp / 1000  # Convert to seconds
+        self.timestamp = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
         self.is_error = is_error
 
     @classmethod
