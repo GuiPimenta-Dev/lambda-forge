@@ -13,6 +13,17 @@ class LogType(Enum):
     END = "END"
     REPORT = "REPORT"
     INIT_START = "INIT_START"
+    UNKNOWN = "UNKNOWN"
+
+    @classmethod
+    def get(cls, value):
+        """
+        Safely get an enum member by value. Return UNKNOWN if value is not found.
+        """
+        try:
+            return LogType(value)
+        except ValueError:
+            return LogType.UNKNOWN
 
 
 class CloudWatchLog:
@@ -30,7 +41,10 @@ class CloudWatchLog:
         timestamp = log["timestamp"]
         message = log["message"]
         is_error = log["is_error"]
-        log_type = LogType(message.split(" ")[0])
+        if is_error:
+            log_type = LogType.ERROR
+        else:
+            log_type = LogType(message.split(" ")[0])
 
         return cls(function_name, log_type, message, timestamp, is_error)
 
