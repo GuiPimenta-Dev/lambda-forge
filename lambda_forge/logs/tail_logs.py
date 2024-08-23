@@ -12,8 +12,11 @@ def watch_logs_for_functions(functions, log_file_path, stack, interval=1):
             for function in functions:
                 function_name = function['name']
                 project = json.load(open("cdk.json", "r"))["context"]["name"]
-                full_function_name = f"{stack}-{project}-{function_name}"
+                # full_function_name = f"{stack}-{project}-{function_name}"
+                full_function_name = f"{project}-{function_name}"
                 log_group_name = f"/aws/lambda/{full_function_name}"
+
+                print(f"Watching logs for {full_function_name}... [{log_group_name}]")
 
                 try:
                     # Get the log streams for the Lambda function
