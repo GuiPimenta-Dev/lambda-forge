@@ -16,9 +16,8 @@ from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge.diagram import create_diagram
 from lambda_forge.live import server_cli
-from lambda_forge.logs.tail_logs import watch_logs_for_functions
 from lambda_forge.printer import Printer
-from lambda_forge.logs.launch_tui import launch_forge_logs_tui
+from lambda_forge.logs.tui import ForgeLogsApp
 
 
 printer = Printer()
@@ -717,9 +716,11 @@ def logs(stack, interval):
     #     exit()
 
     functions = json.load(open("functions.json", "r"))
-    watch_logs_for_functions(
+    app = ForgeLogsApp(
         functions=functions, log_file_path="logs.log", stack=stack, interval=interval
     )
+
+    app.run()
 
 
 if __name__ == "__main__":

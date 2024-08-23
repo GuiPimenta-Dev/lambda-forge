@@ -1,7 +1,8 @@
 from collections import defaultdict
 from enum import Enum
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List
 from ._test_data import log_groups, cloudwatch_logs
+from .log_watcher import watch_logs_for_functions
 
 
 class LogType(Enum):
@@ -23,7 +24,7 @@ class CloudWatchLog:
     def __init__(self, log_type: LogType, message: str, timestamp: int) -> None:
         self.log_type = log_type
         self.message = message
-        self.timestamp = timestamp / 1000 # Convert to seconds
+        self.timestamp = timestamp / 1000  # Convert to seconds
 
     @classmethod
     def parse(cls, timestamp: int, message: str):
@@ -34,9 +35,20 @@ class CloudWatchLog:
 
 
 class ForgeLogsAPI:
-    def __init__(self, params: Optional[Dict]) -> None:
-        self.params = params
+    def __init__(self, functions, log_path, stack, interval) -> None:
+        self.functions = functions
+        self.log_path = log_path
+        self.stack = stack
+        self.interval = interval
         self.d = defaultdict(int)
+
+    def start_watcher(self):
+        watch_logs_for_functions(
+            self.functions,
+            self.log_path,
+            self.stack,
+            self.interval,
+        )
 
     def get_lambdas(self) -> List[LambdaGroup]:
         return [LambdaGroup(group, name) for group, name in log_groups]
