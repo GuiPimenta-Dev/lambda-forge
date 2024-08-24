@@ -39,21 +39,20 @@ def fetch_log_events(
     next_token: Optional[str] = None,
 ) -> Optional[Dict]:
     """Fetch log events from a specific log stream."""
+
+    data = dict(
+        logGroupName=log_group_name,
+        logStreamName=log_stream_name,
+        startFromHead=False,
+    )
+
     try:
         if next_token:
-            return cloudwatch_client.get_log_events(
-                logGroupName=log_group_name,
-                logStreamName=log_stream_name,
-                nextToken=next_token,
-                startFromHead=False,
-            )
+            extra_data = dict(nextToken=next_token)
         else:
-            return cloudwatch_client.get_log_events(
-                logGroupName=log_group_name,
-                logStreamName=log_stream_name,
-                limit=1,  # Fetch only the latest event to get the token
-                startFromHead=False,
-            )
+            extra_data = dict(limit=1)
+
+        return cloudwatch_client.get_log_events(**(data | extra_data))
     except ClientError as e:
         raise ValueError(
             f"Error fetching log events for {log_group_name}, {log_stream_name}: {e}"
@@ -104,7 +103,6 @@ def watch_logs_for_functions(
             function_name = function["name"]
             full_function_name = f"{project}-{function_name}"
             log_group_name = get_log_group_name(project, function_name)
-
             log_stream_name = get_latest_log_stream(cloudwatch_client, log_group_name)
 
             if not log_stream_name:
@@ -112,7 +110,9 @@ def watch_logs_for_functions(
 
             if full_function_name not in last_tokens:
                 log_events = fetch_log_events(
-                    cloudwatch_client, log_group_name, log_stream_name
+                    cloudwatch_client,
+                    log_group_name,
+                    log_stream_name,
                 )
                 if log_events:
                     last_tokens[full_function_name] = log_events["nextForwardToken"]
