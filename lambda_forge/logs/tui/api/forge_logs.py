@@ -3,7 +3,7 @@ from collections import defaultdict
 from json import loads as json_loads
 from enum import Enum
 from typing import Dict, Iterable, List
-from .log_watcher import watch_logs_for_functions
+from .log_watcher import LogWatcher
 from .lambda_fetcher import list_lambda_functions
 
 
@@ -51,17 +51,13 @@ class CloudWatchLog:
 
 class ForgeLogsAPI:
     def __init__(self, functions, log_path, stack) -> None:
-        self.functions = functions
         self.log_path = log_path
         self.stack = stack
+        self.log_watcher = LogWatcher(log_path, functions)
         self.d = defaultdict(int)
 
     def update_logs(self):
-        watch_logs_for_functions(
-            self.functions,
-            self.log_path,
-            self.stack,
-        )
+        self.log_watcher.update_logs()
 
     def get_lambdas(self) -> List[str]:
         return list_lambda_functions()
