@@ -56,6 +56,7 @@ class CloudWatchLogs(Static):
 
     def on_mount(self):
         self.set_interval(LOGS_UPDATE_INTERVAL, self.update_logs)
+        self.log_list.display = False
 
     def update_logs(self):
         all_logs = list(self.logs_api.get_logs(self.lambda_name))
@@ -65,6 +66,7 @@ class CloudWatchLogs(Static):
             return
 
         for log in all_logs[len(self.log_list._options) :]:
+            self.log_list.display = True
             self.log_list.add_option(CloudWatchSingleLog(log))
 
         self.update_tab_label()

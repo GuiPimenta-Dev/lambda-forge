@@ -106,6 +106,7 @@ TextArea .text-area-gutter {
 
 CloudWatchLogs > OptionList {
 
+  height: 1fr;
   border: none;
   background: $background;
 
