@@ -1,6 +1,7 @@
+from rich.console import RenderableType
 from textual.app import ComposeResult
 from textual.widgets import OptionList, Static, TabPane, TabbedContent
-from ...api.forge_logs import ForgeLogsAPI, LambdaGroup
+from ...api.forge_logs import ForgeLogsAPI
 from .cloudwatch_single_log import CloudWatchSingleLog
 
 LOGS_UPDATE_INTERVAL = 3
@@ -10,6 +11,7 @@ class CloudWatchLogs(Static):
     DEFAULT_CSS = """
     CloudWatchLogs {
         height: 1fr;
+        content-align: center middle;
     }
     """
 
@@ -35,7 +37,7 @@ class CloudWatchLogs(Static):
 
     def update_tab_label(self):
         tab_pane = self.tabbed_content.get_tab(self.parent_tab)
-        label = self.log_group.group
+        label = self.lambda_name
 
         if self.new_logs:
             label += f" ({len(self.new_logs)})"
@@ -46,23 +48,25 @@ class CloudWatchLogs(Static):
     def log_list(self) -> OptionList:
         return self.query_one(OptionList)
 
-    def __init__(self, log_group: LambdaGroup):
-        self.log_group = log_group
+    def __init__(self, lambda_name: str):
+        self.lambda_name = lambda_name
         self.logs = []
         self.new_logs = []
-        super().__init__(id=log_group.name.replace("/", "-"))
+        super().__init__(id=lambda_name)
 
     def on_mount(self):
         self.set_interval(LOGS_UPDATE_INTERVAL, self.update_logs)
+        self.log_list.display = False
 
     def update_logs(self):
-        all_logs = list(self.logs_api.get_logs(self.log_group.name))
+        all_logs = list(self.logs_api.get_logs(self.lambda_name))
         self.new_logs = all_logs[len(self.logs) :]
 
         if not self.new_logs:
             return
 
         for log in all_logs[len(self.log_list._options) :]:
+            self.log_list.display = True
             self.log_list.add_option(CloudWatchSingleLog(log))
 
         self.update_tab_label()
@@ -72,6 +76,9 @@ class CloudWatchLogs(Static):
 
     def compose(self) -> ComposeResult:
         yield OptionList()
+
+    def render(self) -> RenderableType:
+        return "No logs available yet for this lambda function."
 
     def on_show(self):
         self.log_list.focus()

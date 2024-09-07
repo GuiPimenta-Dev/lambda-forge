@@ -16,9 +16,8 @@ from lambda_forge.builders.project_builder import ProjectBuilder
 from lambda_forge.builders.service_builder import ServiceBuilder
 from lambda_forge.diagram import create_diagram
 from lambda_forge.live import server_cli
-from lambda_forge.logs.tail_logs import watch_logs_for_functions
 from lambda_forge.printer import Printer
-from lambda_forge.logs.launch_tui import launch_forge_logs_tui
+from lambda_forge.logs.tui import ForgeLogsApp
 
 
 printer = Printer()
@@ -471,23 +470,24 @@ def live(include, exclude):
     server_cli.run_live(include=include, exclude=exclude)
 
 
-@forge.command()
-@click.option("-i", "--include", help="Include functions to watch", default=None)
-@click.option("-e", "--exclude", help="Exclude functions to watch", default=None)
-def logs(include, exclude):
-    """
-    Starts a Log Stream for the specified Lambda functions.
-
-    This command shows the logs of the specified Lambda functions in real-time
-    as an alternative to the AWS CloudWatch console.
-    """
-
-    with open("live.log", "w") as f:
-        f.write("")
-
-    include = include.split(",") if include else None
-    exclude = exclude.split(",") if exclude else None
-    launch_forge_logs_tui({"include": include, "exclude": exclude})
+# NOTE: This was added by kraanzu
+# @forge.command()
+# @click.option("-i", "--include", help="Include functions to watch", default=None)
+# @click.option("-e", "--exclude", help="Exclude functions to watch", default=None)
+# def logs(include, exclude):
+#     """
+#     Starts a Log Stream for the specified Lambda functions.
+#
+#     This command shows the logs of the specified Lambda functions in real-time
+#     as an alternative to the AWS CloudWatch console.
+#     """
+#
+#     with open("live.log", "w") as f:
+#         f.write("")
+#
+#     include = include.split(",") if include else None
+#     exclude = exclude.split(",") if exclude else None
+#     launch_forge_logs_tui({"include": include, "exclude": exclude})
 
 
 @forge.command()
@@ -694,7 +694,7 @@ def output():
 
 
 @forge.command()
-@click.argument("stack")
+@click.argument("stack", default="dev")
 @click.option(
     "--interval",
     help="Query interval for the logs",
@@ -709,13 +709,19 @@ def logs(stack, interval):
     printer.show_banner("Logs")
     printer.br()
 
+    # XXX: Uncomment this!!
     # Check if the specified stack is in the list of available stacks
-    if not any(stack.lower() in s.lower() for s in stacks):
-        printer.print(f"Stack '{stack}' not found in available stacks: {stacks}", "red")
-        exit()
+    # if not any(stack.lower() in s.lower() for s in stacks):
+    #     printer.print(f"Stack '{stack}' not found in available stacks: {stacks}", "red")
+    #     exit()
 
     functions = json.load(open("functions.json", "r"))
-    watch_logs_for_functions(functions=functions, log_file_path="logs.log", stack=stack, interval=interval)
+    app = ForgeLogsApp(
+        functions=functions, log_file_path="logs.log", stack=stack, interval=interval
+    )
+
+    app.run()
+
 
 if __name__ == "__main__":
     forge()

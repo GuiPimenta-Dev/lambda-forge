@@ -1,7 +1,10 @@
+from datetime import datetime
 from collections import defaultdict
+from json import loads as json_loads
 from enum import Enum
-from typing import Dict, Iterable, List, Optional
-from ._test_data import log_groups, cloudwatch_logs
+from typing import Dict, Iterable, List
+from .log_watcher import LogWatcher
+from .lambda_fetcher import list_lambda_functions
 
 
 class LogType(Enum):
@@ -10,54 +13,67 @@ class LogType(Enum):
     END = "END"
     REPORT = "REPORT"
     INIT_START = "INIT_START"
+    UNKNOWN = "UNKNOWN"
 
-
-class LambdaGroup:
-    def __init__(self, name: str, group: str) -> None:
-        self.name = name
-        self.group = group
+    @classmethod
+    def get(cls, value):
+        """
+        Safely get an enum member by value. Return UNKNOWN if value is not found.
+        """
+        try:
+            return LogType(value)
+        except ValueError:
+            return LogType.UNKNOWN
 
 
 class CloudWatchLog:
 
-    def __init__(self, log_type: LogType, message: str, timestamp: int) -> None:
+    def __init__(self, function_name, log_type, message, timestamp, is_error) -> None:
+        self.function_name = function_name
         self.log_type = log_type
         self.message = message
-        self.timestamp = timestamp / 1000 # Convert to seconds
+        self.timestamp = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+        self.is_error = is_error
 
     @classmethod
-    def parse(cls, timestamp: int, message: str):
-        log_type, message = message.split(" ", 1)
-        log_type = LogType(log_type)
+    def parse(cls, log: Dict):
+        function_name = log["function_name"]
+        timestamp = log["timestamp"]
+        message = log["message"]
+        is_error = log["is_error"]
+        if is_error:
+            log_type = LogType.ERROR
+        else:
+            log_type = LogType(message.split(" ")[0])
 
-        return cls(log_type, message, int(timestamp))
+        return cls(function_name, log_type, message, timestamp, is_error)
 
 
 class ForgeLogsAPI:
-    def __init__(self, params: Optional[Dict]) -> None:
-        self.params = params
+    def __init__(self, functions, log_path, stack) -> None:
+        self.log_path = log_path
+        self.stack = stack
+        self.log_watcher = LogWatcher(log_path, functions)
         self.d = defaultdict(int)
 
-    def get_lambdas(self) -> List[LambdaGroup]:
-        return [LambdaGroup(group, name) for group, name in log_groups]
+    def update_logs(self):
+        self.log_watcher.update_logs()
 
-    # NOTE: Implement this function (@gui)
-    def _get_logs(self, lambda_group: str) -> List[Dict]:
-        self.d[lambda_group] += 1
+    def get_lambdas(self) -> List[str]:
+        return list_lambda_functions()
 
-        def _get_index(name):
-            return [i for i, _ in log_groups].index(name)
+    def _get_logs(self) -> List[CloudWatchLog]:
+        logs = []
 
-        if _get_index(lambda_group) % 2 == 0:
-            return list(reversed(cloudwatch_logs))[0 : self.d[lambda_group]]
-        else:
-            return cloudwatch_logs[0 : self.d[lambda_group]]
+        with open(self.log_path, "r") as f:
+            lines = f.readlines()
+            for line in lines:
+                data = json_loads(line)
+                log_obj = CloudWatchLog.parse(data)
+                logs.append(log_obj)
+
+        return logs
 
     def get_logs(self, lambda_group: str) -> Iterable[CloudWatchLog]:
-        logs = self._get_logs(lambda_group)
-
-        for log in logs:
-            yield CloudWatchLog.parse(
-                log["timestamp"],
-                log["message"],
-            )
+        logs = [i for i in self._get_logs() if i.function_name == lambda_group]
+        return logs

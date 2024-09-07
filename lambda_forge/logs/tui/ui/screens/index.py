@@ -22,9 +22,9 @@ class Index(Screen):
     def compose(self) -> ComposeResult:
         yield ForgeLogsHeader()
         with TabbedContent(id="cloud_watch_logs"):
-            for log_group in self.logs_api.get_lambdas():
-                with TabPane(log_group.group):
-                    yield CloudWatchLogs(log_group)
+            for name in self.logs_api.get_lambdas():
+                with TabPane(name):
+                    yield CloudWatchLogs(name)
 
     @on(TabbedContent.TabActivated)
     def _tab_activated(self, event: TabbedContent.TabActivated):
