@@ -72,7 +72,9 @@ def message_callback(client, userdata, message):
 
             try:
                 # Call the process function
-                response_payload = process(deserialized_data["event"], deserialized_data["context"])
+                response_payload = process(
+                    deserialized_data["event"], deserialized_data["context"]
+                )
 
             except Exception as e:
                 # Log the exception

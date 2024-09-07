@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lambda_forge",
-    version="1.0.1069",
+    version="2.1.43",
     packages=find_packages(),
     license="MIT",
     install_requires=[
@@ -11,7 +11,7 @@ setup(
         "constructs>=10.0.0,<11.0.0",
         "boto3==1.26.59",
         "click==8.1.3",
-        "pytest==6.2.5",
+        "pytest<7.0.0",
         "pytest-sugar==1.0.0",
         "coverage==7.2.3",
         "python-dotenv==1.0.1",
@@ -23,6 +23,8 @@ setup(
         "inquirerpy==0.3.4",
         "tabulate==0.9.0",
         "diagrams==0.23.4",
+        "textual==0.75.1",
+        "textual-serve==1.0.3"
     ],
     include_package_data=True,
     package_data={
@@ -34,8 +36,9 @@ setup(
             "scaffold/.coveragerc",
             "scaffold/**/**",
             "scaffold/**/**/*",
-            "services/*",
+            "api_gateway/*",
             "live/*",
+            "live/**", 
             "stacks/*",
             "stacks/**/*",
         ],
@@ -43,5 +46,5 @@ setup(
     author="Guilherme Alves Pimenta",
     author_email="guialvespimenta27@gmail.com",
     description="Lambda Forge is a framework to help you create lambda functions following a pre-defined structure.",
-    entry_points={"console_scripts": ["forge=lambda_forge.cli:forge"]},
+    entry_points={"console_scripts": ["forge=lambda_forge.forge:forge"]},
 )

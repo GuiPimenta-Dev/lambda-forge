@@ -1,0 +1,1951 @@
+<!-- Elements added to main will be displayed on all pages -->
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../image-to-qr-code-converter/">
+      
+      
+        <link rel="next" href="../real-time-chat/">
+      
+      
+      <link rel="icon" href="../../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.28">
+    
+    
+      
+        <title>JWT Authentication - Lambda Forge</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+<script>
+var gtmId = 'GTM-TQPKQK7';
+if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1')) {
+  gtmId = 'GTM-XXX'
+}
+(function(w,d,s,l,i){
+  w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer', gtmId);
+</script>
+
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/mermaid@8.5.1/dist/mermaid.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#implementing-a-serverless-authentication-system-with-jwt-dynamo-db-secrets-manager-and-kms" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Lambda Forge" class="md-header__button md-logo" aria-label="Lambda Forge" data-md-component="logo">
+      
+  <img src="../../images/favicon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Lambda Forge
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              JWT Authentication
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../home/getting-started/" class="md-tabs__link">
+          
+  
+  Docs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../introduction/" class="md-tabs__link">
+          
+  
+  Example Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../license/license/" class="md-tabs__link">
+        
+  
+    
+  
+  License
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Lambda Forge" class="md-nav__button md-logo" aria-label="Lambda Forge" data-md-component="logo">
+      
+  <img src="../../images/favicon.png" alt="logo">
+
+    </a>
+    Lambda Forge
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Docs
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/getting-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/creating-a-hello-world/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Creating a Hello World
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/aws-services/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Services
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/securing-endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authorizers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/lambda-layers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lambda Layers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/live-development/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Live Development
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/custom-codepipeline-steps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CodeBuild Steps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/multi-stage-environments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CodePipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../home/docs-generation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docs Generation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Example Projects
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Example Projects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Begginer
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Begginer
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guess-the-number/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guess The Number
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../url-shortener/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    URL Shortener
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../image-to-qr-code-converter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Image to QR Code
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Intermediate
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Intermediate
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    JWT Authentication
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    JWT Authentication
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-the-dynamodb-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Up the DynamoDB Tables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-password-hashing-with-kms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementing Password Hashing with KMS
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-jwt-secret-on-secrets-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a JWT Secret on Secrets Manager
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-pyjwt-public-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using the PYJWT Public Layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-the-signup-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementing the SignUp Function
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-the-signin-functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementing the SignIn Functionality
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-the-jwt-authorizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating the JWT Authorizer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-private-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a Private Function
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploying-the-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the Functions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-the-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing the Functions
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../real-time-chat/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Real-Time Chat
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../blog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog Application
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../license/license/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    License
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-the-dynamodb-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Up the DynamoDB Tables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-password-hashing-with-kms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementing Password Hashing with KMS
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-jwt-secret-on-secrets-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a JWT Secret on Secrets Manager
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-pyjwt-public-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using the PYJWT Public Layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-the-signup-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementing the SignUp Function
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-the-signin-functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementing the SignIn Functionality
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-the-jwt-authorizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating the JWT Authorizer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-private-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating a Private Function
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploying-the-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the Functions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-the-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Testing the Functions
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="implementing-a-serverless-authentication-system-with-jwt-dynamo-db-secrets-manager-and-kms">Implementing a Serverless Authentication System with JWT, Dynamo DB, Secrets Manager and KMS</h1>
+<p>In this section, we will develop a serverless authentication system using JWT authentication. This system effectively transmits information from the client and authenticates users to gain access to endpoints containing private information.</p>
+<p>JWT authentication is a secure method for transmitting information between parties as a JSON object. To gain a deeper understanding of JWT tokens and their functionality, you can refer to the article <a href="http://127.0.0.1:8000/articles/page6/">JSON Web Tokens</a>.</p>
+<p>The design for the Lambda functions we intend to create will look like this:</p>
+<p align="center">
+  <img src="https://docs.lambda-forge.com/examples/images/auth.png" alt="alt text">
+</p>
+
+<h2 id="setting-up-the-dynamodb-tables">Setting Up the DynamoDB Tables</h2>
+<p>To get started, we must create tables to store user credentials securely. For maximum decoupling of environments, proceed to your AWS console and create three separate tables, each designated for a specific stage: <code>Dev-Auth</code>, <code>Staging-Auth</code> and <code>Prod-Auth</code>.</p>
+<p>Once you have obtained the ARNs for these tables, let's integrate them into the <code>cdk.json</code> file within the corresponding environment.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">cdk.json</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-51">51</a></span>
+<span class="normal"><a href="#__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#__codelineno-0-53">53</a></span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span>
+<span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span>
+<span class="normal"><a href="#__codelineno-0-59">59</a></span>
+<span class="normal"><a href="#__codelineno-0-60">60</a></span>
+<span class="normal"><a href="#__codelineno-0-61">61</a></span>
+<span class="normal"><a href="#__codelineno-0-62">62</a></span>
+<span class="normal"><a href="#__codelineno-0-63">63</a></span>
+<span class="normal"><a href="#__codelineno-0-64">64</a></span>
+<span class="normal"><a href="#__codelineno-0-65">65</a></span>
+<span class="normal"><a href="#__codelineno-0-66">66</a></span>
+<span class="normal"><a href="#__codelineno-0-67">67</a></span>
+<span class="normal"><a href="#__codelineno-0-68">68</a></span>
+<span class="normal"><a href="#__codelineno-0-69">69</a></span>
+<span class="normal"><a href="#__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span>
+<span class="normal"><a href="#__codelineno-0-72">72</a></span>
+<span class="normal"><a href="#__codelineno-0-73">73</a></span>
+<span class="normal"><a href="#__codelineno-0-74">74</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-51" name="__codelineno-0-51"></a>   <span class="s2">&quot;dev&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com/dev&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="hll">        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$DEV-AUTH-TABLE-ARN&quot;</span>
+</span><a id="__codelineno-0-57" name="__codelineno-0-57"></a>      <span class="p">}</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a>    <span class="p">},</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="s2">&quot;staging&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com/staging&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="hll">        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$STAGING-AUTH-TABLE-ARN&quot;</span>
+</span><a id="__codelineno-0-65" name="__codelineno-0-65"></a>      <span class="p">}</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a>    <span class="p">},</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a>    <span class="s2">&quot;prod&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>      <span class="s2">&quot;base_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://api.lambda-forge.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>      <span class="s2">&quot;arns&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a>        <span class="s2">&quot;urls_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-URLS-TABLE-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>        <span class="s2">&quot;images_bucket&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-IMAGES-BUCKET-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="hll">        <span class="s2">&quot;auth_table&quot;</span><span class="p">:</span> <span class="s2">&quot;$PROD-AUTH-TABLE-ARN&quot;</span>
+</span><a id="__codelineno-0-73" name="__codelineno-0-73"></a>      <span class="p">}</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a>    <span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<p>Next, we'll create a new variable class within the DynamoDB class to reference our JWT tables.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/services/dynamodb.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-1-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-1-10">10</a></span>
+<span class="normal"><a href="#__codelineno-1-11">11</a></span>
+<span class="normal"><a href="#__codelineno-1-12">12</a></span>
+<span class="normal"><a href="#__codelineno-1-13">13</a></span>
+<span class="normal"><a href="#__codelineno-1-14">14</a></span>
+<span class="normal"><a href="#__codelineno-1-15">15</a></span>
+<span class="normal"><a href="#__codelineno-1-16">16</a></span>
+<span class="normal"><a href="#__codelineno-1-17">17</a></span>
+<span class="normal"><a href="#__codelineno-1-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-8" name="__codelineno-1-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">urls_table</span> <span class="o">=</span> <span class="n">dynamodb</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9"></a>            <span class="n">scope</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10"></a>            <span class="s2">&quot;URLsTable&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11"></a>            <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;arns&quot;</span><span class="p">][</span><span class="s2">&quot;urls_table&quot;</span><span class="p">],</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12"></a>        <span class="p">)</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">auth_table</span> <span class="o">=</span> <span class="n">dynamodb</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_table_arn</span><span class="p">(</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15"></a>            <span class="n">scope</span><span class="p">,</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16"></a>            <span class="s2">&quot;AuthTable&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="hll">            <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;arns&quot;</span><span class="p">][</span><span class="s2">&quot;auth_table&quot;</span><span class="p">],</span>
+</span><a id="__codelineno-1-18" name="__codelineno-1-18"></a><span class="hll">        <span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+<h2 id="implementing-password-hashing-with-kms">Implementing Password Hashing with KMS</h2>
+<p>As we're dealing with sensitive data such as passwords, storing them in plain text poses a significant security risk. To mitigate this risk, we'll utilize KMS (Key Management Service), an AWS resource designed for hashing passwords and other sensitive information.</p>
+<p>To create a new KMS service, execute the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>forge service kms
+</code></pre></div>
+<p>This command creates a new file within the <code>infra/services</code> directory specifically for managing KMS keys.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>infra
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>└── services
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    ├── __init__.py
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    ├── api_gateway.py
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    ├── aws_lambda.py
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    ├── dynamodb.py
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="hll">    ├── kms.py
+</span><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    ├── layers.py
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    ├── s3.py
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    └── secrets_manager.py
+</code></pre></div>
+<p>Next, navigate to your AWS KMS console on AWS and create a new key. Then, update the KMS class with the ARN of the newly generated key.</p>
+<div class="highlight"><span class="filename">infra/services/kms.py</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_kms</span> <span class="k">as</span> <span class="n">kms</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">class</span> <span class="nc">KMS</span><span class="p">:</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">auth_key</span> <span class="o">=</span> <span class="n">kms</span><span class="o">.</span><span class="n">Key</span><span class="o">.</span><span class="n">from_key_arn</span><span class="p">(</span>
+</span><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="hll">            <span class="n">scope</span><span class="p">,</span>
+</span><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="hll">            <span class="s2">&quot;AuthKey&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="hll">            <span class="n">key_arn</span><span class="o">=</span><span class="s2">&quot;$AUTH-KEY-ARN&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="hll">        <span class="p">)</span>
+</span></code></pre></div>
+<h2 id="creating-a-jwt-secret-on-secrets-manager">Creating a JWT Secret on Secrets Manager</h2>
+<p>To validate JWT tokens securely, a secret is essential. This secret, usually a random string, acts as a key for verifying whether the token was generated from a trusted source. It ensures that only authorized parties can generate and verify tokens, preventing unauthorized access to protected resources.</p>
+<p>By storing the secret securely, you safeguard the integrity and confidentiality of your authentication system, mitigating the risk of unauthorized access and data breaches. Having that said, navigate to AWS Secrets Manager, create a new secret and save your random string there.</p>
+<p>After obtaining the secret ARN from AWS Secrets Manager, integrate it into the Secrets Manager class.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/services/secrets_manager.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-5-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-5-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-5-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-5-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-5-10">10</a></span>
+<span class="normal"><a href="#__codelineno-5-11">11</a></span>
+<span class="normal"><a href="#__codelineno-5-12">12</a></span>
+<span class="normal"><a href="#__codelineno-5-13">13</a></span>
+<span class="normal"><a href="#__codelineno-5-14">14</a></span>
+<span class="normal"><a href="#__codelineno-5-15">15</a></span>
+<span class="normal"><a href="#__codelineno-5-16">16</a></span>
+<span class="normal"><a href="#__codelineno-5-17">17</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="k">class</span> <span class="nc">SecretsManager</span><span class="p">:</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">resources</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">gmail_secret</span> <span class="o">=</span> <span class="n">secrets_manager</span><span class="o">.</span><span class="n">Secret</span><span class="o">.</span><span class="n">from_secret_complete_arn</span><span class="p">(</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8"></a>            <span class="n">scope</span><span class="p">,</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9"></a>            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;GmailSecret&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10"></a>            <span class="n">secret_complete_arn</span><span class="o">=</span><span class="s2">&quot;$GMAIL-SECRET-ARN&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11"></a>        <span class="p">)</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12"></a>
+<a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">jwt_secret</span> <span class="o">=</span> <span class="n">secrets_manager</span><span class="o">.</span><span class="n">Secret</span><span class="o">.</span><span class="n">from_secret_complete_arn</span><span class="p">(</span>
+</span><a id="__codelineno-5-14" name="__codelineno-5-14"></a><span class="hll">            <span class="n">scope</span><span class="p">,</span>
+</span><a id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="hll">            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;JwtSecret&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="hll">            <span class="n">secret_complete_arn</span><span class="o">=</span><span class="s2">&quot;$JWT-SECRET-ARN&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="hll">        <span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+<h2 id="using-the-pyjwt-public-layer">Using the PYJWT Public Layer</h2>
+<p>To hash our JWT tokens, we'll leverage the widely-used Python library called <code>pyjwt</code>. Due to its popularity, AWS conveniently offers it as a public layer, streamlining our authentication implementation.</p>
+<ul>
+<li>PYJWT: <code>arn:aws:lambda:us-east-2:770693421928:layer:Klayers-p39-PyJWT:3</code></li>
+</ul>
+<p>Let's now create a new class variable refencing the pyjwt layer.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/services/layers.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-6-14">14</a></span>
+<span class="normal"><a href="#__codelineno-6-15">15</a></span>
+<span class="normal"><a href="#__codelineno-6-16">16</a></span>
+<span class="normal"><a href="#__codelineno-6-17">17</a></span>
+<span class="normal"><a href="#__codelineno-6-18">18</a></span>
+<span class="normal"><a href="#__codelineno-6-19">19</a></span>
+<span class="normal"><a href="#__codelineno-6-20">20</a></span>
+<span class="normal"><a href="#__codelineno-6-21">21</a></span>
+<span class="normal"><a href="#__codelineno-6-22">22</a></span>
+<span class="normal"><a href="#__codelineno-6-23">23</a></span>
+<span class="normal"><a href="#__codelineno-6-24">24</a></span>
+<span class="normal"><a href="#__codelineno-6-25">25</a></span>
+<span class="normal"><a href="#__codelineno-6-26">26</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-6-14" name="__codelineno-6-14"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">sm_utils_layer</span> <span class="o">=</span> <span class="n">_lambda</span><span class="o">.</span><span class="n">LayerVersion</span><span class="p">(</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15"></a>            <span class="n">scope</span><span class="p">,</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16"></a>            <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;SmUtilsLayer&#39;</span><span class="p">,</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17"></a>            <span class="n">code</span><span class="o">=</span><span class="n">_lambda</span><span class="o">.</span><span class="n">Code</span><span class="o">.</span><span class="n">from_asset</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">layer</span><span class="p">(</span><span class="s1">&#39;layers/sm_utils&#39;</span><span class="p">)),</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18"></a>            <span class="n">compatible_runtimes</span><span class="o">=</span><span class="p">[</span><span class="n">_lambda</span><span class="o">.</span><span class="n">Runtime</span><span class="o">.</span><span class="n">PYTHON_3_9</span><span class="p">],</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19"></a>            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20"></a>         <span class="p">)</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21"></a>
+<a id="__codelineno-6-22" name="__codelineno-6-22"></a><span class="hll">        <span class="bp">self</span><span class="o">.</span><span class="n">pyjwt_layer</span> <span class="o">=</span> <span class="n">_lambda</span><span class="o">.</span><span class="n">LayerVersion</span><span class="o">.</span><span class="n">from_layer_version_arn</span><span class="p">(</span>
+</span><a id="__codelineno-6-23" name="__codelineno-6-23"></a><span class="hll">            <span class="n">scope</span><span class="p">,</span>
+</span><a id="__codelineno-6-24" name="__codelineno-6-24"></a><span class="hll">            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;JWTLayer&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-6-25" name="__codelineno-6-25"></a><span class="hll">            <span class="n">layer_version_arn</span><span class="o">=</span><span class="s2">&quot;arn:aws:lambda:us-east-2:770693421928:layer:Klayers-p39-PyJWT:3&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-6-26" name="__codelineno-6-26"></a><span class="hll">        <span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+<p>Don't forget to add the pyjwt layer in the <code>requirements.txt</code></p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">requirements.txt</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-7-15">15</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-7-15" name="__codelineno-7-15"></a>jwt==1.3.1
+</code></pre></div></td></tr></table></div>
+<h2 id="implementing-the-signup-function">Implementing the SignUp Function</h2>
+<p>Now that we have all the necessary components set up, it's time to develop our authentication logic. We'll begin with the signup function, which is responsible for receiving an email and a password from the user. This function will then store them in the database, ensuring that the user is unique and storing a hashed version of the password for security purposes.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>forge function signup --method &quot;POST&quot; --description &quot;Securely handle user registration with unique credentials.&quot; --public --belongs-to auth --no-tests --endpoint signup
+</code></pre></div>
+<p>This command generates a new function within the <code>auth</code> directory.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>functions
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>└── auth
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    └── signup
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>        ├── __init__.py
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>        ├── config.py
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>        └── main.py
+</code></pre></div>
+<p>The signup functionality can be implemented as follows:</p>
+<div class="highlight"><span class="filename">functions/auth/signup/main.py</span><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">import</span> <span class="nn">json</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">import</span> <span class="nn">os</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kn">import</span> <span class="nn">boto3</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="nd">@dataclass</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="k">class</span> <span class="nc">Input</span><span class="p">:</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>    <span class="n">password</span><span class="p">:</span> <span class="nb">int</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="nd">@dataclass</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="k">class</span> <span class="nc">Output</span><span class="p">:</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>    <span class="k">pass</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="k">def</span> <span class="nf">encrypt_with_kms</span><span class="p">(</span><span class="n">plaintext</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kms_key_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>    <span class="n">kms_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;kms&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>    <span class="n">response</span> <span class="o">=</span> <span class="n">kms_client</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">KeyId</span><span class="o">=</span><span class="n">kms_key_id</span><span class="p">,</span> <span class="n">Plaintext</span><span class="o">=</span><span class="n">plaintext</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>    <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;CiphertextBlob&quot;</span><span class="p">]</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>
+<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>    <span class="c1"># Retrieve the DynamoDB table name and KMS key ID from environment variables.</span>
+<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>    <span class="n">AUTH_TABLE_NAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUTH_TABLE_NAME&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>    <span class="n">KMS_KEY_ID</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;KMS_KEY_ID&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>
+<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a>    <span class="c1"># Initialize a DynamoDB resource.</span>
+<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a>    <span class="n">dynamodb</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;dynamodb&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a>
+<a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a>    <span class="c1"># Reference the DynamoDB table.</span>
+<a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a>    <span class="n">auth_table</span> <span class="o">=</span> <span class="n">dynamodb</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">AUTH_TABLE_NAME</span><span class="p">)</span>
+<a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a>
+<a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a>    <span class="c1"># Parse the request body to get user data.</span>
+<a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a>    <span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">])</span>
+<a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a>
+<a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a>    <span class="c1"># Verify if the user already exists.</span>
+<a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a>    <span class="n">user</span> <span class="o">=</span> <span class="n">auth_table</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">Key</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;PK&quot;</span><span class="p">:</span> <span class="n">body</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]})</span>
+<a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a>    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Item&quot;</span><span class="p">):</span>
+<a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a>        <span class="k">return</span> <span class="p">{</span>
+<a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a>            <span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+<a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a>            <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;User already exists&quot;</span><span class="p">}),</span>
+<a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a>        <span class="p">}</span>
+<a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a>
+<a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a>    <span class="c1"># Encrypt the password using KMS.</span>
+<a id="__codelineno-10-48" name="__codelineno-10-48" href="#__codelineno-10-48"></a>    <span class="n">encrypted_password</span> <span class="o">=</span> <span class="n">encrypt_with_kms</span><span class="p">(</span><span class="n">body</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">],</span> <span class="n">KMS_KEY_ID</span><span class="p">)</span>
+<a id="__codelineno-10-49" name="__codelineno-10-49" href="#__codelineno-10-49"></a>
+<a id="__codelineno-10-50" name="__codelineno-10-50" href="#__codelineno-10-50"></a>    <span class="c1"># Insert the new user into the DynamoDB table.</span>
+<a id="__codelineno-10-51" name="__codelineno-10-51" href="#__codelineno-10-51"></a>    <span class="n">auth_table</span><span class="o">.</span><span class="n">put_item</span><span class="p">(</span><span class="n">Item</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;PK&quot;</span><span class="p">:</span> <span class="n">body</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">],</span> <span class="s2">&quot;password&quot;</span><span class="p">:</span> <span class="n">encrypted_password</span><span class="p">})</span>
+<a id="__codelineno-10-52" name="__codelineno-10-52" href="#__codelineno-10-52"></a>
+<a id="__codelineno-10-53" name="__codelineno-10-53" href="#__codelineno-10-53"></a>    <span class="c1"># Return a successful response with the newly created user ID.</span>
+<a id="__codelineno-10-54" name="__codelineno-10-54" href="#__codelineno-10-54"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">201</span><span class="p">}</span>
+</code></pre></div>
+<p>This Lambda function basically handles user signup by encrypting passwords with KMS and storing them in DynamoDB, ensuring secure user registration.</p>
+<p>With our implementation ready, let's configure it to utilize AWS resources for seamless functionality.</p>
+<div class="highlight"><span class="filename">functions/auth/signup/config.py</span><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">class</span> <span class="nc">SignUpConfig</span><span class="p">:</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SignUp&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/auth&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Securely handle user registration with unique credentials.&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;signup&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
+</span><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="hll">                <span class="s2">&quot;AUTH_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
+</span><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="hll">                <span class="s2">&quot;KMS_KEY_ID&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">kms</span><span class="o">.</span><span class="n">auth_key</span><span class="o">.</span><span class="n">key_id</span><span class="p">,</span>
+</span><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="hll">            <span class="p">},</span>
+</span><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>        <span class="p">)</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>        <span class="n">services</span><span class="o">.</span><span class="n">api_gateway</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/signup&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">grant_read_write_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</span><a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">kms</span><span class="o">.</span><span class="n">auth_key</span><span class="o">.</span><span class="n">grant_encrypt</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="implementing-the-signin-functionality">Implementing the SignIn Functionality</h2>
+<p>Now that the signup functionality is in place, let's proceed with the implementation of the signin function. This function will handle user input of email and password, verify them against existing credentials in the database, and decrypt the encrypted password to authenticate the user.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>forge function signin --method &quot;POST&quot; --description &quot;Authenticate user login by verifying email and password against stored credentials&quot; --public --belongs-to auth --no-tests --endpoint signin
+</code></pre></div>
+<p>Here's our updated folder structure:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>functions
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>└── auth
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    ├── signin
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    │   ├── __init__.py
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    │   ├── config.py
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    │   └── main.py
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    └── signup
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>        ├── __init__.py
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        ├── config.py
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>        └── main.py
+</code></pre></div>
+<p>And now, it's implementation.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">functions/auth/signup/main.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-14-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-14-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-14-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-14-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-14-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-14-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-14-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-14-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-14-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-14-10">10</a></span>
+<span class="normal"><a href="#__codelineno-14-11">11</a></span>
+<span class="normal"><a href="#__codelineno-14-12">12</a></span>
+<span class="normal"><a href="#__codelineno-14-13">13</a></span>
+<span class="normal"><a href="#__codelineno-14-14">14</a></span>
+<span class="normal"><a href="#__codelineno-14-15">15</a></span>
+<span class="normal"><a href="#__codelineno-14-16">16</a></span>
+<span class="normal"><a href="#__codelineno-14-17">17</a></span>
+<span class="normal"><a href="#__codelineno-14-18">18</a></span>
+<span class="normal"><a href="#__codelineno-14-19">19</a></span>
+<span class="normal"><a href="#__codelineno-14-20">20</a></span>
+<span class="normal"><a href="#__codelineno-14-21">21</a></span>
+<span class="normal"><a href="#__codelineno-14-22">22</a></span>
+<span class="normal"><a href="#__codelineno-14-23">23</a></span>
+<span class="normal"><a href="#__codelineno-14-24">24</a></span>
+<span class="normal"><a href="#__codelineno-14-25">25</a></span>
+<span class="normal"><a href="#__codelineno-14-26">26</a></span>
+<span class="normal"><a href="#__codelineno-14-27">27</a></span>
+<span class="normal"><a href="#__codelineno-14-28">28</a></span>
+<span class="normal"><a href="#__codelineno-14-29">29</a></span>
+<span class="normal"><a href="#__codelineno-14-30">30</a></span>
+<span class="normal"><a href="#__codelineno-14-31">31</a></span>
+<span class="normal"><a href="#__codelineno-14-32">32</a></span>
+<span class="normal"><a href="#__codelineno-14-33">33</a></span>
+<span class="normal"><a href="#__codelineno-14-34">34</a></span>
+<span class="normal"><a href="#__codelineno-14-35">35</a></span>
+<span class="normal"><a href="#__codelineno-14-36">36</a></span>
+<span class="normal"><a href="#__codelineno-14-37">37</a></span>
+<span class="normal"><a href="#__codelineno-14-38">38</a></span>
+<span class="normal"><a href="#__codelineno-14-39">39</a></span>
+<span class="normal"><a href="#__codelineno-14-40">40</a></span>
+<span class="normal"><a href="#__codelineno-14-41">41</a></span>
+<span class="normal"><a href="#__codelineno-14-42">42</a></span>
+<span class="normal"><a href="#__codelineno-14-43">43</a></span>
+<span class="normal"><a href="#__codelineno-14-44">44</a></span>
+<span class="normal"><a href="#__codelineno-14-45">45</a></span>
+<span class="normal"><a href="#__codelineno-14-46">46</a></span>
+<span class="normal"><a href="#__codelineno-14-47">47</a></span>
+<span class="normal"><a href="#__codelineno-14-48">48</a></span>
+<span class="normal"><a href="#__codelineno-14-49">49</a></span>
+<span class="normal"><a href="#__codelineno-14-50">50</a></span>
+<span class="normal"><a href="#__codelineno-14-51">51</a></span>
+<span class="normal"><a href="#__codelineno-14-52">52</a></span>
+<span class="normal"><a href="#__codelineno-14-53">53</a></span>
+<span class="normal"><a href="#__codelineno-14-54">54</a></span>
+<span class="normal"><a href="#__codelineno-14-55">55</a></span>
+<span class="normal"><a href="#__codelineno-14-56">56</a></span>
+<span class="normal"><a href="#__codelineno-14-57">57</a></span>
+<span class="normal"><a href="#__codelineno-14-58">58</a></span>
+<span class="normal"><a href="#__codelineno-14-59">59</a></span>
+<span class="normal"><a href="#__codelineno-14-60">60</a></span>
+<span class="normal"><a href="#__codelineno-14-61">61</a></span>
+<span class="normal"><a href="#__codelineno-14-62">62</a></span>
+<span class="normal"><a href="#__codelineno-14-63">63</a></span>
+<span class="normal"><a href="#__codelineno-14-64">64</a></span>
+<span class="normal"><a href="#__codelineno-14-65">65</a></span>
+<span class="normal"><a href="#__codelineno-14-66">66</a></span>
+<span class="normal"><a href="#__codelineno-14-67">67</a></span>
+<span class="normal"><a href="#__codelineno-14-68">68</a></span>
+<span class="normal"><a href="#__codelineno-14-69">69</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1"></a><span class="kn">import</span> <span class="nn">json</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2"></a><span class="kn">import</span> <span class="nn">os</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3"></a><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4"></a>
+<a id="__codelineno-14-5" name="__codelineno-14-5"></a><span class="kn">import</span> <span class="nn">boto3</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6"></a><span class="kn">import</span> <span class="nn">jwt</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7"></a><span class="kn">import</span> <span class="nn">sm_utils</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8"></a>
+<a id="__codelineno-14-9" name="__codelineno-14-9"></a>
+<a id="__codelineno-14-10" name="__codelineno-14-10"></a><span class="nd">@dataclass</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11"></a><span class="k">class</span> <span class="nc">Input</span><span class="p">:</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12"></a>    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13"></a>    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14"></a>
+<a id="__codelineno-14-15" name="__codelineno-14-15"></a>
+<a id="__codelineno-14-16" name="__codelineno-14-16"></a><span class="nd">@dataclass</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17"></a><span class="k">class</span> <span class="nc">Output</span><span class="p">:</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18"></a>    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-14-19" name="__codelineno-14-19"></a>
+<a id="__codelineno-14-20" name="__codelineno-14-20"></a>
+<a id="__codelineno-14-21" name="__codelineno-14-21"></a><span class="k">def</span> <span class="nf">decrypt_with_kms</span><span class="p">(</span><span class="n">ciphertext_blob</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">kms_key_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-14-22" name="__codelineno-14-22"></a>    <span class="n">kms_client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;kms&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-23" name="__codelineno-14-23"></a>
+<a id="__codelineno-14-24" name="__codelineno-14-24"></a>    <span class="c1"># Then you can pass the decoded string to the decrypt method</span>
+<a id="__codelineno-14-25" name="__codelineno-14-25"></a>    <span class="n">response</span> <span class="o">=</span> <span class="n">kms_client</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">CiphertextBlob</span><span class="o">=</span><span class="nb">bytes</span><span class="p">(</span><span class="n">ciphertext_blob</span><span class="p">),</span> <span class="n">KeyId</span><span class="o">=</span><span class="n">kms_key_id</span><span class="p">)</span>
+<a id="__codelineno-14-26" name="__codelineno-14-26"></a>    <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;Plaintext&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+<a id="__codelineno-14-27" name="__codelineno-14-27"></a>
+<a id="__codelineno-14-28" name="__codelineno-14-28"></a>
+<a id="__codelineno-14-29" name="__codelineno-14-29"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<a id="__codelineno-14-30" name="__codelineno-14-30"></a>    <span class="c1"># Retrieve the DynamoDB table name and KMS key ID from environment variables.</span>
+<a id="__codelineno-14-31" name="__codelineno-14-31"></a>    <span class="n">AUTH_TABLE_NAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;AUTH_TABLE_NAME&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-32" name="__codelineno-14-32"></a>    <span class="n">KMS_KEY_ID</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;KMS_KEY_ID&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-33" name="__codelineno-14-33"></a>    <span class="n">JWT_SECRET_NAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;JWT_SECRET_NAME&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-34" name="__codelineno-14-34"></a>
+<a id="__codelineno-14-35" name="__codelineno-14-35"></a>    <span class="n">JWT_SECRET</span> <span class="o">=</span> <span class="n">sm_utils</span><span class="o">.</span><span class="n">get_secret</span><span class="p">(</span><span class="n">JWT_SECRET_NAME</span><span class="p">)</span>
+<a id="__codelineno-14-36" name="__codelineno-14-36"></a>
+<a id="__codelineno-14-37" name="__codelineno-14-37"></a>    <span class="c1"># Parse the request body to get user credentials.</span>
+<a id="__codelineno-14-38" name="__codelineno-14-38"></a>    <span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;body&quot;</span><span class="p">])</span>
+<a id="__codelineno-14-39" name="__codelineno-14-39"></a>    <span class="n">email</span> <span class="o">=</span> <span class="n">body</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span>
+<a id="__codelineno-14-40" name="__codelineno-14-40"></a>    <span class="n">password</span> <span class="o">=</span> <span class="n">body</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">]</span>
+<a id="__codelineno-14-41" name="__codelineno-14-41"></a>
+<a id="__codelineno-14-42" name="__codelineno-14-42"></a>    <span class="c1"># Initialize a DynamoDB resource.</span>
+<a id="__codelineno-14-43" name="__codelineno-14-43"></a>    <span class="n">dynamodb</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s2">&quot;dynamodb&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-44" name="__codelineno-14-44"></a>    <span class="n">auth_table</span> <span class="o">=</span> <span class="n">dynamodb</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">AUTH_TABLE_NAME</span><span class="p">)</span>
+<a id="__codelineno-14-45" name="__codelineno-14-45"></a>
+<a id="__codelineno-14-46" name="__codelineno-14-46"></a>    <span class="c1"># Retrieve user data from DynamoDB.</span>
+<a id="__codelineno-14-47" name="__codelineno-14-47"></a>    <span class="n">response</span> <span class="o">=</span> <span class="n">auth_table</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">Key</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;PK&quot;</span><span class="p">:</span> <span class="n">email</span><span class="p">})</span>
+<a id="__codelineno-14-48" name="__codelineno-14-48"></a>    <span class="n">user</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Item&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-49" name="__codelineno-14-49"></a>
+<a id="__codelineno-14-50" name="__codelineno-14-50"></a>    <span class="c1"># Check if user exists.</span>
+<a id="__codelineno-14-51" name="__codelineno-14-51"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+<a id="__codelineno-14-52" name="__codelineno-14-52"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">401</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;User not found&quot;</span><span class="p">})}</span>
+<a id="__codelineno-14-53" name="__codelineno-14-53"></a>
+<a id="__codelineno-14-54" name="__codelineno-14-54"></a>    <span class="c1"># Check if user exists and password matches.</span>
+<a id="__codelineno-14-55" name="__codelineno-14-55"></a>    <span class="n">encrypted_password</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-56" name="__codelineno-14-56"></a>    <span class="n">decrypted_password</span> <span class="o">=</span> <span class="n">decrypt_with_kms</span><span class="p">(</span><span class="n">encrypted_password</span><span class="p">,</span> <span class="n">KMS_KEY_ID</span><span class="p">)</span>
+<a id="__codelineno-14-57" name="__codelineno-14-57"></a>
+<a id="__codelineno-14-58" name="__codelineno-14-58"></a>    <span class="c1"># Compare the decrypted password with the provided one.</span>
+<a id="__codelineno-14-59" name="__codelineno-14-59"></a>    <span class="k">if</span> <span class="n">password</span> <span class="o">==</span> <span class="n">decrypted_password</span><span class="p">:</span>
+<a id="__codelineno-14-60" name="__codelineno-14-60"></a>        <span class="c1"># Generate JWT token</span>
+<a id="__codelineno-14-61" name="__codelineno-14-61"></a>        <span class="n">status_code</span> <span class="o">=</span> <span class="mi">200</span>
+<a id="__codelineno-14-62" name="__codelineno-14-62"></a>        <span class="n">token</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">({</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">email</span><span class="p">},</span> <span class="n">JWT_SECRET</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;HS256&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-63" name="__codelineno-14-63"></a>        <span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">token</span><span class="p">})</span>
+<a id="__codelineno-14-64" name="__codelineno-14-64"></a>
+<a id="__codelineno-14-65" name="__codelineno-14-65"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-14-66" name="__codelineno-14-66"></a>        <span class="n">status_code</span> <span class="o">=</span> <span class="mi">401</span>
+<a id="__codelineno-14-67" name="__codelineno-14-67"></a>        <span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid credentials&quot;</span><span class="p">})</span>
+<a id="__codelineno-14-68" name="__codelineno-14-68"></a>
+<a id="__codelineno-14-69" name="__codelineno-14-69"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="n">status_code</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="n">body</span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+<p>Note that upon matching the input password with the encrypted password, the email is encoded within the JWT token and returned to the client, specifically on line 62. This step is crucial for facilitating retrieval of this information at a later stage.</p>
+<p>Now, let's move on to configure the signin function.</p>
+<div class="highlight"><span class="filename">functions/auth/signup/config.py</span><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">class</span> <span class="nc">SigninConfig</span><span class="p">:</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Signin&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/auth&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Authenticate user login by verifying email and password against stored credentials&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>            <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;signin&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="hll">            <span class="n">layers</span><span class="o">=</span><span class="p">[</span><span class="n">services</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">sm_utils_layer</span><span class="p">,</span> <span class="n">services</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">pyjwt_layer</span><span class="p">],</span>
+</span><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
+</span><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="hll">                <span class="s2">&quot;AUTH_TABLE_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span>
+</span><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="hll">                <span class="s2">&quot;KMS_KEY_ID&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">kms</span><span class="o">.</span><span class="n">auth_key</span><span class="o">.</span><span class="n">key_id</span><span class="p">,</span>
+</span><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="hll">                <span class="s2">&quot;JWT_SECRET_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">secrets_manager</span><span class="o">.</span><span class="n">jwt_secret</span><span class="o">.</span><span class="n">secret_name</span><span class="p">,</span>
+</span><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="hll">            <span class="p">},</span>
+</span><a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>        <span class="p">)</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>        <span class="n">services</span><span class="o">.</span><span class="n">api_gateway</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;/signin&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">dynamodb</span><span class="o">.</span><span class="n">auth_table</span><span class="o">.</span><span class="n">grant_read_data</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</span><a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">kms</span><span class="o">.</span><span class="n">auth_key</span><span class="o">.</span><span class="n">grant_decrypt</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</span><a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>
+<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">secrets_manager</span><span class="o">.</span><span class="n">jwt_secret</span><span class="o">.</span><span class="n">grant_read</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="creating-the-jwt-authorizer">Creating the JWT Authorizer</h2>
+<p>Now that we have the signin function, it returns a token to the client, typically a frontend application, which must include this token in the headers of subsequent requests protected by the JWT authorizer. The authorizer's role is to decode if the token was generated with the same hash as its creation, and if so, decode the token and pass the email to the protected functions.</p>
+<p>With that being said, let's proceed with its implementation.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>forge authorizer jwt --description &quot;A jwt authorizer for private lambda functions&quot; --no-tests
+</code></pre></div>
+<p>This command creates a new <code>jwt</code> authorizer under the <code>authorizers</code> folder.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>authorizers
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>  └── jwt
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>      ├── __init__.py
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>      ├── config.py
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>      └── main.py
+</code></pre></div>
+<p>Now, let's proceed with the implementation.</p>
+<div class="highlight"><span class="filename">authorizers/jwt/main.py</span><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">import</span> <span class="nn">os</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kn">import</span> <span class="nn">jwt</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kn">import</span> <span class="nn">sm_utils</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="c1"># Extract the JWT token from the event</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="n">token</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authorization&quot;</span><span class="p">)</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>    <span class="c1"># Retrieve the JWT secret from Secrets Manager</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>    <span class="n">JWT_SECRET_NAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;JWT_SECRET_NAME&quot;</span><span class="p">)</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>    <span class="n">JWT_SECRET</span> <span class="o">=</span> <span class="n">sm_utils</span><span class="o">.</span><span class="n">get_secret</span><span class="p">(</span><span class="n">JWT_SECRET_NAME</span><span class="p">)</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a>        <span class="c1"># Decode the JWT token</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>        <span class="n">decoded_token</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">JWT_SECRET</span><span class="p">,</span> <span class="n">algorithms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;HS256&quot;</span><span class="p">])</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>        <span class="n">effect</span> <span class="o">=</span> <span class="s2">&quot;allow&quot;</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>        <span class="n">email</span> <span class="o">=</span> <span class="n">decoded_token</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">)</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>    <span class="k">except</span><span class="p">:</span>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>        <span class="n">effect</span> <span class="o">=</span> <span class="s2">&quot;deny&quot;</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a>        <span class="n">email</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a>    <span class="c1"># Set the decoded email as context</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a>    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">email</span><span class="p">}</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a>
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a>    <span class="c1"># Allow access with the user&#39;s email</span>
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a>    <span class="k">return</span> <span class="p">{</span>
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a>        <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">context</span><span class="p">,</span>
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a>        <span class="s2">&quot;policyDocument&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a>            <span class="s2">&quot;Version&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-10-17&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a>            <span class="s2">&quot;Statement&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-18-32" name="__codelineno-18-32" href="#__codelineno-18-32"></a>                <span class="p">{</span>
+<a id="__codelineno-18-33" name="__codelineno-18-33" href="#__codelineno-18-33"></a>                    <span class="s2">&quot;Action&quot;</span><span class="p">:</span> <span class="s2">&quot;execute-api:Invoke&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-34" name="__codelineno-18-34" href="#__codelineno-18-34"></a>                    <span class="s2">&quot;Effect&quot;</span><span class="p">:</span> <span class="n">effect</span><span class="p">,</span>
+<a id="__codelineno-18-35" name="__codelineno-18-35" href="#__codelineno-18-35"></a>                    <span class="s2">&quot;Resource&quot;</span><span class="p">:</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;methodArn&quot;</span><span class="p">],</span>
+<a id="__codelineno-18-36" name="__codelineno-18-36" href="#__codelineno-18-36"></a>                <span class="p">}</span>
+<a id="__codelineno-18-37" name="__codelineno-18-37" href="#__codelineno-18-37"></a>            <span class="p">],</span>
+<a id="__codelineno-18-38" name="__codelineno-18-38" href="#__codelineno-18-38"></a>        <span class="p">},</span>
+<a id="__codelineno-18-39" name="__codelineno-18-39" href="#__codelineno-18-39"></a>    <span class="p">}</span>
+</code></pre></div>
+<p>This function attempts to decode the token received in the headers under the key <code>authorization</code> using the same JWT secret stored in Secrets Manager that was used during its generation. If successful, it retrieves the hashed email from the signin function and passes it as context.</p>
+<p>Now, let's set up our new JWT authorizer.</p>
+<div class="highlight"><span class="filename">authorizers/jwt/config.py</span><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="k">class</span> <span class="nc">JwtAuthorizerConfig</span><span class="p">:</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;JwtAuthorizer&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./authorizers/jwt&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A jwt authorizer for private lambda functions&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="hll">            <span class="n">layers</span><span class="o">=</span><span class="p">[</span><span class="n">services</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">sm_utils_layer</span><span class="p">,</span> <span class="n">services</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">pyjwt_layer</span><span class="p">],</span>
+</span><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="hll">            <span class="n">environment</span><span class="o">=</span><span class="p">{</span>
+</span><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="hll">                <span class="s2">&quot;JWT_SECRET_NAME&quot;</span><span class="p">:</span> <span class="n">services</span><span class="o">.</span><span class="n">secrets_manager</span><span class="o">.</span><span class="n">jwt_secret</span><span class="o">.</span><span class="n">secret_name</span>
+</span><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="hll">            <span class="p">},</span>
+</span><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>        <span class="p">)</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">api_gateway</span><span class="o">.</span><span class="n">create_authorizer</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;jwt&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a>
+<a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">secrets_manager</span><span class="o">.</span><span class="n">jwt_secret</span><span class="o">.</span><span class="n">grant_read</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="creating-a-private-function">Creating a Private Function</h2>
+<p>Now it's time to create a simple private function that can only be acessible through requests that passes the validations made through the authorizer.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>forge function hello --method &quot;GET&quot; --description &quot;A private function&quot; --no-tests
+</code></pre></div>
+<p>This command creates a standalone function in the root of the <code>functions</code> folder.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>functions
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>└── hello
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    ├── __init__.py
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    ├── config.py
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    └── main.py
+</code></pre></div>
+<p>Now, let's implement a very straightforward function that should simply retrieve the email decoded by the authorizer and return it to the user.</p>
+<div class="highlight"><span class="filename">functions/hello/main.py</span><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kn">import</span> <span class="nn">json</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="nd">@dataclass</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="k">class</span> <span class="nc">Input</span><span class="p">:</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    <span class="k">pass</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="nd">@dataclass</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="k">class</span> <span class="nc">Output</span><span class="p">:</span>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>    <span class="n">email</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s2">&quot;requestContext&quot;</span><span class="p">][</span><span class="s2">&quot;authorizer&quot;</span><span class="p">][</span><span class="s2">&quot;email&quot;</span><span class="p">]</span>
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a>
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a>    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Hello, </span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">})}</span>
+</code></pre></div>
+<p>Finally, it's configuration.</p>
+<div class="highlight"><span class="filename">functions/hello/config.py</span><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kn">from</span> <span class="nn">infra.services</span> <span class="kn">import</span> <span class="n">Services</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="k">class</span> <span class="nc">HelloConfig</span><span class="p">:</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">services</span><span class="p">:</span> <span class="n">Services</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>        <span class="n">function</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">aws_lambda</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a>            <span class="n">path</span><span class="o">=</span><span class="s2">&quot;./functions/hello&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a>            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A private function&quot;</span><span class="p">,</span>
+<a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a>        <span class="p">)</span>
+<a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a>
+<a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="hll">        <span class="n">services</span><span class="o">.</span><span class="n">api_gateway</span><span class="o">.</span><span class="n">create_endpoint</span><span class="p">(</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;/hello&quot;</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">authorizer</span><span class="o">=</span><span class="s2">&quot;jwt&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Note that because we didn't specify the JWT authorizer as default, and this function isn't marked as public, we need to explicitly pass the authorizer's name to the <code>create_endpoint</code> method.</p>
+<h2 id="deploying-the-functions">Deploying the Functions</h2>
+<p>Next, we'll commit our code and push it to GitHub, following these steps:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># Send your changes to stage</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c1"># Commit with a descriptive message</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;JWT Authentication System&quot;</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="c1"># Push changes to the &#39;dev&#39; branch</span>
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>dev
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="c1"># Merge &#39;dev&#39; into &#39;staging&#39; and push</span>
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a>git<span class="w"> </span>checkout<span class="w"> </span>staging
+<a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a>git<span class="w"> </span>merge<span class="w"> </span>dev
+<a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>staging
+<a id="__codelineno-24-14" name="__codelineno-24-14" href="#__codelineno-24-14"></a>
+<a id="__codelineno-24-15" name="__codelineno-24-15" href="#__codelineno-24-15"></a><span class="c1"># Finally, merge &#39;staging&#39; into &#39;main&#39; and push</span>
+<a id="__codelineno-24-16" name="__codelineno-24-16" href="#__codelineno-24-16"></a>git<span class="w"> </span>checkout<span class="w"> </span>main
+<a id="__codelineno-24-17" name="__codelineno-24-17" href="#__codelineno-24-17"></a>git<span class="w"> </span>merge<span class="w"> </span>staging
+<a id="__codelineno-24-18" name="__codelineno-24-18" href="#__codelineno-24-18"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+</code></pre></div>
+<p>This sequence ensures our code passes through development, staging, and finally, production environments, activating our three distinct deployment pipelines.</p>
+<p><img alt="Pipelines running" src="../images/three_example_pipelines.png" /></p>
+<p>After the pipelines complete, the Authentication system should be available across development, staging, and production stages.</p>
+<h2 id="testing-the-functions">Testing the Functions</h2>
+<p>Let's start by testing the signup function with the credentials below:</p>
+<ul>
+<li>Email: <code>tutorial@lambda-forge.com</code></li>
+<li>Password: <code>12345678</code></li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>curl --request POST \
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>  --url https://api.lambda-forge.com/signup \
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>  --header &#39;Content-Type: application/json&#39; \
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>  --data &#39;{
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>    &quot;email&quot;: &quot;tutorial@lambda-forge.com&quot;,
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a>    &quot;password&quot;: &quot;12345678&quot;
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>}&#39;
+</code></pre></div>
+<p>The endpoint returns a status code <code>201</code>.</p>
+<p>However, if we navigate to the <code>Prod-Auth</code> Table on the Dynamo DB console, we'll notice that the password stored isn't simply <code>12345678</code>, but rather a significantly lengthy hash string:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>AQICAHinYrMBzzQKgEowcHc4llDo3C5gg+cRawehAsWTMZ24iwEvX3NrQs9oYi0hD2YnB28hAAAAZjBkBgkqhkiG9w0BBwagVzBVAgEAMFAGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMEeMCuyCVk4C+Nr4OAgEQgCOEKlx01+tGfqKTNXSktApuxUI31EnwzLt7GdW0wdXrT+Yu+A==
+</code></pre></div>
+<p>This showcases the robustness of the security measures in place to safeguard passwords.</p>
+<p>Now, let's utilize the same credentials to log in:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>curl --request POST \
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>  --url https://api.lambda-forge.com/signin \
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>  --header &#39;Content-Type: application/json&#39; \
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>  --data &#39;{
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>    &quot;email&quot;: &quot;tutorial@lambdaforge.com&quot;,
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>    &quot;password&quot;: &quot;12345678&quot;
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>}&#39;
+</code></pre></div>
+<p>The signin endpoint returns a token:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">{</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="nt">&quot;token&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InR1dG9yaWFsQGxhbWJkYWZvcmdlLmNvbSJ9.ppQLiYZ-6AtHdwaCb-H-vJnjTCle9ppULqq5-TqVPjk&quot;</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>Next, let's attempt a GET request to the hello function without headers:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>curl --request GET \
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>  --url https://api.lambda-forge.com/hello
+</code></pre></div>
+<p>This returns the message:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">{</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">  </span><span class="nt">&quot;Message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;User is not authorized to access this resource with an explicit deny&quot;</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>However, if we pass the token generated by the signin function:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>curl --request GET \
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>  --url https://api.lambda-forge.com/hello \
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>  --header &#39;authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InR1dG9yaWFsQGxhbWJkYWZvcmdlLmNvbSJ9.ppQLiYZ-6AtHdwaCb-H-vJnjTCle9ppULqq5-TqVPjk&#39;
+</code></pre></div>
+<p>We receive the desired output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">{</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello, tutorial@lambda-forge.com!&quot;</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>🎉 Congratulations! You've successfully implemented a JWT authentication system, securing your endpoints.🔒</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2024 Guilherme Alves Pimenta
+
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/GuiPimenta-Dev/lambda-forge" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/guilhermealvespimenta/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://web.telegram.org/a/#6950159714" target="_blank" rel="noopener" title="web.telegram.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M248 8C111.033 8 0 119.033 0 256s111.033 248 248 248 248-111.033 248-248S384.967 8 248 8Zm114.952 168.66c-3.732 39.215-19.881 134.378-28.1 178.3-3.476 18.584-10.322 24.816-16.948 25.425-14.4 1.326-25.338-9.517-39.287-18.661-21.827-14.308-34.158-23.215-55.346-37.177-24.485-16.135-8.612-25 5.342-39.5 3.652-3.793 67.107-61.51 68.335-66.746.153-.655.3-3.1-1.154-4.384s-3.59-.849-5.135-.5q-3.283.746-104.608 69.142-14.845 10.194-26.894 9.934c-8.855-.191-25.888-5.006-38.551-9.123-15.531-5.048-27.875-7.717-26.8-16.291q.84-6.7 18.45-13.7 108.446-47.248 144.628-62.3c68.872-28.647 83.183-33.623 92.511-33.789 2.052-.034 6.639.474 9.61 2.885a10.452 10.452 0 0 1 3.53 6.716 43.765 43.765 0 0 1 .417 9.769Z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

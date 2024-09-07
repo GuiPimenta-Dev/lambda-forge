@@ -1,0 +1,112 @@
+[
+    {
+        "name": "SecretAuthorizer",
+        "path": "./authorizers/secret",
+        "description": "An authorizer based on a secret",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
+        "name": "Start",
+        "path": "./functions/web_crawler/start",
+        "description": "handle start command",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/start",
+                "method": "POST",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "sqs",
+                "resource": "crawler_queue"
+            }
+        ]
+    },
+    {
+        "name": "Crawler",
+        "path": "./functions/web_crawler/crawler",
+        "description": "crawl the websites",
+        "timeout": 900,
+        "triggers": [
+            {
+                "service": "sqs",
+                "trigger": "crawler_queue"
+            }
+        ],
+        "invocations": [
+            {
+                "service": "sqs",
+                "resource": "crawler_queue"
+            },
+            {
+                "service": "dynamodb",
+                "resource": "visited_urls_table"
+            }
+        ]
+    },
+    {
+        "name": "AskQuestion",
+        "path": "./functions/rag/ask_question",
+        "description": "anything",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/ask",
+                "method": "GET",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "AskQuestionsToLLM",
+        "path": "./functions/rag/ask_questions",
+        "description": "ask for llm",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/question",
+                "method": "GET",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "CreateVectors",
+        "path": "./functions/rag/create_vectors",
+        "description": "vectorize the scraped data",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/vectors",
+                "method": "POST",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "Textual",
+        "path": "./functions/rag/textual",
+        "description": "Lambda Forge telegram webhook for Textual",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/textual",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": []
+    }
+]

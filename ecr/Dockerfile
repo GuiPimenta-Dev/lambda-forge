@@ -5,7 +5,7 @@ WORKDIR /lambda-forge
 COPY . /lambda-forge
 
 # Install nvm with Node.js and npm
-ENV NODE_VERSION=16.13.0
+ENV NODE_VERSION=18.18.0
 RUN apt-get update \
   && apt-get install -y curl jq 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -19,13 +19,14 @@ RUN npm --version
 
 # Install Node.js dependencies
 RUN apt-get update && apt-get install -y gnupg \
-  && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
-  && apt-get install -y nodejs graphviz \
   && apt-get clean && rm -rf /var/lib/apt/lists/* \ 
-  && npm install -g aws-cdk redoc-cli
+  && npm install -g aws-cdk redoc-cli cdk-assets@2
+
+RUN node --version
+RUN npm --version
 
 # Install Python dependencies
 RUN pip install --upgrade pip \
   && pip install pyyaml pytest-html coverage awscli boto3==1.33.2 botocore==1.33.2 \ 
   && pip install -r base-requirements.txt \ 
-  && pip install lambda-forge --extra-index-url https://pypi.org/simple --extra-index-url https://test.pypi.org/simple/ --upgrade
+  && pip install lambda-forge

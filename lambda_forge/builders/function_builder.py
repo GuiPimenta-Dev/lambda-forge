@@ -22,7 +22,9 @@ class FunctionBuilder(FileService):
 
     def with_config(self, belongs):
         self.belongs = belongs
-        self.pascal_name = "".join(word.capitalize() for word in self.function_name.split("_"))
+        self.pascal_name = "".join(
+            word.capitalize() for word in self.function_name.split("_")
+        )
         directory = f'directory="{self.function_name}"' if belongs else ""
         self.config = f"""from infra.services import Services
 
@@ -120,12 +122,18 @@ def test_lambda_handler():
     def with_lambda_stack(self, docs=False):
         self.lambda_stack = self.read_lines("infra/stacks/lambda_stack.py")
 
-        folder = f"functions.{self.belongs}.{self.function_name}" if self.belongs else f"functions.{self.function_name}"
+        folder = (
+            f"functions.{self.belongs}.{self.function_name}"
+            if self.belongs
+            else f"functions.{self.function_name}"
+        )
 
         if folder in self.lambda_stack:
             return self
 
-        self.lambda_stack.insert(0, f"from {folder}.config import {self.pascal_name}Config\n")
+        self.lambda_stack.insert(
+            0, f"from {folder}.config import {self.pascal_name}Config\n"
+        )
 
         directory = self.belongs or self.function_name
         comment = "".join(word.capitalize() for word in directory.split("_"))

@@ -1,0 +1,2043 @@
+<!-- Elements added to main will be displayed on all pages -->
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../custom-codepipeline-steps/">
+      
+      
+        <link rel="next" href="../docs-generation/">
+      
+      
+      <link rel="icon" href="../../images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.28">
+    
+    
+      
+        <title>CodePipeline - Lambda Forge</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+<script>
+var gtmId = 'GTM-TQPKQK7';
+if (typeof window !== 'undefined' && window.location.href.includes('127.0.0.1')) {
+  gtmId = 'GTM-XXX'
+}
+(function(w,d,s,l,i){
+  w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer', gtmId);
+</script>
+
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://unpkg.com/mermaid@8.5.1/dist/mermaid.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#multi-stage-environments-with-aws-codepipeline" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Lambda Forge" class="md-header__button md-logo" aria-label="Lambda Forge" data-md-component="logo">
+      
+  <img src="../../images/favicon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Lambda Forge
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CodePipeline
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../getting-started/" class="md-tabs__link">
+          
+  
+  Docs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../examples/introduction/" class="md-tabs__link">
+          
+  
+  Example Projects
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../license/license/" class="md-tabs__link">
+        
+  
+    
+  
+  License
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Lambda Forge" class="md-nav__button md-logo" aria-label="Lambda Forge" data-md-component="logo">
+      
+  <img src="../../images/favicon.png" alt="logo">
+
+    </a>
+    Lambda Forge
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Docs
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creating-a-hello-world/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Creating a Hello World
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-services/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS Services
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../securing-endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authorizers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lambda-layers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Lambda Layers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../live-development/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Live Development
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-codepipeline-steps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CodeBuild Steps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    CodePipeline
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    CodePipeline
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#development-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development Environment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#development-environment-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development Environment Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dev-pipeline-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dev Pipeline Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-wikis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Wikis
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-the-dev-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the Dev Environment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#staging-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Staging Environment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Staging Environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#staging-environment-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Staging Environment Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#staging-pipeline-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Staging Pipeline Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-the-validatetodo-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding the ValidateTodo Step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-the-staging-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the Staging Environment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolving-the-initial-staging-deployment-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resolving the Initial Staging Deployment Error
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production Environment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Production Environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#production-environment-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production Environment Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-pipeline-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production Pipeline Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-the-production-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the Production Environment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-new-pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating new Pipelines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docs-generation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docs Generation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Example Projects
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Example Projects
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Begginer
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            Begginer
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/guess-the-number/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Guess The Number
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/url-shortener/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    URL Shortener
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/image-to-qr-code-converter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Image to QR Code
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Intermediate
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Intermediate
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/jwt-authentication/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    JWT Authentication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/real-time-chat/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Real-Time Chat
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/blog/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog Application
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../license/license/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    License
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#development-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development Environment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Development Environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#development-environment-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development Environment Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dev-pipeline-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dev Pipeline Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-wikis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Wikis
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-the-dev-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the Dev Environment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#staging-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Staging Environment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Staging Environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#staging-environment-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Staging Environment Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#staging-pipeline-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Staging Pipeline Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-the-validatetodo-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding the ValidateTodo Step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-the-staging-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the Staging Environment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolving-the-initial-staging-deployment-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resolving the Initial Staging Deployment Error
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#production-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production Environment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Production Environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#production-environment-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production Environment Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#production-pipeline-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Production Pipeline Workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploying-the-production-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying the Production Environment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-new-pipelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      Creating new Pipelines
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="multi-stage-environments-with-aws-codepipeline">Multi-Stage Environments With AWS CodePipeline</h1>
+<p>In practical scenarios, it is highly recommended to adopt a multi-stage development approach. This strategy allows you to freely develop and test your code in isolated environments without affecting your live production environment and, consequently, the real-world users of your application.</p>
+<p>In Lambda Forge, the pipelines for development, staging, and production are meticulously organized within distinct files, found at <code>infra/stacks/dev_stack.py</code>, <code>infra/stacks/staging_stack.py</code>, and <code>infra/stacks/prod_stack.py</code>, respectively.</p>
+<p>Each stage is designed to operate with its own set of isolated resources, to ensure that changes in one environment do not inadvertently affect another.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Lambda Forge provides a suggested pipeline configuration for each stage of deployment. You're encouraged to customize these pipelines to fit your project's needs. Whether adding new steps, adjusting existing ones, reordering or even removing some of them.
+</p>
+</div>
+
+<h2 id="development-environment">Development Environment</h2>
+<p>The <code>Development</code> environment is where the initial coding and feature implementation occur, allowing developers to make frequent changes and test new ideas in an isolated environment.</p>
+<p>This environment is strategically structured to facilitate rapid deployments, allowing new features to be rolled out directly without undergoing any preliminary validation steps. It functions essentially as a sandbox environment, providing developers with a space to both develop and test new features in a fast-paced and flexible setting. This approach enables immediate feedback and iterative improvements, streamlining the development process.</p>
+<h3 id="development-environment-configuration">Development Environment Configuration</h3>
+<p>This section details the setup process for the development environment.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/dev_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-0-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-0-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-0-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-0-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-0-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-0-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-0-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-0-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-0-10">10</a></span>
+<span class="normal"><a href="#__codelineno-0-11">11</a></span>
+<span class="normal"><a href="#__codelineno-0-12">12</a></span>
+<span class="normal"><a href="#__codelineno-0-13">13</a></span>
+<span class="normal"><a href="#__codelineno-0-14">14</a></span>
+<span class="normal"><a href="#__codelineno-0-15">15</a></span>
+<span class="normal"><a href="#__codelineno-0-16">16</a></span>
+<span class="normal"><a href="#__codelineno-0-17">17</a></span>
+<span class="normal"><a href="#__codelineno-0-18">18</a></span>
+<span class="normal"><a href="#__codelineno-0-19">19</a></span>
+<span class="normal"><a href="#__codelineno-0-20">20</a></span>
+<span class="normal"><a href="#__codelineno-0-21">21</a></span>
+<span class="normal"><a href="#__codelineno-0-22">22</a></span>
+<span class="normal"><a href="#__codelineno-0-23">23</a></span>
+<span class="normal"><a href="#__codelineno-0-24">24</a></span>
+<span class="normal"><a href="#__codelineno-0-25">25</a></span>
+<span class="normal"><a href="#__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#__codelineno-0-37">37</a></span>
+<span class="normal"><a href="#__codelineno-0-38">38</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">aws_cdk</span> <span class="k">as</span> <span class="nn">cdk</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_codebuild</span> <span class="k">as</span> <span class="n">codebuild</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">pipelines</span> <span class="k">as</span> <span class="n">pipelines</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="kn">from</span> <span class="nn">aws_cdk.pipelines</span> <span class="kn">import</span> <span class="n">CodePipelineSource</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5"></a><span class="kn">from</span> <span class="nn">constructs</span> <span class="kn">import</span> <span class="n">Construct</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6"></a><span class="kn">from</span> <span class="nn">infra.stages.deploy</span> <span class="kn">import</span> <span class="n">DeployStage</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8"></a><span class="kn">from</span> <span class="nn">lambda_forge.constants</span> <span class="kn">import</span> <span class="n">ECR</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9"></a><span class="kn">from</span> <span class="nn">lambda_forge.context</span> <span class="kn">import</span> <span class="n">context</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10"></a><span class="kn">from</span> <span class="nn">lambda_forge.steps</span> <span class="kn">import</span> <span class="n">CodeBuildSteps</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11"></a>
+<a id="__codelineno-0-12" name="__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="nd">@context</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;Dev&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="s2">&quot;dev&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="k">class</span> <span class="nc">DevStack</span><span class="p">(</span><span class="n">cdk</span><span class="o">.</span><span class="n">Stack</span><span class="p">):</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">Construct</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">create_id</span><span class="p">(</span><span class="s2">&quot;Stack&quot;</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18"></a>        <span class="n">source</span> <span class="o">=</span> <span class="n">CodePipelineSource</span><span class="o">.</span><span class="n">git_hub</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">repo</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">repo</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;dev&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19"></a>
+<a id="__codelineno-0-20" name="__codelineno-0-20"></a>        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipelines</span><span class="o">.</span><span class="n">CodePipeline</span><span class="p">(</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21"></a>            <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22"></a>            <span class="s2">&quot;Pipeline&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23"></a>            <span class="n">pipeline_name</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">create_id</span><span class="p">(</span><span class="s2">&quot;Pipeline&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24"></a>            <span class="n">synth</span><span class="o">=</span><span class="n">pipelines</span><span class="o">.</span><span class="n">ShellStep</span><span class="p">(</span><span class="s2">&quot;Synth&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cdk synth&quot;</span><span class="p">]),</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25"></a>            <span class="n">code_build_defaults</span><span class="o">=</span><span class="n">pipelines</span><span class="o">.</span><span class="n">CodeBuildOptions</span><span class="p">(</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>                <span class="n">build_environment</span><span class="o">=</span><span class="n">codebuild</span><span class="o">.</span><span class="n">BuildEnvironment</span><span class="p">(</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a>                    <span class="n">build_image</span><span class="o">=</span><span class="n">codebuild</span><span class="o">.</span><span class="n">LinuxBuildImage</span><span class="o">.</span><span class="n">from_docker_registry</span><span class="p">(</span><span class="n">ECR</span><span class="o">.</span><span class="n">LATEST</span><span class="p">),</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>                <span class="p">)</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a>            <span class="p">),</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="p">)</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a>        <span class="n">steps</span> <span class="o">=</span> <span class="n">CodeBuildSteps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a>        <span class="c1"># post</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>        <span class="n">swagger</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">swagger</span><span class="p">()</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a>        <span class="n">redoc</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">redoc</span><span class="p">()</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="n">pipeline</span><span class="o">.</span><span class="n">add_stage</span><span class="p">(</span><span class="n">DeployStage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span> <span class="n">post</span><span class="o">=</span><span class="p">[</span><span class="n">swagger</span><span class="p">,</span> <span class="n">redoc</span><span class="p">])</span>
+</code></pre></div></td></tr></table></div>
+<p>On line 10, the <code>context</code> decorator assigns the stage name as <code>Dev</code> and configures the use of resources tagged as <code>dev</code> in the <code>cdk.json</code> file. Moreover, it imports some additional configuration variables from the <code>cdk.json</code> file, assigning them to the argument named <code>context</code>.</p>
+<p>Additionally, we incorporate the source code from the <code>dev</code> branch hosted on GitHub into the pipeline. Subsequently, we finalize the deployment of the Lambda functions by activating the <code>DeployStage</code>. Post-deployment, we generate <code>Swagger</code> and <code>Redoc</code> documentation using a helper class provided by Lambda Forge. This class utilizes the public Docker image hosted on ECR described in the previous chapter to facilitate these operations.</p>
+<h3 id="dev-pipeline-workflow">Dev Pipeline Workflow</h3>
+<p>The diagram below succinctly illustrates the default pipeline configuration for the <code>Dev</code> stage and established within the AWS CodePipeline.</p>
+<div style="text-align:center;">
+
+<div class="mermaid">graph TD;
+    Source --&gt; Build;
+    Build --&gt; UpdatePipeline
+    UpdatePipeline --&gt; Assets
+    Assets --&gt; Deployment
+    Deployment --&gt; Redoc
+    Deployment --&gt; Swagger</div>
+
+</div>
+
+<h3 id="adding-wikis">Adding Wikis</h3>
+<p>For project success through teamwork, prioritizing knowledge sharing is key. Leveraging wikis facilitates seamless information dissemination, ensuring everyone is on the same page.</p>
+<p>First, let's create a markdown file that we'll use as our document.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docs/
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>└── wikis/
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    └── wiki.md
+</code></pre></div>
+<p>Let's proceed by updating the pipeline to generate the S3 artifact containing our wikis.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/dev_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-38">38</a></span>
+<span class="normal"><a href="#__codelineno-2-39">39</a></span>
+<span class="normal"><a href="#__codelineno-2-40">40</a></span>
+<span class="normal"><a href="#__codelineno-2-41">41</a></span>
+<span class="normal"><a href="#__codelineno-2-42">42</a></span>
+<span class="normal"><a href="#__codelineno-2-43">43</a></span>
+<span class="normal"><a href="#__codelineno-2-44">44</a></span>
+<span class="normal"><a href="#__codelineno-2-45">45</a></span>
+<span class="normal"><a href="#__codelineno-2-46">46</a></span>
+<span class="normal"><a href="#__codelineno-2-47">47</a></span>
+<span class="normal"><a href="#__codelineno-2-48">48</a></span>
+<span class="normal"><a href="#__codelineno-2-49">49</a></span>
+<span class="normal"><a href="#__codelineno-2-50">50</a></span>
+<span class="normal"><a href="#__codelineno-2-51">51</a></span>
+<span class="normal"><a href="#__codelineno-2-52">52</a></span>
+<span class="normal"><a href="#__codelineno-2-53">53</a></span>
+<span class="normal"><a href="#__codelineno-2-54">54</a></span>
+<span class="normal"><a href="#__codelineno-2-55">55</a></span>
+<span class="normal"><a href="#__codelineno-2-56">56</a></span>
+<span class="normal"><a href="#__codelineno-2-57">57</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-38" name="__codelineno-2-38"></a>        <span class="c1"># post</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39"></a>        <span class="n">redoc</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">redoc</span><span class="p">()</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40"></a>        <span class="n">swagger</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">swagger</span><span class="p">()</span>
+<a id="__codelineno-2-41" name="__codelineno-2-41"></a><span class="hll">        <span class="n">wikis</span> <span class="o">=</span> <span class="p">[</span>
+</span><a id="__codelineno-2-42" name="__codelineno-2-42"></a><span class="hll">            <span class="p">{</span>
+</span><a id="__codelineno-2-43" name="__codelineno-2-43"></a><span class="hll">                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Wiki&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-2-44" name="__codelineno-2-44"></a><span class="hll">                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;docs/wikis/wiki.md&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-2-45" name="__codelineno-2-45"></a><span class="hll">                <span class="s2">&quot;favicon&quot;</span><span class="p">:</span> <span class="s2">&quot;https://docs.lambda-forge.com/images/favicon.png&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-2-46" name="__codelineno-2-46"></a><span class="hll">            <span class="p">}</span>
+</span><a id="__codelineno-2-47" name="__codelineno-2-47"></a><span class="hll">        <span class="p">]</span>
+</span><a id="__codelineno-2-48" name="__codelineno-2-48"></a><span class="hll">        <span class="n">wikis</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">wikis</span><span class="p">(</span><span class="n">wikis</span><span class="p">)</span>
+</span><a id="__codelineno-2-49" name="__codelineno-2-49"></a>
+<a id="__codelineno-2-50" name="__codelineno-2-50"></a>        <span class="n">pipeline</span><span class="o">.</span><span class="n">add_stage</span><span class="p">(</span>
+<a id="__codelineno-2-51" name="__codelineno-2-51"></a>            <span class="n">DeployStage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span>
+<a id="__codelineno-2-52" name="__codelineno-2-52"></a>            <span class="n">post</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-2-53" name="__codelineno-2-53"></a>                <span class="n">redoc</span><span class="p">,</span>
+<a id="__codelineno-2-54" name="__codelineno-2-54"></a>                <span class="n">swagger</span><span class="p">,</span>
+<a id="__codelineno-2-55" name="__codelineno-2-55"></a><span class="hll">                <span class="n">wikis</span><span class="p">,</span>
+</span><a id="__codelineno-2-56" name="__codelineno-2-56"></a>            <span class="p">]</span>
+<a id="__codelineno-2-57" name="__codelineno-2-57"></a>        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>Below is the diagram illustrating the updated pipeline configuration:</p>
+<div style="text-align:center;">
+
+<div class="mermaid">graph TD;
+    Source --&gt; Build;
+    Build --&gt; UpdatePipeline[Update Pipeline]
+    UpdatePipeline --&gt; Assets
+    Assets --&gt; Deployment
+    Deployment --&gt; Redoc
+    Deployment --&gt; Swagger
+    Deployment --&gt; Wikis</div>
+
+</div>
+
+<h3 id="deploying-the-dev-environment">Deploying the Dev Environment</h3>
+<p>After committing and pushing the code to Github, our pipeline should be triggered and updated with the latest configurations.</p>
+<p><img alt="alt text" src="../images/updated-dev.png" /></p>
+<h2 id="staging-environment">Staging Environment</h2>
+<p>The <code>Staging</code> environment serves as a near-replica of the production environment, enabling thorough testing and quality assurance processes to catch any bugs or issues before they reach the end-users.</p>
+<h3 id="staging-environment-configuration">Staging Environment Configuration</h3>
+<p>Let's take a deeper look in the staging configuration file.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/staging_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-3-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-3-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-3-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-3-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-3-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-3-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-3-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-3-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-3-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-3-10">10</a></span>
+<span class="normal"><a href="#__codelineno-3-11">11</a></span>
+<span class="normal"><a href="#__codelineno-3-12">12</a></span>
+<span class="normal"><a href="#__codelineno-3-13">13</a></span>
+<span class="normal"><a href="#__codelineno-3-14">14</a></span>
+<span class="normal"><a href="#__codelineno-3-15">15</a></span>
+<span class="normal"><a href="#__codelineno-3-16">16</a></span>
+<span class="normal"><a href="#__codelineno-3-17">17</a></span>
+<span class="normal"><a href="#__codelineno-3-18">18</a></span>
+<span class="normal"><a href="#__codelineno-3-19">19</a></span>
+<span class="normal"><a href="#__codelineno-3-20">20</a></span>
+<span class="normal"><a href="#__codelineno-3-21">21</a></span>
+<span class="normal"><a href="#__codelineno-3-22">22</a></span>
+<span class="normal"><a href="#__codelineno-3-23">23</a></span>
+<span class="normal"><a href="#__codelineno-3-24">24</a></span>
+<span class="normal"><a href="#__codelineno-3-25">25</a></span>
+<span class="normal"><a href="#__codelineno-3-26">26</a></span>
+<span class="normal"><a href="#__codelineno-3-27">27</a></span>
+<span class="normal"><a href="#__codelineno-3-28">28</a></span>
+<span class="normal"><a href="#__codelineno-3-29">29</a></span>
+<span class="normal"><a href="#__codelineno-3-30">30</a></span>
+<span class="normal"><a href="#__codelineno-3-31">31</a></span>
+<span class="normal"><a href="#__codelineno-3-32">32</a></span>
+<span class="normal"><a href="#__codelineno-3-33">33</a></span>
+<span class="normal"><a href="#__codelineno-3-34">34</a></span>
+<span class="normal"><a href="#__codelineno-3-35">35</a></span>
+<span class="normal"><a href="#__codelineno-3-36">36</a></span>
+<span class="normal"><a href="#__codelineno-3-37">37</a></span>
+<span class="normal"><a href="#__codelineno-3-38">38</a></span>
+<span class="normal"><a href="#__codelineno-3-39">39</a></span>
+<span class="normal"><a href="#__codelineno-3-40">40</a></span>
+<span class="normal"><a href="#__codelineno-3-41">41</a></span>
+<span class="normal"><a href="#__codelineno-3-42">42</a></span>
+<span class="normal"><a href="#__codelineno-3-43">43</a></span>
+<span class="normal"><a href="#__codelineno-3-44">44</a></span>
+<span class="normal"><a href="#__codelineno-3-45">45</a></span>
+<span class="normal"><a href="#__codelineno-3-46">46</a></span>
+<span class="normal"><a href="#__codelineno-3-47">47</a></span>
+<span class="normal"><a href="#__codelineno-3-48">48</a></span>
+<span class="normal"><a href="#__codelineno-3-49">49</a></span>
+<span class="normal"><a href="#__codelineno-3-50">50</a></span>
+<span class="normal"><a href="#__codelineno-3-51">51</a></span>
+<span class="normal"><a href="#__codelineno-3-52">52</a></span>
+<span class="normal"><a href="#__codelineno-3-53">53</a></span>
+<span class="normal"><a href="#__codelineno-3-54">54</a></span>
+<span class="normal"><a href="#__codelineno-3-55">55</a></span>
+<span class="normal"><a href="#__codelineno-3-56">56</a></span>
+<span class="normal"><a href="#__codelineno-3-57">57</a></span>
+<span class="normal"><a href="#__codelineno-3-58">58</a></span>
+<span class="normal"><a href="#__codelineno-3-59">59</a></span>
+<span class="normal"><a href="#__codelineno-3-60">60</a></span>
+<span class="normal"><a href="#__codelineno-3-61">61</a></span>
+<span class="normal"><a href="#__codelineno-3-62">62</a></span>
+<span class="normal"><a href="#__codelineno-3-63">63</a></span>
+<span class="normal"><a href="#__codelineno-3-64">64</a></span>
+<span class="normal"><a href="#__codelineno-3-65">65</a></span>
+<span class="normal"><a href="#__codelineno-3-66">66</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="kn">import</span> <span class="nn">aws_cdk</span> <span class="k">as</span> <span class="nn">cdk</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_codebuild</span> <span class="k">as</span> <span class="n">codebuild</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">pipelines</span> <span class="k">as</span> <span class="n">pipelines</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4"></a><span class="kn">from</span> <span class="nn">aws_cdk.pipelines</span> <span class="kn">import</span> <span class="n">CodePipelineSource</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5"></a><span class="kn">from</span> <span class="nn">constructs</span> <span class="kn">import</span> <span class="n">Construct</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6"></a><span class="kn">from</span> <span class="nn">infra.stages.deploy</span> <span class="kn">import</span> <span class="n">DeployStage</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8"></a><span class="kn">from</span> <span class="nn">lambda_forge.constants</span> <span class="kn">import</span> <span class="n">ECR</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9"></a><span class="kn">from</span> <span class="nn">lambda_forge.context</span> <span class="kn">import</span> <span class="n">context</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10"></a><span class="kn">from</span> <span class="nn">lambda_forge.steps</span> <span class="kn">import</span> <span class="n">CodeBuildSteps</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11"></a>
+<a id="__codelineno-3-12" name="__codelineno-3-12"></a>
+<a id="__codelineno-3-13" name="__codelineno-3-13"></a><span class="nd">@context</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;Staging&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="s2">&quot;staging&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14"></a><span class="k">class</span> <span class="nc">StagingStack</span><span class="p">(</span><span class="n">cdk</span><span class="o">.</span><span class="n">Stack</span><span class="p">):</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">Construct</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">create_id</span><span class="p">(</span><span class="s2">&quot;Stack&quot;</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17"></a>
+<a id="__codelineno-3-18" name="__codelineno-3-18"></a>        <span class="n">source</span> <span class="o">=</span> <span class="n">CodePipelineSource</span><span class="o">.</span><span class="n">git_hub</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">repo</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">repo</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;staging&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19"></a>
+<a id="__codelineno-3-20" name="__codelineno-3-20"></a>        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipelines</span><span class="o">.</span><span class="n">CodePipeline</span><span class="p">(</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21"></a>            <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22"></a>            <span class="s2">&quot;Pipeline&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-23" name="__codelineno-3-23"></a>            <span class="n">pipeline_name</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">create_id</span><span class="p">(</span><span class="s2">&quot;Pipeline&quot;</span><span class="p">),</span>
+<a id="__codelineno-3-24" name="__codelineno-3-24"></a>            <span class="n">synth</span><span class="o">=</span><span class="n">pipelines</span><span class="o">.</span><span class="n">ShellStep</span><span class="p">(</span><span class="s2">&quot;Synth&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cdk synth&quot;</span><span class="p">]),</span>
+<a id="__codelineno-3-25" name="__codelineno-3-25"></a>            <span class="n">code_build_defaults</span><span class="o">=</span><span class="n">pipelines</span><span class="o">.</span><span class="n">CodeBuildOptions</span><span class="p">(</span>
+<a id="__codelineno-3-26" name="__codelineno-3-26"></a>                <span class="n">build_environment</span><span class="o">=</span><span class="n">codebuild</span><span class="o">.</span><span class="n">BuildEnvironment</span><span class="p">(</span>
+<a id="__codelineno-3-27" name="__codelineno-3-27"></a>                    <span class="n">build_image</span><span class="o">=</span><span class="n">codebuild</span><span class="o">.</span><span class="n">LinuxBuildImage</span><span class="o">.</span><span class="n">from_docker_registry</span><span class="p">(</span><span class="n">ECR</span><span class="o">.</span><span class="n">LATEST</span><span class="p">),</span>
+<a id="__codelineno-3-28" name="__codelineno-3-28"></a>                <span class="p">)</span>
+<a id="__codelineno-3-29" name="__codelineno-3-29"></a>            <span class="p">),</span>
+<a id="__codelineno-3-30" name="__codelineno-3-30"></a>        <span class="p">)</span>
+<a id="__codelineno-3-31" name="__codelineno-3-31"></a>
+<a id="__codelineno-3-32" name="__codelineno-3-32"></a>        <span class="n">steps</span> <span class="o">=</span> <span class="n">CodeBuildSteps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
+<a id="__codelineno-3-33" name="__codelineno-3-33"></a>
+<a id="__codelineno-3-34" name="__codelineno-3-34"></a>        <span class="c1"># pre</span>
+<a id="__codelineno-3-35" name="__codelineno-3-35"></a>        <span class="n">unit_tests</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">unit_tests</span><span class="p">()</span>
+<a id="__codelineno-3-36" name="__codelineno-3-36"></a>        <span class="n">coverage</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">coverage</span><span class="p">()</span>
+<a id="__codelineno-3-37" name="__codelineno-3-37"></a>        <span class="n">validate_docs</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">validate_docs</span><span class="p">()</span>
+<a id="__codelineno-3-38" name="__codelineno-3-38"></a>        <span class="n">validate_integration_tests</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">validate_integration_tests</span><span class="p">()</span>
+<a id="__codelineno-3-39" name="__codelineno-3-39"></a>        <span class="n">validate_todo</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">custom_step</span><span class="p">(</span>
+<a id="__codelineno-3-40" name="__codelineno-3-40"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ValidateTodo&quot;</span><span class="p">,</span> <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;python infra/scripts/validate_todo.py&quot;</span><span class="p">]</span>
+<a id="__codelineno-3-41" name="__codelineno-3-41"></a>        <span class="p">)</span>
+<a id="__codelineno-3-42" name="__codelineno-3-42"></a>
+<a id="__codelineno-3-43" name="__codelineno-3-43"></a>        <span class="c1"># post</span>
+<a id="__codelineno-3-44" name="__codelineno-3-44"></a>        <span class="n">redoc</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">redoc</span><span class="p">()</span>
+<a id="__codelineno-3-45" name="__codelineno-3-45"></a>        <span class="n">swagger</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">swagger</span><span class="p">()</span>
+<a id="__codelineno-3-46" name="__codelineno-3-46"></a>        <span class="n">integration_tests</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">integration_tests</span><span class="p">()</span>
+<a id="__codelineno-3-47" name="__codelineno-3-47"></a>        <span class="n">tests_report</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">tests_report</span><span class="p">()</span>
+<a id="__codelineno-3-48" name="__codelineno-3-48"></a>        <span class="n">coverage_report</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">coverage_report</span><span class="p">()</span>
+<a id="__codelineno-3-49" name="__codelineno-3-49"></a>
+<a id="__codelineno-3-50" name="__codelineno-3-50"></a>        <span class="n">pipeline</span><span class="o">.</span><span class="n">add_stage</span><span class="p">(</span>
+<a id="__codelineno-3-51" name="__codelineno-3-51"></a>            <span class="n">DeployStage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span>
+<a id="__codelineno-3-52" name="__codelineno-3-52"></a>            <span class="n">pre</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-3-53" name="__codelineno-3-53"></a>                <span class="n">unit_tests</span><span class="p">,</span> 
+<a id="__codelineno-3-54" name="__codelineno-3-54"></a>                <span class="n">coverage</span><span class="p">,</span> 
+<a id="__codelineno-3-55" name="__codelineno-3-55"></a>                <span class="n">validate_integration_tests</span><span class="p">,</span> 
+<a id="__codelineno-3-56" name="__codelineno-3-56"></a>                <span class="n">validate_docs</span><span class="p">,</span> 
+<a id="__codelineno-3-57" name="__codelineno-3-57"></a>                <span class="n">validate_todo</span>
+<a id="__codelineno-3-58" name="__codelineno-3-58"></a>            <span class="p">],</span>
+<a id="__codelineno-3-59" name="__codelineno-3-59"></a>            <span class="n">post</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-3-60" name="__codelineno-3-60"></a>                <span class="n">redoc</span><span class="p">,</span>
+<a id="__codelineno-3-61" name="__codelineno-3-61"></a>                <span class="n">swagger</span><span class="p">,</span>
+<a id="__codelineno-3-62" name="__codelineno-3-62"></a>                <span class="n">integration_tests</span><span class="p">,</span>
+<a id="__codelineno-3-63" name="__codelineno-3-63"></a>                <span class="n">tests_report</span><span class="p">,</span>
+<a id="__codelineno-3-64" name="__codelineno-3-64"></a>                <span class="n">coverage_report</span><span class="p">,</span>
+<a id="__codelineno-3-65" name="__codelineno-3-65"></a>            <span class="p">],</span>
+<a id="__codelineno-3-66" name="__codelineno-3-66"></a>        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>Similar to the <code>Dev</code> environment, this environment is named <code>Staging</code>, with resources designated as <code>staging</code> in the <code>cdk.json</code> file. We also integrate the source code from the <code>staging</code> branch on GitHub into the pipeline. However, in contrast to Dev, the Staging environment incorporates stringent quality assurance protocols prior to deployment.</p>
+<h3 id="staging-pipeline-workflow">Staging Pipeline Workflow</h3>
+<p>The diagram below succinctly illustrates the default pipeline configuration for the <code>Staging</code> stage and established within the AWS CodePipeline.</p>
+<div style="text-align:center;">
+
+<div class="mermaid">graph TD;
+    Source --&gt; Build;
+    Build --&gt; UpdatePipeline
+    UpdatePipeline --&gt; Assets
+    Assets --&gt; UnitTests
+    Assets --&gt; Coverage
+    Assets --&gt; ValidateDocs
+    Assets --&gt; ValidateIntegrationTests
+    UnitTests --&gt; Deploy
+    Coverage --&gt; Deploy
+    ValidateDocs --&gt; Deploy
+    ValidateIntegrationTests --&gt; Deploy
+    Deploy --&gt; Redoc
+    Deploy --&gt; Swagger
+    Deploy --&gt; IntegrationTests
+    Deploy --&gt; TestsReport
+    Deploy --&gt; CoverageReport</div>
+
+</div>
+
+<h3 id="adding-the-validatetodo-step">Adding the ValidateTodo Step</h3>
+<p>Let's fine-tune our pipeline by incorporating the <code>ValidateTodo</code> step, which we devised during the previous session. This step will scan files for any TODO comments, promptly raising an error if one is detected.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">infra/stacks/staging_stack.py</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-38">38</a></span>
+<span class="normal"><a href="#__codelineno-4-39">39</a></span>
+<span class="normal"><a href="#__codelineno-4-40">40</a></span>
+<span class="normal"><a href="#__codelineno-4-41">41</a></span>
+<span class="normal"><a href="#__codelineno-4-42">42</a></span>
+<span class="normal"><a href="#__codelineno-4-43">43</a></span>
+<span class="normal"><a href="#__codelineno-4-44">44</a></span>
+<span class="normal"><a href="#__codelineno-4-45">45</a></span>
+<span class="normal"><a href="#__codelineno-4-46">46</a></span>
+<span class="normal"><a href="#__codelineno-4-47">47</a></span>
+<span class="normal"><a href="#__codelineno-4-48">48</a></span>
+<span class="normal"><a href="#__codelineno-4-49">49</a></span>
+<span class="normal"><a href="#__codelineno-4-50">50</a></span>
+<span class="normal"><a href="#__codelineno-4-51">51</a></span>
+<span class="normal"><a href="#__codelineno-4-52">52</a></span>
+<span class="normal"><a href="#__codelineno-4-53">53</a></span>
+<span class="normal"><a href="#__codelineno-4-54">54</a></span>
+<span class="normal"><a href="#__codelineno-4-55">55</a></span>
+<span class="normal"><a href="#__codelineno-4-56">56</a></span>
+<span class="normal"><a href="#__codelineno-4-57">57</a></span>
+<span class="normal"><a href="#__codelineno-4-58">58</a></span>
+<span class="normal"><a href="#__codelineno-4-59">59</a></span>
+<span class="normal"><a href="#__codelineno-4-60">60</a></span>
+<span class="normal"><a href="#__codelineno-4-61">61</a></span>
+<span class="normal"><a href="#__codelineno-4-62">62</a></span>
+<span class="normal"><a href="#__codelineno-4-63">63</a></span>
+<span class="normal"><a href="#__codelineno-4-64">64</a></span>
+<span class="normal"><a href="#__codelineno-4-65">65</a></span>
+<span class="normal"><a href="#__codelineno-4-66">66</a></span>
+<span class="normal"><a href="#__codelineno-4-67">67</a></span>
+<span class="normal"><a href="#__codelineno-4-68">68</a></span>
+<span class="normal"><a href="#__codelineno-4-69">69</a></span>
+<span class="normal"><a href="#__codelineno-4-70">70</a></span>
+<span class="normal"><a href="#__codelineno-4-71">71</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-38" name="__codelineno-4-38"></a>        <span class="c1"># pre</span>
+<a id="__codelineno-4-39" name="__codelineno-4-39"></a>        <span class="n">unit_tests</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">unit_tests</span><span class="p">()</span>
+<a id="__codelineno-4-40" name="__codelineno-4-40"></a>        <span class="n">coverage</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">coverage</span><span class="p">()</span>
+<a id="__codelineno-4-41" name="__codelineno-4-41"></a>        <span class="n">validate_docs</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">validate_docs</span><span class="p">()</span>
+<a id="__codelineno-4-42" name="__codelineno-4-42"></a>        <span class="n">validate_integration_tests</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">validate_integration_tests</span><span class="p">()</span>
+<a id="__codelineno-4-43" name="__codelineno-4-43"></a><span class="hll">        <span class="n">validate_todo</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">custom_step</span><span class="p">(</span>
+</span><a id="__codelineno-4-44" name="__codelineno-4-44"></a><span class="hll">            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ValidateTodo&quot;</span><span class="p">,</span>
+</span><a id="__codelineno-4-45" name="__codelineno-4-45"></a><span class="hll">            <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;python infra/scripts/validate_todo.py&quot;</span><span class="p">]</span>
+</span><a id="__codelineno-4-46" name="__codelineno-4-46"></a><span class="hll">        <span class="p">)</span>
+</span><a id="__codelineno-4-47" name="__codelineno-4-47"></a>
+<a id="__codelineno-4-48" name="__codelineno-4-48"></a>        <span class="c1"># post</span>
+<a id="__codelineno-4-49" name="__codelineno-4-49"></a>        <span class="n">redoc</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">redoc</span><span class="p">()</span>
+<a id="__codelineno-4-50" name="__codelineno-4-50"></a>        <span class="n">swagger</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">swagger</span><span class="p">()</span>
+<a id="__codelineno-4-51" name="__codelineno-4-51"></a>        <span class="n">integration_tests</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">integration_tests</span><span class="p">()</span>
+<a id="__codelineno-4-52" name="__codelineno-4-52"></a>        <span class="n">tests_report</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">tests_report</span><span class="p">()</span>
+<a id="__codelineno-4-53" name="__codelineno-4-53"></a>        <span class="n">coverage_report</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">coverage_report</span><span class="p">()</span>
+<a id="__codelineno-4-54" name="__codelineno-4-54"></a>
+<a id="__codelineno-4-55" name="__codelineno-4-55"></a>        <span class="n">pipeline</span><span class="o">.</span><span class="n">add_stage</span><span class="p">(</span>
+<a id="__codelineno-4-56" name="__codelineno-4-56"></a>            <span class="n">DeployStage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span>
+<a id="__codelineno-4-57" name="__codelineno-4-57"></a>            <span class="n">pre</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-4-58" name="__codelineno-4-58"></a>                <span class="n">unit_tests</span><span class="p">,</span>
+<a id="__codelineno-4-59" name="__codelineno-4-59"></a>                <span class="n">coverage</span><span class="p">,</span>
+<a id="__codelineno-4-60" name="__codelineno-4-60"></a>                <span class="n">validate_docs</span><span class="p">,</span>
+<a id="__codelineno-4-61" name="__codelineno-4-61"></a><span class="hll">                <span class="n">validate_todo</span><span class="p">,</span>
+</span><a id="__codelineno-4-62" name="__codelineno-4-62"></a>                <span class="n">validate_integration_tests</span><span class="p">,</span>
+<a id="__codelineno-4-63" name="__codelineno-4-63"></a>            <span class="p">],</span>
+<a id="__codelineno-4-64" name="__codelineno-4-64"></a>            <span class="n">post</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-4-65" name="__codelineno-4-65"></a>                <span class="n">redoc</span><span class="p">,</span>
+<a id="__codelineno-4-66" name="__codelineno-4-66"></a>                <span class="n">swagger</span><span class="p">,</span>
+<a id="__codelineno-4-67" name="__codelineno-4-67"></a>                <span class="n">integration_tests</span><span class="p">,</span>
+<a id="__codelineno-4-68" name="__codelineno-4-68"></a>                <span class="n">tests_report</span><span class="p">,</span>
+<a id="__codelineno-4-69" name="__codelineno-4-69"></a>                <span class="n">coverage_report</span><span class="p">,</span>
+<a id="__codelineno-4-70" name="__codelineno-4-70"></a>            <span class="p">],</span>
+<a id="__codelineno-4-71" name="__codelineno-4-71"></a>        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>We've introduced the validate todo step prior to deployment. Below, you'll find the updated pipeline configuration.</p>
+<div style="text-align:center;">
+
+<div class="mermaid">graph TD;
+    Source --&gt; Build;
+    Build --&gt; UpdatePipeline
+    UpdatePipeline --&gt; Assets
+    Assets --&gt; UnitTests
+    Assets --&gt; Coverage
+    Assets --&gt; ValidateDocs
+    Assets --&gt; ValidateIntegrationTests
+    Assets --&gt; ValidateTodo
+    UnitTests --&gt; Deploy
+    Coverage --&gt; Deploy
+    ValidateDocs --&gt; Deploy
+    ValidateTodo --&gt; Deploy
+    ValidateIntegrationTests --&gt; Deploy
+    Deploy --&gt; CoverageReport
+    Deploy --&gt; IntegrationTests
+    Deploy --&gt; Redoc
+    Deploy --&gt; Swagger
+    Deploy --&gt; TestsReport</div>
+
+</div>
+
+<h3 id="deploying-the-staging-environment">Deploying the Staging Environment</h3>
+<p>Next, let's deploy the staging environment with CDK, adhering to the naming conventions established by Forge:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>forge deploy --stack Staging
+</code></pre></div>
+<p>After some minutes, a new pipeline named <code>Staging-Lambda-Forge-Demo-Stack</code> is created on AWS CodePipeline.</p>
+<p><img alt="alt text" src="../images/staging-running-only.png" /></p>
+<p>In the staging environment, we conduct rigorous testing to ensure the robustness of our applications. Integration tests are particularly vital as they simulate real-world scenarios in an environment closely mirroring production.</p>
+<p>Let's take the <code>HelloWorld</code> integration test as example.</p>
+<div class="highlight"><span class="filename">functions/hello_world/integration.py</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span> <span class="nn">pytest</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">import</span> <span class="nn">requests</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span> <span class="nn">lambda_forge.constants</span> <span class="kn">import</span> <span class="n">BASE_URL</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">integration</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;/hello_world&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">def</span> <span class="nf">test_hello_world_status_code_is_200</span><span class="p">():</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="hll">    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/hello_world&quot;</span><span class="p">)</span>
+</span><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="hll">    <span class="k">assert</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+</span></code></pre></div>
+<p>Note that, this integration test is actually sending a <code>GET</code> request to the deployed staging <code>/hello_world</code> endpoint and expecting <code>200</code> as the status code.</p>
+<p><mark><strong>However, given this is our initial deployment, the BASE URL has not been established yet, leading the IntegrationTests step to fail.</strong></mark></p>
+<p><img alt="alt text" src="../images/integrations-failed.png" /></p>
+<h3 id="resolving-the-initial-staging-deployment-error">Resolving the Initial Staging Deployment Error</h3>
+<p>To address the initial staging deployment error, we need to configure the BASE URL specifically for the integration tests.</p>
+<p>First, run the following command to list all variables from your CloudFormation stacks:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>forge output
+</code></pre></div>
+<p>Upon running the command, the variables will be listed in your terminal:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Stack Name: Dev-Lambda-Forge-Demo-Lambda-Stack
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>BASE-URL: https://zo3691q3pd.execute-api.us-east-2.amazonaws.com/dev/
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>Stack Name: Staging-Lambda-Forge-Demo-Lambda-Stack
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>BASE-URL: https://qkaer0f0q5.execute-api.us-east-2.amazonaws.com/staging/
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>Stack Name: Prod-Lambda-Forge-Demo-Lambda-Stack
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>BASE-URL: https://byi76zqidj.execute-api.us-east-2.amazonaws.com/prod/
+</code></pre></div>
+<p>With the BASE URL identified, incorporate it into your <code>cdk.json</code> file under the <code>base_url</code> key. This adjustment ensures that all integration tests can interact seamlessly with the staging environment for automated testing.</p>
+<div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">cdk.json</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-50">50</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-9-50" name="__codelineno-9-50"></a><span class="w">    </span><span class="nt">&quot;base_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://qkaer0f0q5.execute-api.us-east-2.amazonaws.com/staging/&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p>Once the base URL is properly configured for the integration tests, commit your changes and push the updated code to GitHub. Following these adjustments, the pipeline should successfully complete its run.</p>
+<p><img alt="alt text" src="../images/staging-success.png" /></p>
+<h2 id="production-environment">Production Environment</h2>
+<p>The <code>Production</code> environment represents the phase where the tested and stable version of the software is deployed. This version is accessible to end-users and operates within the live environment. It is imperative that this stage remains the most safeguarded, permitting only fully vetted and secure code to be deployed. This precaution helps in minimizing the risk of exposing end-users to bugs or undesirable functionalities, ensuring a seamless and reliable user experience.</p>
+<h3 id="production-environment-configuration">Production Environment Configuration</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">import</span> <span class="nn">aws_cdk</span> <span class="k">as</span> <span class="nn">cdk</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">aws_codebuild</span> <span class="k">as</span> <span class="n">codebuild</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kn">from</span> <span class="nn">aws_cdk</span> <span class="kn">import</span> <span class="n">pipelines</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kn">from</span> <span class="nn">aws_cdk.pipelines</span> <span class="kn">import</span> <span class="n">CodePipelineSource</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kn">from</span> <span class="nn">constructs</span> <span class="kn">import</span> <span class="n">Construct</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="kn">from</span> <span class="nn">infra.stages.deploy</span> <span class="kn">import</span> <span class="n">DeployStage</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="kn">from</span> <span class="nn">lambda_forge.constants</span> <span class="kn">import</span> <span class="n">ECR</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="kn">from</span> <span class="nn">lambda_forge.context</span> <span class="kn">import</span> <span class="n">context</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="kn">from</span> <span class="nn">lambda_forge.steps</span> <span class="kn">import</span> <span class="n">CodeBuildSteps</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="nd">@context</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;Prod&quot;</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="s2">&quot;prod&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="k">class</span> <span class="nc">ProdStack</span><span class="p">(</span><span class="n">cdk</span><span class="o">.</span><span class="n">Stack</span><span class="p">):</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">Construct</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">create_id</span><span class="p">(</span><span class="s2">&quot;Stack&quot;</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>        <span class="n">source</span> <span class="o">=</span> <span class="n">CodePipelineSource</span><span class="o">.</span><span class="n">git_hub</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">repo</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">repo</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;main&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipelines</span><span class="o">.</span><span class="n">CodePipeline</span><span class="p">(</span>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>            <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>            <span class="s2">&quot;Pipeline&quot;</span><span class="p">,</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>            <span class="n">pipeline_name</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">create_id</span><span class="p">(</span><span class="s2">&quot;Pipeline&quot;</span><span class="p">),</span>
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>            <span class="n">synth</span><span class="o">=</span><span class="n">pipelines</span><span class="o">.</span><span class="n">ShellStep</span><span class="p">(</span><span class="s2">&quot;Synth&quot;</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cdk synth&quot;</span><span class="p">]),</span>
+<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>            <span class="n">code_build_defaults</span><span class="o">=</span><span class="n">pipelines</span><span class="o">.</span><span class="n">CodeBuildOptions</span><span class="p">(</span>
+<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>                <span class="n">build_environment</span><span class="o">=</span><span class="n">codebuild</span><span class="o">.</span><span class="n">BuildEnvironment</span><span class="p">(</span>
+<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>                    <span class="n">build_image</span><span class="o">=</span><span class="n">codebuild</span><span class="o">.</span><span class="n">LinuxBuildImage</span><span class="o">.</span><span class="n">from_docker_registry</span><span class="p">(</span><span class="n">ECR</span><span class="o">.</span><span class="n">LATEST</span><span class="p">),</span>
+<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>                <span class="p">)</span>
+<a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>            <span class="p">),</span>
+<a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a>        <span class="p">)</span>
+<a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a>
+<a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a>        <span class="n">steps</span> <span class="o">=</span> <span class="n">CodeBuildSteps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">)</span>
+<a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a>
+<a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a>        <span class="c1"># pre</span>
+<a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a>        <span class="n">unit_tests</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">unit_tests</span><span class="p">()</span>
+<a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a>        <span class="n">integration_tests</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">integration_tests</span><span class="p">()</span>
+<a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a>
+<a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a>        <span class="c1"># post</span>
+<a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a>        <span class="n">diagram</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">diagram</span><span class="p">()</span>
+<a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a>        <span class="n">redoc</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">redoc</span><span class="p">()</span>
+<a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a>        <span class="n">swagger</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">swagger</span><span class="p">()</span>
+<a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a>
+<a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a>        <span class="n">pipeline</span><span class="o">.</span><span class="n">add_stage</span><span class="p">(</span>
+<a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a>            <span class="n">DeployStage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span>
+<a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a>            <span class="n">pre</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a>                <span class="n">unit_tests</span><span class="p">,</span>
+<a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a>                <span class="n">integration_tests</span><span class="p">,</span>
+<a id="__codelineno-10-48" name="__codelineno-10-48" href="#__codelineno-10-48"></a>            <span class="p">],</span>
+<a id="__codelineno-10-49" name="__codelineno-10-49" href="#__codelineno-10-49"></a>            <span class="n">post</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-10-50" name="__codelineno-10-50" href="#__codelineno-10-50"></a>                <span class="n">diagram</span><span class="p">,</span>
+<a id="__codelineno-10-51" name="__codelineno-10-51" href="#__codelineno-10-51"></a>                <span class="n">redoc</span><span class="p">,</span>
+<a id="__codelineno-10-52" name="__codelineno-10-52" href="#__codelineno-10-52"></a>                <span class="n">swagger</span><span class="p">,</span>
+<a id="__codelineno-10-53" name="__codelineno-10-53" href="#__codelineno-10-53"></a>            <span class="p">],</span>
+<a id="__codelineno-10-54" name="__codelineno-10-54" href="#__codelineno-10-54"></a>        <span class="p">)</span>
+</code></pre></div>
+<p>This environment is named <code>Prod</code> and the resources used are provenient from the <code>prod</code> key in the <code>cdk.json</code> file. Additionally, the <code>main</code> branch on GitHub is being used to trigger the pipeline.</p>
+<p>Considering the paramount importance of security and integrity in our production environment, we meticulously replicate tests and reinforce safeguards prior to deployment. This rigorous process guarantees that any modifications adhere to our stringent quality benchmarks, thereby safeguarding against vulnerabilities and upholding a seamless user experience. Following this, we proceed to generate the Swagger and Redoc docs alongside the AWS Architecture Diagram for our application.</p>
+<h3 id="production-pipeline-workflow">Production Pipeline Workflow</h3>
+<p>The following diagram visually represents the configuration established in AWS CodePipeline.</p>
+<div style="text-align:center;">
+
+<div class="mermaid">graph TD;
+    Source --&gt; Build;
+    Build --&gt; UpdatePipeline
+    UpdatePipeline --&gt; Assets
+    Assets --&gt; IntegrationTests
+    Assets --&gt; UnitTests
+    IntegrationTests --&gt; Deployment
+    UnitTests --&gt; Deployment
+    Deployment --&gt; Diagram
+    Deployment --&gt; Redoc
+    Deployment --&gt; Swagger</div>
+
+</div>
+
+<h3 id="deploying-the-production-environment">Deploying the Production Environment</h3>
+<p>Deploy your production environment using the AWS CDK, adhering to the naming conventions.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>forge deploy --stack Prod
+</code></pre></div>
+<p>Executing this command initiates the creation of a new pipeline in AWS CodePipeline, designed to automate our deployment process.</p>
+<p><img alt="alt text" src="../images/prod-pipeline-running.png" /></p>
+<p>In just a matter of minutes, the pipeline is expected to finish its run, seamlessly deploying our functions into the production environment.</p>
+<p><img alt="alt text" src="../images/prod-success.png" /></p>
+<h2 id="creating-new-pipelines">Creating new Pipelines</h2>
+<p>Feel free to create as many pipelines as you need. Just remember to instantiate them in the <code>app.py</code> file located at the root of your project.</p>
+<div class="highlight"><span class="filename">app.py</span><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">import</span> <span class="nn">aws_cdk</span> <span class="k">as</span> <span class="nn">cdk</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="hll"><span class="kn">from</span> <span class="nn">infra.stacks.dev_stack</span> <span class="kn">import</span> <span class="n">DevStack</span>
+</span><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="hll"><span class="kn">from</span> <span class="nn">infra.stacks.staging_stack</span> <span class="kn">import</span> <span class="n">StagingStack</span>
+</span><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="hll"><span class="kn">from</span> <span class="nn">infra.stacks.prod_stack</span> <span class="kn">import</span> <span class="n">ProdStack</span>
+</span><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="n">app</span> <span class="o">=</span> <span class="n">cdk</span><span class="o">.</span><span class="n">App</span><span class="p">()</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="hll"><span class="n">DevStack</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+</span><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="hll"><span class="n">StagingStack</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+</span><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="hll"><span class="n">ProdStack</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+</span><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="n">app</span><span class="o">.</span><span class="n">synth</span><span class="p">()</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>
+You can deploy all pipelines at once by using the following command:
+
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>forge deploy --all
+</code></pre></div>
+
+</p>
+</div>
+
+<h2 id="overview">Overview</h2>
+<p>By adhering to the instructions outlined in this tutorial, you are now equipped with three distinct CI/CD pipelines. Each pipeline corresponds to a specific stage of the development lifecycle, directly linked to the <code>dev</code>, <code>staging</code>, and <code>main</code> branches in your GitHub repository.</p>
+<p>These pipelines ensure that changes made in each branch are automatically integrated and deployed to the appropriate environment, streamlining the process from development to production.</p>
+<p><img alt="alt text" src="../images/success-pipelines.png" /></p>
+<p>Furthermore, you have deployed three unique stack of functions, each corresponding to a different environment:</p>
+<p><img alt="alt text" src="../images/deployed-hello-worlds.png" /></p>
+<ul>
+<li><strong>Dev</strong>: <a href="https://zo3691q3pd.execute-api.us-east-2.amazonaws.com/dev/hello_world">https://zo3691q3pd.execute-api.us-east-2.amazonaws.com/dev/hello_world</a></li>
+<li><strong>Staging</strong>: <a href="https://qkaer0f0q5.execute-api.us-east-2.amazonaws.com/staging/hello_world">https://qkaer0f0q5.execute-api.us-east-2.amazonaws.com/staging/hello_world</a></li>
+<li><strong>Prod</strong>: <a href="https://byi76zqidj.execute-api.us-east-2.amazonaws.com/prod/hello_world">https://byi76zqidj.execute-api.us-east-2.amazonaws.com/prod/hello_world</a></li>
+</ul>
+<p>Each link directs you to the corresponding function deployed within its respective environment, demonstrating the successful separation and management of environments through your CI/CD workflows.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2024 Guilherme Alves Pimenta
+
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/GuiPimenta-Dev/lambda-forge" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/guilhermealvespimenta/" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://web.telegram.org/a/#6950159714" target="_blank" rel="noopener" title="web.telegram.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M248 8C111.033 8 0 119.033 0 256s111.033 248 248 248 248-111.033 248-248S384.967 8 248 8Zm114.952 168.66c-3.732 39.215-19.881 134.378-28.1 178.3-3.476 18.584-10.322 24.816-16.948 25.425-14.4 1.326-25.338-9.517-39.287-18.661-21.827-14.308-34.158-23.215-55.346-37.177-24.485-16.135-8.612-25 5.342-39.5 3.652-3.793 67.107-61.51 68.335-66.746.153-.655.3-3.1-1.154-4.384s-3.59-.849-5.135-.5q-3.283.746-104.608 69.142-14.845 10.194-26.894 9.934c-8.855-.191-25.888-5.006-38.551-9.123-15.531-5.048-27.875-7.717-26.8-16.291q.84-6.7 18.45-13.7 108.446-47.248 144.628-62.3c68.872-28.647 83.183-33.623 92.511-33.789 2.052-.034 6.639.474 9.61 2.885a10.452 10.452 0 0 1 3.53 6.716 43.765 43.765 0 0 1 .417 9.769Z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@8.5.1/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

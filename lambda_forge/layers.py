@@ -160,7 +160,9 @@ def deploy_external_layer(lib, region):
     os.chdir(folder_path)
 
     lib_zip = f"{lib}.zip"
-    subprocess.run(["zip", "-r", lib_zip, "."], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.run(
+        ["zip", "-r", lib_zip, "."], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
 
     s3_client = boto3.client("s3", region_name=region)
 
@@ -177,7 +179,9 @@ def deploy_external_layer(lib, region):
             break
 
     if not bucket:
-        bucket = s3_client.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": region})
+        bucket = s3_client.create_bucket(
+            Bucket=bucket_name, CreateBucketConfiguration={"LocationConstraint": region}
+        )
 
     s3_client.upload_file(lib_zip, bucket["Name"], lib_zip.replace("_", "-"))
 
@@ -194,7 +198,9 @@ def deploy_external_layer(lib, region):
 
 def install_external_layer(library_name):
     # Install the library using pip
-    subprocess.run(["pip", "install", library_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.run(
+        ["pip", "install", library_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
 
     # Get the installed version of the library
     installed_version = importlib.metadata.version(library_name)

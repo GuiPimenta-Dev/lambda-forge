@@ -43,23 +43,33 @@ class LiveApiGtw:
         for part in urlpaths:
             current_path += f"/{part}"
             existing_resource = next(
-                (resource for resource in all_resources if resource["path"] == current_path),
+                (
+                    resource
+                    for resource in all_resources
+                    if resource["path"] == current_path
+                ),
                 None,
             )
 
             if not existing_resource:
-                resource = self.api_client.create_resource(restApiId=self.root_id, parentId=parent_id, pathPart=part)
+                resource = self.api_client.create_resource(
+                    restApiId=self.root_id, parentId=parent_id, pathPart=part
+                )
                 parent_id = resource["id"]
                 all_resources.append({"id": resource["id"], "path": current_path})
             else:
                 parent_id = existing_resource["id"]
 
         try:
-            response = self.api_client.get_method(restApiId=self.root_id, resourceId=parent_id, httpMethod=method)
+            response = self.api_client.get_method(
+                restApiId=self.root_id, resourceId=parent_id, httpMethod=method
+            )
 
             # If the method exists, delete it
             if response["httpMethod"] == method:
-                self.api_client.delete_method(restApiId=self.root_id, resourceId=parent_id, httpMethod=method)
+                self.api_client.delete_method(
+                    restApiId=self.root_id, resourceId=parent_id, httpMethod=method
+                )
         except:
             pass
 
@@ -93,8 +103,7 @@ class LiveApiGtw:
             pass
 
         endpoint = self.__get_endpoint_url()
-        response = {"trigger": "API Gateway", "url": endpoint, "method": method}
-        return response
+        return f"{endpoint} ({method})"
 
     def __get_endpoint_url(self):
         endpoint_url = f"https://{self.root_id}.execute-api.{self.region}.amazonaws.com/{self.stage}/{self.urlpath}"

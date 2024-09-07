@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Webhook",
+        "path": "./functions/webhook",
+        "description": "Lambda Forge telegram webhook",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/webhook",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "telegram_table"
+            }
+        ]
+    }
+]

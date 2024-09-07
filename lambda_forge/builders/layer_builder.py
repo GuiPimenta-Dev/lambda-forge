@@ -39,7 +39,9 @@ class Layers:
         layers_lines = self.read_lines("infra/services/layers.py")
 
         layers_lines.append(f"\n")
-        layers_lines.append(f"        self.{name}_layer = _lambda.LayerVersion.from_layer_version_arn(\n")
+        layers_lines.append(
+            f"        self.{name}_layer = _lambda.LayerVersion.from_layer_version_arn(\n"
+        )
         layers_lines.append(f"            scope,\n")
         layers_lines.append(f"            id='{name.title().replace('_','')}Layer',\n")
         layers_lines.append(f"            layer_version_arn='{arn}',\n")
@@ -57,8 +59,12 @@ class Layers:
         layers_lines.append(f"        self.{name}_layer = _lambda.LayerVersion(\n")
         layers_lines.append(f"            scope,\n")
         layers_lines.append(f"            id='{name.title().replace('_','')}Layer',\n")
-        layers_lines.append(f"            code=_lambda.Code.from_asset(Path.layer('layers/{name}')),\n")
-        layers_lines.append(f"            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9],\n")
+        layers_lines.append(
+            f"            code=_lambda.Code.from_asset(Path.layer('layers/{name}')),\n"
+        )
+        layers_lines.append(
+            f"            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9],\n"
+        )
         layers_lines.append(f"            description='{description}',\n")
         layers_lines.append("         )\n")
 

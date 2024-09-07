@@ -28,7 +28,9 @@ def invoke(service, resource, function, extra=[]):
             function_name = function_value._physical_name.split(f"{project}-")[1]
             for fc in functions:
                 if fc["name"] == function_name:
-                    fc["invocations"].append({"service": service, "resource": invoked_value, **extra_values})
+                    fc["invocations"].append(
+                        {"service": service, "resource": invoked_value, **extra_values}
+                    )
                     break
 
             cdk["context"]["functions"] = functions
@@ -68,7 +70,9 @@ def trigger(service, trigger, function, extra=[]):
             function_name = function_value._physical_name.split(f"{project}-")[1]
             for fc in functions:
                 if fc["name"] == function_name:
-                    fc["triggers"].append({"service": service, "trigger": trigger_value, **extra_values})
+                    fc["triggers"].append(
+                        {"service": service, "trigger": trigger_value, **extra_values}
+                    )
                     break
 
             with open("functions.json", "w") as file:

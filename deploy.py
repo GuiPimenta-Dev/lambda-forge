@@ -24,7 +24,9 @@ def update_setup_py(new_version):
     """Updates the setup.py file with the new version."""
     with open("setup.py", "r") as file:
         content = file.read()
-    content = re.sub(r"(version=['\"])([^'\"]+)(['\"])", rf"\g<1>{new_version}\3", content)
+    content = re.sub(
+        r"(version=['\"])([^'\"]+)(['\"])", rf"\g<1>{new_version}\3", content
+    )
     with open("setup.py", "w") as file:
         file.write(content)
 

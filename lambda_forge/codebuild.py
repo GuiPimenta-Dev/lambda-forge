@@ -33,13 +33,17 @@ class CodeBuild:
             env=env,
             commands=commands,
             build_environment=codebuild.BuildEnvironment(
-                build_image=codebuild.LinuxBuildImage.from_docker_registry(docker_registry),
+                build_image=codebuild.LinuxBuildImage.from_docker_registry(
+                    docker_registry
+                ),
                 privileged=True,
                 compute_type=codebuild.ComputeType.SMALL,
                 environment_variables=env,
             ),
             partial_build_spec=codebuild.BuildSpec.from_object(partial_build_spec),
-            cache=codebuild.Cache.local(codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM),
+            cache=codebuild.Cache.local(
+                codebuild.LocalCacheMode.DOCKER_LAYER, codebuild.LocalCacheMode.CUSTOM
+            ),
             role_policy_statements=[*self.get_role_policy_statements(permissions)],
         )
 

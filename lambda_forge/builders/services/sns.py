@@ -5,12 +5,12 @@ from lambda_forge.trackers import invoke, trigger
 
 
 class SNS:
-    def __init__(self, scope, resources) -> None:
+    def __init__(self, scope, context) -> None:
 
         # self.sns_topic = sns.Topic.from_topic_arn(
         #     scope,
         #     id="SNSTopic",
-        #     topic_arn=resources["arns"]["sns_topic_arn"],
+        #     topic_arn=context.resources["arns"]["sns_topic_arn"],
         # )
         ...
 

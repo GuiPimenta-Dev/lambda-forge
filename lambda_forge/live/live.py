@@ -33,7 +33,9 @@ class Live:
 
     def create_lambda(self, name, path, timeout):
         iot_endpoint = self.__get_iot_endpoint()
-        self.live_lambda = LiveLambda(name, self.region, timeout, iot_endpoint, self.account, self.printer)
+        self.live_lambda = LiveLambda(
+            name, self.region, timeout, iot_endpoint, self.account, self.printer
+        )
         function_arn = self.live_lambda.create_lambda()
         self.functions[name] = {"arn": function_arn, "triggers": []}
         self.__run_server(name, path)
@@ -74,12 +76,16 @@ class Live:
                 return "No Triggers"
             formatted_triggers = []
             for trigger in triggers:
-                details = ", ".join([f"{key.title()}: {value}" for key, value in trigger.items()])
+                details = ", ".join(
+                    [f"{key.title()}: {value}" for key, value in trigger.items()]
+                )
                 formatted_triggers.append(details)
             return "\n\n".join(formatted_triggers)
 
         headers = ["Name", "Triggers"]
-        data_to_display = [[func["Name"], format_triggers(func["Triggers"])] for func in functions]
+        data_to_display = [
+            [func["Name"], format_triggers(func["Triggers"])] for func in functions
+        ]
 
         for data in data_to_display:
             formated_text = ""

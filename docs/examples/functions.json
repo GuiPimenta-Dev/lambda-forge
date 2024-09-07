@@ -1,0 +1,340 @@
+[
+    {
+        "name": "SSOAuthorizer",
+        "path": "./authorizers/sso",
+        "description": "A cognito authorizer for private lambda functions",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
+        "name": "JwtAuthorizer",
+        "path": "./authorizers/jwt",
+        "description": "A jwt authorizer for private lambda functions",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
+        "name": "MakeGuess",
+        "path": "./functions/guess_the_number/make_guess",
+        "description": "Make a guess for a particular game",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/games/{game_id}",
+                "method": "GET",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "CreateGame",
+        "path": "./functions/guess_the_number/create_game",
+        "description": "Creates a new guess the number game",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/games",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "numbers_table"
+            }
+        ]
+    },
+    {
+        "name": "Redirect",
+        "path": "./functions/urls/redirect",
+        "description": "Redirects from the short url to the original url",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/{url_id}",
+                "method": "GET",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "Shortener",
+        "path": "./functions/urls/shortener",
+        "description": "Creates a new short URL entry in DynamoDB mapping to the original url",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/urls",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "urls_table"
+            }
+        ]
+    },
+    {
+        "name": "Mailer",
+        "path": "./functions/images/mailer",
+        "description": "Sends an email when an image enters the bucket",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "s3",
+                "trigger": "images_bucket"
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "Qrcode",
+        "path": "./functions/images/qrcode",
+        "description": "Converts an image into a qr code",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/images/qrcode",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": [
+            {
+                "service": "s3",
+                "resource": "images_bucket"
+            }
+        ]
+    },
+    {
+        "name": "Hello",
+        "path": "./functions/auth/hello",
+        "description": "A private function",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/hello",
+                "method": "GET",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "Signin",
+        "path": "./functions/auth/signin",
+        "description": "Authenticate user login by verifying email and password against stored credentials",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/signin",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "SignUp",
+        "path": "./functions/auth/signup",
+        "description": "Securely handle user registration with unique credentials.",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/signup",
+                "method": "POST",
+                "public": true
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "auth_table"
+            }
+        ]
+    },
+    {
+        "name": "SendMessage",
+        "path": "./functions/chat/send_message",
+        "description": "Send messages to sender and recipient",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "wss",
+                "trigger": "sendMessage"
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "SendConnectionId",
+        "path": "./functions/chat/send_connection_id",
+        "description": "Sends the connection id to the client when a connection is made",
+        "timeout": 60,
+        "triggers": [],
+        "invocations": []
+    },
+    {
+        "name": "Connect",
+        "path": "./functions/chat/connect",
+        "description": "Handle the websocket connection",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "wss",
+                "trigger": "$connect"
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "DeletePost",
+        "path": "./functions/blog/delete_post",
+        "description": "Delete a post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts/{post_id}",
+                "method": "DELETE",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    },
+    {
+        "name": "UpdatePost",
+        "path": "./functions/blog/update_post",
+        "description": "Update a post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts/{post_id}",
+                "method": "PUT",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    },
+    {
+        "name": "LikePost",
+        "path": "./functions/blog/like_post",
+        "description": "Like a post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts/{post_id}/like",
+                "method": "POST",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    },
+    {
+        "name": "DeleteComment",
+        "path": "./functions/blog/delete_comment",
+        "description": "Delete a comment",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts/{post_id}/comments",
+                "method": "DELETE",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    },
+    {
+        "name": "CommentPost",
+        "path": "./functions/blog/comment_post",
+        "description": "Comment on a blog post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts/{post_id}/comments",
+                "method": "POST",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    },
+    {
+        "name": "Feed",
+        "path": "./functions/blog/feed",
+        "description": "Get feed of posts",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/feed",
+                "method": "GET",
+                "public": false
+            }
+        ],
+        "invocations": []
+    },
+    {
+        "name": "CreatePost",
+        "path": "./functions/blog/create_post",
+        "description": "Create a new post",
+        "timeout": 60,
+        "triggers": [
+            {
+                "service": "api_gateway",
+                "trigger": "/posts",
+                "method": "POST",
+                "public": false
+            }
+        ],
+        "invocations": [
+            {
+                "service": "dynamodb",
+                "resource": "posts_table"
+            }
+        ]
+    }
+]

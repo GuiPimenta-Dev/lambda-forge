@@ -14,5 +14,7 @@ class LiveIAM:
         role_arn = response["Configuration"]["Role"]
         role_name = role_arn.split("/")[-1]
         self.iam_client.put_role_policy(
-            RoleName=role_name, PolicyName=policy_name, PolicyDocument=json.dumps(policy_dict)
+            RoleName=role_name,
+            PolicyName=policy_name,
+            PolicyDocument=json.dumps(policy_dict),
         )
