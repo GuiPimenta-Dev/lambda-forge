@@ -41,19 +41,21 @@ class CloudWatchLogs(Static):
 
         post_attach = ""
 
-        errors = len([log for log in self.logs if log.is_error])
-        non_errors = len(self.logs) - errors
+        if self.new_logs:
+            errors = len([log for log in self.logs if log.is_error])
+            non_errors = len(self.logs) - errors
 
-        if errors:
-            post_attach += f"⚠ {errors} "
+            if errors:
+                post_attach += f"⚠ {errors} "
 
-        if non_errors:
-            post_attach += f"● {non_errors} "
+            if non_errors:
+                post_attach += f"● {non_errors} "
 
-        if post_attach:
-            post_attach = " " + post_attach.strip()
+            if post_attach:
+                post_attach = " " + post_attach.strip()
 
-        label += post_attach
+            label += post_attach
+
         tab_pane.label = label
 
     @property
