@@ -39,9 +39,21 @@ class CloudWatchLogs(Static):
         tab_pane = self.tabbed_content.get_tab(self.parent_tab)
         label = self.lambda_name
 
-        if self.new_logs:
-            label += f" ({len(self.new_logs)})"
+        post_attach = ""
 
+        errors = len([log for log in self.logs if log.is_error])
+        non_errors = len(self.logs) - errors
+
+        if errors:
+            post_attach += f"⚠ {errors} "
+
+        if non_errors:
+            post_attach += f"● {non_errors} "
+
+        if post_attach:
+            post_attach = " " + post_attach.strip()
+
+        label += post_attach
         tab_pane.label = label
 
     @property
