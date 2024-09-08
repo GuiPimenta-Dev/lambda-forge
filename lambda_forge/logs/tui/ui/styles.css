@@ -104,12 +104,7 @@ TextArea .text-area-gutter {
   background: red;
 }
 
-CloudWatchLogs > OptionList {
-
-  height: 1fr;
-  border: none;
-  background: $background;
-
+CloudWatchLogs {
   .log-error {
     color: $red;
   }
@@ -129,6 +124,13 @@ CloudWatchLogs > OptionList {
   .timestamp {
     color: $magenta;
   }
+}
+
+CloudWatchLogs > OptionList {
+
+  height: 1fr;
+  border: none;
+  background: $background;
 
   .option-list--option-highlighted {
       color: $background;
