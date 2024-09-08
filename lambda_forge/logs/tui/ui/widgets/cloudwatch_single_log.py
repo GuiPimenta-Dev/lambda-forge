@@ -1,4 +1,3 @@
-from datetime import datetime
 from rich.console import RenderableType
 from rich.table import Table
 from textual.widgets.option_list import Option
