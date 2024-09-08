@@ -1,4 +1,3 @@
-from rich.console import RenderableType
 from rich.table import Table
 from textual.widgets.option_list import Option
 from ...api.forge_logs import CloudWatchLog
@@ -23,17 +22,7 @@ class CloudWatchSingleLog(Option):
         table.add_row() # top padding
         table.add_row(timestamp, self.log.log_type.value, self.log.message)
         table.add_row() # bottom padding
-        self._set_prompt(table)
-
-    def _set_prompt(self, prompt: RenderableType):
-        self.set_prompt(prompt)
-        #
-        # self.set_prompt(
-        #     Panel(
-        #         prompt,
-        #         box=box.ROUNDED,
-        #     )
-        # )
+        self.set_prompt(table)
 
     def toggle_display(self):
         self.tall = not self.tall
