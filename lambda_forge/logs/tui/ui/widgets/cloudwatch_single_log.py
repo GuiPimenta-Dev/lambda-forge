@@ -12,7 +12,7 @@ class CloudWatchSingleLog(Option):
         self.refresh_prompt()
 
     def refresh_prompt(self):
-        table = Table.grid(padding=(0, 1))
+        table = Table.grid(padding=(0, 0))
         table.add_column("timestamp", width=25)
         table.add_column("log_type", width=10)
         table.add_column("message")
