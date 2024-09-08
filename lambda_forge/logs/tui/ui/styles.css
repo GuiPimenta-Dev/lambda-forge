@@ -110,19 +110,39 @@ CloudWatchLogs > OptionList {
   border: none;
   background: $background;
 
-    .option-list--option-highlighted {
-        color: $background;
-        background: $blue;
-    }
+  .log-error {
+    color: $red;
+  }
 
-    .option-list--option-hover {
-        color: $background;
-        background: $blue;
-    }
+  .log-warning {
+    color: $yellow;
+  }
 
-    &:focus {
-        border: none;
-    }
+  .log-info {
+    color: $cyan;
+  }
+
+  .log-debug {
+    color: $foreground;
+  }
+
+  .timestamp {
+    color: $magenta;
+  }
+
+  .option-list--option-highlighted {
+      color: $background;
+      background: $blue;
+  }
+
+  .option-list--option-hover {
+      color: $background;
+      background: $blue;
+  }
+
+  &:focus {
+      border: none;
+  }
 }
 
 Footer {
