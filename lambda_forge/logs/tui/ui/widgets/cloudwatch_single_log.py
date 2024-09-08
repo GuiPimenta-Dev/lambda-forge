@@ -21,8 +21,9 @@ class CloudWatchSingleLog(Option):
 
         timestamp = self.log.timestamp.strftime("%Y-%m-%d (%H:%M)")
 
+        table.add_row() # top padding
         table.add_row(timestamp, self.log.log_type.value, self.log.message)
-        table.add_row()
+        table.add_row() # bottom padding
         self._set_prompt(table)
 
     def _set_prompt(self, prompt: RenderableType):
