@@ -1,4 +1,5 @@
 from rich.console import RenderableType
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.widgets import OptionList, Static, TabPane, TabbedContent
 from ...api.forge_logs import ForgeLogsAPI
@@ -14,6 +15,14 @@ class CloudWatchLogs(Static):
         content-align: center middle;
     }
     """
+
+    COMPONENT_CLASSES = {
+        ".log-error",
+        ".log-warning",
+        ".log-info",
+        ".log-debug",
+        ".timestamp",
+    }
 
     @property
     def logs_api(self) -> ForgeLogsAPI:
@@ -37,24 +46,26 @@ class CloudWatchLogs(Static):
 
     def update_tab_label(self):
         tab_pane = self.tabbed_content.get_tab(self.parent_tab)
-        label = self.lambda_name
+        label = Text(self.lambda_name)
 
-        post_attach = ""
+        post_attach = Text()
 
         if self.new_logs:
             errors = len([log for log in self.new_logs if log.is_error])
             non_errors = len(self.new_logs) - errors
 
             if errors:
-                post_attach += f"⚠ {errors} "
+                style = self.get_component_rich_style("log-error")
+                post_attach += Text(f"⚠ {errors} ", style=style)
 
             if non_errors:
-                post_attach += f"● {non_errors} "
+                style = self.get_component_rich_style("log-info")
+                post_attach += Text(f"● {non_errors} ", style=style)
 
             if post_attach:
-                post_attach = " " + post_attach.strip()
+                post_attach = Text(" ") + post_attach
 
-            label += post_attach
+            label += Text("[ ") + post_attach + Text(" ]")
 
         tab_pane.label = label
 
