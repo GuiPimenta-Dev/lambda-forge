@@ -17,11 +17,11 @@ class CloudWatchLogs(Static):
     """
 
     COMPONENT_CLASSES = {
-        ".log-error",
-        ".log-warning",
-        ".log-info",
-        ".log-debug",
-        ".timestamp",
+        "log-error",
+        "log-warning",
+        "log-info",
+        "log-debug",
+        "timestamp",
     }
 
     @property
