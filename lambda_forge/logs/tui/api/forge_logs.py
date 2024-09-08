@@ -60,7 +60,7 @@ class ForgeLogsAPI:
         self.log_watcher.update_logs()
 
     def get_lambdas(self) -> List[str]:
-        return list_lambda_functions()
+        return list_lambda_functions(self.log_watcher.project_name)
 
     def _get_logs(self) -> List[CloudWatchLog]:
         logs = []
