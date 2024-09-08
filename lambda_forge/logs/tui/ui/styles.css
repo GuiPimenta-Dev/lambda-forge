@@ -126,24 +126,23 @@ CloudWatchLogs {
   }
 }
 
-CloudWatchLogs > OptionList {
-
-  height: 1fr;
-  border: none;
-  background: $background;
-
-  .option-list--option-highlighted {
-      color: $background;
-      background: $blue;
+CloudWatchLogs > DataTable {
+  .datatable--cursor {
+    color: $background;
+    background: $cyan;
   }
 
-  .option-list--option-hover {
-      color: $background;
-      background: $blue;
+  .datatable--hover {
+    color: $background;
+    background: $cyan 80%;
   }
 
-  &:focus {
-      border: none;
+  .datatable--even-row {
+    background: $background-light-1;
+  }
+
+  .datatable--odd-row {
+    background: $background-light-3;
   }
 }
 
