@@ -65,7 +65,7 @@ class CloudWatchLogs(Static):
             if post_attach:
                 post_attach = Text(" ") + post_attach
 
-            label += Text("[ ") + post_attach + Text(" ]")
+            label += Text(" [ ") + post_attach + Text(" ] ")
 
         tab_pane.label = label
 
