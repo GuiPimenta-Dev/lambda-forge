@@ -42,8 +42,8 @@ class CloudWatchLogs(Static):
         post_attach = ""
 
         if self.new_logs:
-            errors = len([log for log in self.logs if log.is_error])
-            non_errors = len(self.logs) - errors
+            errors = len([log for log in self.new_logs if log.is_error])
+            non_errors = len(self.new_logs) - errors
 
             if errors:
                 post_attach += f"⚠ {errors} "
