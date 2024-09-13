@@ -1,19 +1,15 @@
-import boto3
+import json
+from typing import List, Optional
 
 
-def list_lambda_functions():
-    # Create a Lambda client
-    client = boto3.client("lambda")
+def list_lambda_functions(project_name: Optional[str]) -> List[str]:
 
-    # Initialize pagination
-    paginator = client.get_paginator("list_functions")
-    page_iterator = paginator.paginate()
+    if project_name:
+        project_name = project_name + "-"
+    else:
+        project_name = ""
 
-    # Iterate through all pages and collect function names
-    all_functions = []
-    for page in page_iterator:
-        functions = page["Functions"]
-        for function in functions:
-            all_functions.append(function["FunctionName"])
-
-    return all_functions
+    with open("functions.json") as f:
+        functions = json.load(f)
+        function_names = [project_name + i["name"] for i in functions]
+        return function_names

@@ -1,6 +1,7 @@
 from rich.console import RenderableType
+from rich.text import Text
 from textual.app import ComposeResult
-from textual.widgets import OptionList, Static, TabPane, TabbedContent
+from textual.widgets import DataTable, Static, TabPane, TabbedContent
 from ...api.forge_logs import ForgeLogsAPI
 from .cloudwatch_single_log import CloudWatchSingleLog
 
@@ -14,6 +15,14 @@ class CloudWatchLogs(Static):
         content-align: center middle;
     }
     """
+
+    COMPONENT_CLASSES = {
+        "log-error",
+        "log-warning",
+        "log-info",
+        "log-debug",
+        "timestamp",
+    }
 
     @property
     def logs_api(self) -> ForgeLogsAPI:
@@ -37,16 +46,32 @@ class CloudWatchLogs(Static):
 
     def update_tab_label(self):
         tab_pane = self.tabbed_content.get_tab(self.parent_tab)
-        label = self.lambda_name
+        label = Text(self.lambda_name)
+
+        post_attach = Text()
 
         if self.new_logs:
-            label += f" ({len(self.new_logs)})"
+            errors = len([log for log in self.new_logs if log.is_error])
+            non_errors = len(self.new_logs) - errors
+
+            if errors:
+                style = self.get_component_rich_style("log-error")
+                post_attach += Text(f"⚠ {errors} ", style=style)
+
+            if non_errors:
+                style = self.get_component_rich_style("log-info")
+                post_attach += Text(f"● {non_errors} ", style=style)
+
+            if post_attach:
+                post_attach = Text(" ") + post_attach
+
+            label += Text(" [ ") + post_attach + Text(" ] ")
 
         tab_pane.label = label
 
     @property
-    def log_list(self) -> OptionList:
-        return self.query_one(OptionList)
+    def log_list(self) -> DataTable[CloudWatchSingleLog]:
+        return self.query_one(DataTable)
 
     def __init__(self, lambda_name: str):
         self.lambda_name = lambda_name
@@ -59,15 +84,17 @@ class CloudWatchLogs(Static):
         self.log_list.display = False
 
     def update_logs(self):
+        # self.log_list.clear()
+
         all_logs = list(self.logs_api.get_logs(self.lambda_name))
         self.new_logs = all_logs[len(self.logs) :]
 
         if not self.new_logs:
             return
 
-        for log in all_logs[len(self.log_list._options) :]:
+        for log in all_logs[len(self.log_list.rows) :]:
             self.log_list.display = True
-            self.log_list.add_option(CloudWatchSingleLog(log))
+            self.log_list.add_row(CloudWatchSingleLog(log), height = None)
 
         self.update_tab_label()
 
@@ -75,7 +102,11 @@ class CloudWatchLogs(Static):
             self.reset_logs()
 
     def compose(self) -> ComposeResult:
-        yield OptionList()
+        dt = DataTable()
+        dt.add_column('Logs')
+        dt.show_header = False
+        dt.zebra_stripes = True
+        yield dt
 
     def render(self) -> RenderableType:
         return "No logs available yet for this lambda function."

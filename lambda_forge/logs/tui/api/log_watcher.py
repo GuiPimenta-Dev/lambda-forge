@@ -139,9 +139,13 @@ class LogWatcher:
         self.log_manager = LogManager(log_file_path)
         self.last_tokens: Dict[str, str] = {}
 
+    @property
+    def project_name(self):
+        return self.cloudwatch_client.load_project_name()
+
     def update_logs(self):
         """Main function to watch logs for a list of Lambda functions."""
-        project = self.cloudwatch_client.load_project_name()
+        project = self.project_name
 
         if not project:
             raise ForgeError("Failed to load project name. Exiting.")
