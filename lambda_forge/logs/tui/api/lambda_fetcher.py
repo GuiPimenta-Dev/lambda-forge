@@ -1,15 +1,30 @@
-import json
-from typing import List, Optional
+import boto3
+from typing import List
 
 
-def list_lambda_functions(project_name: Optional[str]) -> List[str]:
+def get_lambda_functions_for_stack(stack_name: str):
+    # Create a CloudFormation client
+    cf_client = boto3.client("cloudformation")
 
-    if project_name:
-        project_name = project_name + "-"
-    else:
-        project_name = ""
+    # Create a Lambda client
+    lambda_client = boto3.client("lambda")
 
-    with open("functions.json") as f:
-        functions = json.load(f)
-        function_names = [project_name + i["name"] for i in functions]
-        return function_names
+    # Get the stack resources
+    resources = cf_client.describe_stack_resources(StackName=stack_name)[
+        "StackResources"
+    ]
+
+    # Filter out the Lambda function resources
+    lambda_functions = []
+    for resource in resources:
+        if resource["ResourceType"] == "AWS::Lambda::Function":
+            # Get the Lambda function details using the LogicalResourceId
+            function_name = resource["PhysicalResourceId"]
+            lambda_function = lambda_client.get_function(FunctionName=function_name)
+            lambda_functions.append(lambda_function)
+
+    return [f["Configuration"]["FunctionName"] for f in lambda_functions]
+
+
+def list_lambda_functions( stack_name: str) -> List[str]:
+    return get_lambda_functions_for_stack(stack_name)

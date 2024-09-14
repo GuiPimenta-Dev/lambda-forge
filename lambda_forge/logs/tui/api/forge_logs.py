@@ -50,17 +50,20 @@ class CloudWatchLog:
 
 
 class ForgeLogsAPI:
-    def __init__(self, functions, log_path, stack) -> None:
+    def __init__(self, functions, log_path: str, stack: str, show_all: bool) -> None:
         self.log_path = log_path
         self.stack = stack
-        self.log_watcher = LogWatcher(log_path, functions)
+        self.log_watcher = LogWatcher(log_path, functions, fetch_latest_only=not show_all)
         self.d = defaultdict(int)
+
+    def clear_logs(self):
+        self.log_watcher.log_manager.clear_logs()
 
     def update_logs(self):
         self.log_watcher.update_logs()
 
     def get_lambdas(self) -> List[str]:
-        return list_lambda_functions(self.log_watcher.project_name)
+        return list_lambda_functions(self.stack)
 
     def _get_logs(self) -> List[CloudWatchLog]:
         logs = []

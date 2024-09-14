@@ -695,12 +695,13 @@ def output():
 
 @forge.command()
 @click.argument("stack", default="dev")
+@click.option("--all", help="Show all logs", is_flag=True, default=False)
 @click.option(
     "--interval",
     help="Query interval for the logs",
     default=1,
 )
-def logs(stack, interval):
+def logs(stack, interval, all):
     """
     Query periodically the logs of the specified stack on AWS CloudWatch
     """
@@ -709,15 +710,18 @@ def logs(stack, interval):
     printer.show_banner("Logs")
     printer.br()
 
-    # XXX: Uncomment this!!
     # Check if the specified stack is in the list of available stacks
-    # if not any(stack.lower() in s.lower() for s in stacks):
-    #     printer.print(f"Stack '{stack}' not found in available stacks: {stacks}", "red")
-    #     exit()
+    if not any(stack.lower() in s.lower() for s in stacks):
+        printer.print(f"Stack '{stack}' not found in available stacks: {stacks}", "red")
+        exit()
 
     functions = json.load(open("functions.json", "r"))
     app = ForgeLogsApp(
-        functions=functions, log_file_path="logs.log", stack=stack, interval=interval
+        functions=functions,
+        log_file_path="logs.log",
+        stack=stack,
+        interval=interval,
+        show_all=all,
     )
 
     app.run()
