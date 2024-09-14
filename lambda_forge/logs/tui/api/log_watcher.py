@@ -37,7 +37,6 @@ class LogManager:
         try:
             with open(self.logfile, "w") as file:
                 file.write("")
-            print(f"Logs cleared from {self.logfile}")
         except IOError as e:
             raise ForgeError(f"Error clearing logs: {e}")
 
