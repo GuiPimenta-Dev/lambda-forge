@@ -15,6 +15,10 @@ class CloudWatchLogs(Static):
         height: 1fr;
         content-align: center middle;
     }
+
+    CloudWatchLogs > DataTable {
+        height: 1fr;
+    }
     """
 
     BINDINGS = [ Binding("c", "clear_logs") ]
