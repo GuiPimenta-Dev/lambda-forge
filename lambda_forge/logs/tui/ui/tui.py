@@ -8,9 +8,9 @@ class ForgeLogsApp(App):
     CSS_PATH = "styles.css"
     SCREENS = {"index": Index()}
 
-    def __init__(self, functions, log_file_path, stack, interval):
+    def __init__(self, functions, log_file_path: str, stack: str, interval: int, show_all: bool):
         super().__init__()
-        self.logs_api = ForgeLogsAPI(functions, log_file_path, stack)
+        self.logs_api = ForgeLogsAPI(functions, log_file_path, stack, show_all)
         self.log_check_interval = interval
 
     @work(thread=True)
