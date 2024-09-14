@@ -1,6 +1,6 @@
 import boto3
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from botocore.exceptions import ClientError
 
@@ -72,6 +72,7 @@ class CloudWatchLogFetcher:
         log_group_name: str,
         log_stream_name: str,
         next_token: Optional[str] = None,
+        start_time: Optional[int] = None,
     ) -> Optional[Dict]:
         """
         Fetch log events from a specific log stream.
@@ -79,6 +80,7 @@ class CloudWatchLogFetcher:
         :param log_group_name: The log group name.
         :param log_stream_name: The log stream name.
         :param next_token: The token for the next batch of log events.
+        :param start_time: The start time in milliseconds since the epoch.
         :return: The log events, if available.
         """
         data = {
@@ -132,12 +134,18 @@ class CloudWatchLogFetcher:
 
 
 class LogWatcher:
-    def __init__(self, log_file_path: str, functions: List[Dict[str, str]]):
+    def __init__(
+        self,
+        log_file_path: str,
+        functions: List[Dict[str, str]],
+        fetch_latest_only: bool = False,
+    ):
         self.log_file_path = log_file_path
         self.functions = functions
         self.cloudwatch_client = CloudWatchLogFetcher()
         self.log_manager = LogManager(log_file_path)
         self.last_tokens: Dict[str, str] = {}
+        self.fetch_latest_only = fetch_latest_only
 
     @property
     def project_name(self):
