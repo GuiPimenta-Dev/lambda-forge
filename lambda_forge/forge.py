@@ -710,11 +710,10 @@ def logs(stack, interval, all):
     printer.show_banner("Logs")
     printer.br()
 
-    # XXX: Uncomment this!!
     # Check if the specified stack is in the list of available stacks
-    # if not any(stack.lower() in s.lower() for s in stacks):
-    #     printer.print(f"Stack '{stack}' not found in available stacks: {stacks}", "red")
-    #     exit()
+    if not any(stack.lower() in s.lower() for s in stacks):
+        printer.print(f"Stack '{stack}' not found in available stacks: {stacks}", "red")
+        exit()
 
     functions = json.load(open("functions.json", "r"))
     app = ForgeLogsApp(
