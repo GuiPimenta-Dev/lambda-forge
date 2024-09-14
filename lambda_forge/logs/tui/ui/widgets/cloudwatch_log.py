@@ -1,6 +1,7 @@
 from rich.console import RenderableType
 from rich.text import Text
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.widgets import DataTable, Static, TabPane, TabbedContent
 from ...api.forge_logs import ForgeLogsAPI
 from .cloudwatch_single_log import CloudWatchSingleLog
@@ -16,6 +17,8 @@ class CloudWatchLogs(Static):
     }
     """
 
+    BINDINGS = [ Binding("c", "clear_logs") ]
+
     COMPONENT_CLASSES = {
         "log-error",
         "log-warning",
@@ -27,6 +30,13 @@ class CloudWatchLogs(Static):
     @property
     def logs_api(self) -> ForgeLogsAPI:
         return self.app.logs_api
+
+    def action_clear_logs(self):
+        self.logs_api.clear_logs()
+        self.log_list.clear()
+        self.logs = []
+        self.new_logs = []
+        self.update_tab_label()
 
     @property
     def parent_tab(self) -> TabPane:

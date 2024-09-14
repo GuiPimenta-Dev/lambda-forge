@@ -30,6 +30,17 @@ class LogManager:
         except IOError as e:
             raise ForgeError(f"Error writing log entry: {e}")
 
+    def clear_logs(self):
+        """
+        Clears the contents of the logfile.
+        """
+        try:
+            with open(self.logfile, "w") as file:
+                file.write("")
+            print(f"Logs cleared from {self.logfile}")
+        except IOError as e:
+            raise ForgeError(f"Error clearing logs: {e}")
+
 
 class CloudWatchLogFetcher:
     def __init__(self):

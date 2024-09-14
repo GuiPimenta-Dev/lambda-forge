@@ -56,6 +56,9 @@ class ForgeLogsAPI:
         self.log_watcher = LogWatcher(log_path, functions, fetch_latest_only=not show_all)
         self.d = defaultdict(int)
 
+    def clear_logs(self):
+        self.log_watcher.log_manager.clear_logs()
+
     def update_logs(self):
         self.log_watcher.update_logs()
 
