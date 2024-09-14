@@ -156,7 +156,8 @@ class LogWatcher:
         self.cloudwatch_client = CloudWatchLogFetcher()
         self.log_manager = LogManager(log_file_path)
         self.last_tokens: Dict[str, str] = {}
-        self.fetch_latest_only = fetch_latest_only
+        if fetch_latest_only:
+            self.log_manager.clear_logs()
 
     @property
     def project_name(self):
