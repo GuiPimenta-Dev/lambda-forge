@@ -1,5 +1,6 @@
 from textual import work
 from textual.app import App
+from textual.binding import Binding
 from .screens import Index
 from ..api import ForgeLogsAPI
 
@@ -7,6 +8,7 @@ from ..api import ForgeLogsAPI
 class ForgeLogsApp(App):
     CSS_PATH = "styles.css"
     SCREENS = {"index": Index()}
+    BINDINGS = [ Binding("q", "quit") ]
 
     def __init__(self, functions, log_file_path: str, stack: str, interval: int, show_all: bool):
         super().__init__()

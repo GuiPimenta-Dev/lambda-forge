@@ -1,5 +1,8 @@
 import boto3
-from typing import List
+from typing import List, Optional
+import json
+
+from lambda_forge.logs.tui.api.log_watcher import ForgeError
 
 
 def get_lambda_functions_for_stack(stack_name: str):
@@ -25,6 +28,24 @@ def get_lambda_functions_for_stack(stack_name: str):
 
     return [f["Configuration"]["FunctionName"] for f in lambda_functions]
 
+def get_all_lambda_functions():
+
+    def load_project_name(config_file: str = "cdk.json") -> str:
+        """Load the project name from the configuration file."""
+        try:
+            with open(config_file, "r") as cdk_file:
+                return json.load(cdk_file)["context"]["name"]
+        except IOError as e:
+            raise ForgeError(f"Error loading project name from {config_file}: {e}")
+
+    project_name = load_project_name()
+    with open("functions.json", "r") as f:
+        functions = json.load(f)
+
+    return [project_name + "-" + f["name"] for f in functions]
 
 def list_lambda_functions( stack_name: str) -> List[str]:
-    return get_lambda_functions_for_stack(stack_name)
+    if stack_name:
+        return get_lambda_functions_for_stack(stack_name)
+    else:
+        return get_all_lambda_functions()

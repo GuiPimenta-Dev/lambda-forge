@@ -127,6 +127,8 @@ CloudWatchLogs {
 }
 
 CloudWatchLogs > DataTable {
+  background: $background;
+  
   .datatable--cursor {
     color: $background;
     background: $cyan;

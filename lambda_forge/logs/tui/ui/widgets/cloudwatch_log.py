@@ -15,6 +15,10 @@ class CloudWatchLogs(Static):
         height: 1fr;
         content-align: center middle;
     }
+
+    CloudWatchLogs > DataTable {
+        height: 1fr;
+    }
     """
 
     BINDINGS = [ Binding("c", "clear_logs") ]
@@ -108,8 +112,8 @@ class CloudWatchLogs(Static):
 
         self.update_tab_label()
 
-        if self.parent_tab.id == self.tabbed_content.active:
-            self.reset_logs()
+    def on_click(self, _):
+        self.reset_logs()
 
     def compose(self) -> ComposeResult:
         dt = DataTable()
