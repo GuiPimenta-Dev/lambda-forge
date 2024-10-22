@@ -20,7 +20,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/x8r4y7j7
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/w1u4u5r2
 
       - name: Build Docker image
         run: docker build -t lambda-forge ecr/.
@@ -29,4 +29,4 @@ jobs:
         run: docker tag lambda-forge:latest public.ecr.aws/w1u4u5r2/lambda-forge:latest
 
       - name: Push Docker image to ECR
-        run: docker push public.ecr.aws/x8r4y7j7/lambda-forge:latest
+        run: docker push public.ecr.aws/w1u4u5r2/lambda-forge:latest
