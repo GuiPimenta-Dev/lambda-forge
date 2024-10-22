@@ -26,7 +26,7 @@ jobs:
         run: docker build -t lambda-forge ecr/.
 
       - name: Tag Docker image
-        run: docker tag lambda-forge:latest public.ecr.aws/x8r4y7j7/lambda-forge:latest
+        run: docker tag lambda-forge:latest public.ecr.aws/w1u4u5r2/lambda-forge:latest
 
       - name: Push Docker image to ECR
         run: docker push public.ecr.aws/x8r4y7j7/lambda-forge:latest
