@@ -11,4 +11,4 @@ BASE_URL = get_base_url()
 
 
 class ECR(NamedTuple):
-    LATEST = "public.ecr.aws/x8r4y7j7/lambda-forge:latest"
+    LATEST = "public.ecr.aws/w1u4u5r2/lambda-forge:latest"

@@ -13,7 +13,7 @@ class CodeBuild:
         self,
         name,
         commands,
-        docker_registry="public.ecr.aws/x8r4y7j7/lambda-forge:latest",
+        docker_registry="public.ecr.aws/w1u4u5r2/lambda-forge:latest",
         install_commands=[],
         env={},
         partial_build_spec={},

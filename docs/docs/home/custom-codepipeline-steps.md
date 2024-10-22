@@ -8,7 +8,7 @@ The CodeBuild step within the pipeline is crucial, since it is the component tha
 
 In AWS CodeBuild, you have the flexibility to choose from a variety of setup options for your build environment. You can opt for AWS-managed images that come pre-equipped with tools for popular development environments, utilize a custom Docker image hosted on Amazon ECR or any other registry to tailor your environment to specific requirements, or precisely orchestrate your build steps through a `buildspec.yml` file. Each method is designed to cater to diverse project needs, offering everything from convenience to extensive customization, with Docker images providing the greatest scope for personalization.
 
-To simplify setting up CodeBuild projects, we've prepared a public Docker image hosted on ECR. This image is pre-configured with all the necessary tools and includes custom Python scripts for validation and docs generation, streamlining your workflow. You can access our optimized build environment here: [https://gallery.ecr.aws/x8r4y7j7/lambda-forge](https://gallery.ecr.aws/x8r4y7j7/lambda-forge).
+To simplify setting up CodeBuild projects, we've prepared a public Docker image hosted on ECR. This image is pre-configured with all the necessary tools and includes custom Python scripts for validation and docs generation, streamlining your workflow. You can access our optimized build environment here: [https://gallery.ecr.aws/w1u4u5r2/lambda-forge](https://gallery.ecr.aws/w1u4u5r2/lambda-forge).
 
 For those interested in customizing further, you're encouraged to use this image as a foundation to build your own project-specific private image. The necessary steps and configurations can be found in the Dockerfile provided below.
 
@@ -22,7 +22,7 @@ COPY . /lambda-forge
 # Install nvm with Node.js and npm
 ENV NODE_VERSION=16.13.0
 RUN apt-get update \
-  && apt-get install -y curl jq 
+  && apt-get install -y curl jq
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 ENV NVM_DIR=/root/.nvm
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
@@ -36,14 +36,14 @@ RUN npm --version
 RUN apt-get update && apt-get install -y gnupg \
   && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
   && apt-get install -y nodejs graphviz \
-  && apt-get clean && rm -rf /var/lib/apt/lists/* \ 
+  && apt-get clean && rm -rf /var/lib/apt/lists/* \
   && npm install -g aws-cdk redoc-cli
 
 # Install Python dependencies
 RUN pip install --upgrade pip \
-  && pip install pyyaml pytest-html coverage awscli boto3==1.33.2 botocore==1.33.2 \ 
-  && pip install -r base-requirements.txt \ 
-  && pip install lambda-forge 
+  && pip install pyyaml pytest-html coverage awscli boto3==1.33.2 botocore==1.33.2 \
+  && pip install -r base-requirements.txt \
+  && pip install lambda-forge
 ```
 
 ## Default Steps
@@ -143,9 +143,9 @@ import json
 import os
 
 def check_functions_for_todo(json_file):
-    
+
     functions = json.load(open(json_file, 'r'))
-    
+
     for function in functions:
         path = function.get("path", "")
         with open(path, 'r') as file:
