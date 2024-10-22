@@ -42,6 +42,7 @@ def build_and_upload():
     subprocess.run(["python", "setup.py", "sdist", "bdist_wheel"], check=True)
     subprocess.run(["twine", "upload", "--repository", "pypi", "dist/*"], check=True)
 
+
 def main():
     current_version = read_version()
     if current_version is None:
