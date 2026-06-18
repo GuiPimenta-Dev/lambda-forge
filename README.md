@@ -16,9 +16,6 @@ Lambda Forge is a Python framework that simplifies AWS Lambda function creation 
     </a> |
     <a href="https://guipimenta-dev.github.io/lambda-forge/examples/introduction/" target="_blank">
          Examples
-    </a> |
-    <a href="https://web.telegram.org/a/#6950159714" target="_blank">
-        Telegram
     </a>
 </div>
 
