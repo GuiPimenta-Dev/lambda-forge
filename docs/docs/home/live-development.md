@@ -21,7 +21,7 @@ Lambda Forge also automatically configures triggers defined in the `functions.js
 
 ![alt text](images/live-server.png)
 
-As illustrated in the image above, Lambda Forge sets up real AWS endpoints for live development. It also creates an SNS topic to trigger the Hello World function, which can be activated by multiple sources as previously defined in the [AWS Services](https://docs.lambda-forge.com/home/aws-services/#updating-hello-world-function-to-also-be-triggered-by-sns) documentation.
+As illustrated in the image above, Lambda Forge sets up real AWS endpoints for live development. It also creates an SNS topic to trigger the Hello World function, which can be activated by multiple sources as previously defined in the [AWS Services](https://guipimenta-dev.github.io/lambda-forge/home/aws-services/#updating-hello-world-function-to-also-be-triggered-by-sns) documentation.
 
 By calling these endpoints or the SNS topic, the requests sent to the cloud will be proxied to your local machine. For instance, when sending requests to the `Hello World` function and modifying its responses, you can observe live reloading during development. 
 

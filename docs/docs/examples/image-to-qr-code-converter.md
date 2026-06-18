@@ -5,7 +5,7 @@ In this part, we're going to cover how to make a function that turns images uplo
 The structure of the Lambda functions we plan to develop will be as follows:
 
 <p align="center">
-  <img src="https://docs.lambda-forge.com/examples/images/qrcode-diagram.png" alt="alt text">
+  <img src="https://guipimenta-dev.github.io/lambda-forge/examples/images/qrcode-diagram.png" alt="alt text">
 </p>
 
 ## Incorporating S3 Into the Service Class
@@ -416,7 +416,7 @@ Let's whip up an eye-catching HTML layout to give our email a touch of elegance.
 				Made with ❤️ by
 				<b
 					><a
-						href="https://docs.lambda-forge.com"
+						href="https://guipimenta-dev.github.io/lambda-forge"
 						style="color: inherit; text-decoration: none;"
 						>Lambda Forge</a
 					></b
@@ -560,7 +560,7 @@ That's quite a bit of boilerplate code for such a straightforward task! 😰 Con
 
 To avoid duplicating the previous code throughout our project, let's establish a new `sm_utils` custom layer. This approach will streamline the process, allowing all lambda functions that need to retrieve a secret from Secrets Manager to do so with just a single line of code.
 
-Check out [AWS Lambda Development with Custom Layers](https://docs.lambda-forge.com/home/page5/#aws-lambda-development-with-custom-layers) to delve deeper into custom layers in Lambda development.
+Check out [AWS Lambda Development with Custom Layers](https://guipimenta-dev.github.io/lambda-forge/home/page5/#aws-lambda-development-with-custom-layers) to delve deeper into custom layers in Lambda development.
 
 To create the new custom layer, simply type:
 
@@ -776,7 +776,7 @@ Shortly after the request is made, an email is dispatched to the provided addres
 The email contains a QR code attachment, as seen in the illustration below:
 
 <p align="center">
-  <img src="https://docs.lambda-forge.com/examples/images/qrcode.png" alt="alt text">
+  <img src="https://guipimenta-dev.github.io/lambda-forge/examples/images/qrcode.png" alt="alt text">
 </p>
 
 Upon scanning the QR code, the original image is displayed:

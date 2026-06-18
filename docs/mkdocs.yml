@@ -1,4 +1,8 @@
 site_name: Lambda Forge
+site_url: https://guipimenta-dev.github.io/lambda-forge/
+site_description: A Python framework that simplifies AWS Lambda creation, testing and deployment.
+repo_url: https://github.com/GuiPimenta-Dev/lambda-forge
+repo_name: GuiPimenta-Dev/lambda-forge
 docs_dir: docs/
 
 theme:

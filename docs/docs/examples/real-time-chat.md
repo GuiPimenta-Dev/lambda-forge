@@ -5,7 +5,7 @@ In this section, we will develop a real-time chat application using WebSockets, 
 The architecture for the Lambda functions we are going to implement will be as follows:
 
 <p align="center">
-  <img src="https://docs.lambda-forge.com/examples/images/chat-diagram.png" alt="alt text">
+  <img src="https://guipimenta-dev.github.io/lambda-forge/examples/images/chat-diagram.png" alt="alt text">
 </p>
 
 ## Incorporating the Websockets Class into the Services Class

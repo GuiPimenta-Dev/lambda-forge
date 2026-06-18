@@ -3,7 +3,7 @@
 <div align="center">
 
 # LAMBDA FORGE
-<img height="350" alt="Lambda Forge's Logo" src="https://docs.lambda-forge.com/assets/logo.png">
+<img height="350" alt="Lambda Forge's Logo" src="https://guipimenta-dev.github.io/lambda-forge/assets/logo.png">
 </div>
 
 <br>
@@ -11,10 +11,10 @@
 Lambda Forge is a Python framework that simplifies AWS Lambda function creation and deployment. It automates serverless management, letting developers focus on coding.
 
 <div align="center">
-    <a href="https://docs.lambda-forge.com/home/getting-started/" target="_blank">
+    <a href="https://guipimenta-dev.github.io/lambda-forge/home/getting-started/" target="_blank">
          Docs
     </a> |
-    <a href="https://docs.lambda-forge.com/examples/introduction/" target="_blank">
+    <a href="https://guipimenta-dev.github.io/lambda-forge/examples/introduction/" target="_blank">
          Examples
     </a> |
     <a href="https://web.telegram.org/a/#6950159714" target="_blank">
@@ -137,7 +137,7 @@ forge live server
 ```
 
 <p align="center">
-<img src="https://docs.lambda-forge.com/home/images/live-server.png" width=500> 
+<img src="https://guipimenta-dev.github.io/lambda-forge/home/images/live-server.png" width=500> 
 </p>
 
 Lambda Forge creates real endpoints on AWS that are easily accessible through the triggers defined in your `config.py` files. When these endpoints are triggered, the requests are proxied to your local machine. This setup allows you to modify responses and see the output on a deployed function in real-time, as demonstrated below.
@@ -181,38 +181,31 @@ Lambda Forge provides multi-stage environments with automatic CI/CD pipelines on
 
 #### Development
 <p align="center">
-<img src="https://docs.lambda-forge.com/home/images/updated-dev.png" width=500> 
+<img src="https://guipimenta-dev.github.io/lambda-forge/home/images/updated-dev.png" width=500> 
 </p>
 
 #### Staging
 <p align="center">
-<img src="https://docs.lambda-forge.com/home/images/staging-success.png" width=500> 
+<img src="https://guipimenta-dev.github.io/lambda-forge/home/images/staging-success.png" width=500> 
 </p>
 
 #### Production
 <p align="center">
-<img src="https://docs.lambda-forge.com/home/images/prod-success.png" width=500> 
+<img src="https://guipimenta-dev.github.io/lambda-forge/home/images/prod-success.png" width=500> 
 </p>
 
 ### Automatic Documentation
 
-Lambda Forge automatically generates documentation for your project and let them available through an api gateway endpoint, as demonstrated below:
+Lambda Forge automatically generates and exposes rich documentation for your project through an API Gateway endpoint, including:
 
-<div style="width: 100%; text-align: center;" align="center">
+<div align="center">
 
-<table style="width: 100%; font-size: 16px;">
-  <tr>
-    <td><a href="https://byi76zqidj.execute-api.us-east-2.amazonaws.com/prod/swagger">Swagger</a></td>
-    <td><a href="https://byi76zqidj.execute-api.us-east-2.amazonaws.com/prod/redoc">Redoc</a></td>
-    <td><a href="https://byi76zqidj.execute-api.us-east-2.amazonaws.com/prod/diagram">Diagram</a></td>
-  </tr>
-  <tr>
-    <td><a href="https://qkaer0f0q5.execute-api.us-east-2.amazonaws.com/staging/coverage">Coverage</a></td>
-    <td><a href="https://qkaer0f0q5.execute-api.us-east-2.amazonaws.com/staging/tests?sort=result">Tests</a></td>
-    <td><a href="https://api.lambda-forge.com/dev/wiki">Wiki</a></td>
-  </tr>
-</table>
+| Swagger | Redoc | Diagram | Coverage | Tests | Wiki |
+| :-----: | :---: | :-----: | :------: | :---: | :--: |
+
 </div>
+
+See the [Docs Generation guide](https://guipimenta-dev.github.io/lambda-forge/home/docs-generation/) for how it works and how to enable each one in your own project.
 
 ### Architecture Diagram
 

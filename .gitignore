@@ -112,6 +112,8 @@ celerybeat-schedule
 # mkdocs documentation #
 ########################
 /site
+docs/site/
+.docs-venv/
 
 # mypy #
 ########

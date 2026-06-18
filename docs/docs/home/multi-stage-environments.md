@@ -107,7 +107,7 @@ Let's proceed by updating the pipeline to generate the S3 artifact containing ou
             {
                 "title": "Wiki",
                 "file_path": "docs/wikis/wiki.md",
-                "favicon": "https://docs.lambda-forge.com/images/favicon.png",
+                "favicon": "https://guipimenta-dev.github.io/lambda-forge/images/favicon.png",
             }
         ]
         wikis = steps.wikis(wikis)

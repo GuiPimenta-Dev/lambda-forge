@@ -5,7 +5,7 @@ In this section, we will explore the development of a URL shortener. This utilit
 The setup for the Lambda functions we aim to develop will follow this structure:
 
 <p align="center">
-  <img src="https://docs.lambda-forge.com/examples/images/url-shortener.png" alt="alt text">
+  <img src="https://guipimenta-dev.github.io/lambda-forge/examples/images/url-shortener.png" alt="alt text">
 </p>
 
 ## Setting Up the DynamoDB Tables
@@ -154,7 +154,7 @@ To make this possible, we must incorporate the base URL into the `cdk.json` file
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>
-Follow the article <a href="https://docs.lambda-forge.com/articles/locating-the-base-url/">Locating The Api Gateway Base URL on CloudFormation</a> to locate your own base URL in each environment.
+Follow the article <a href="https://guipimenta-dev.github.io/lambda-forge/articles/locating-the-base-url/">Locating The Api Gateway Base URL on CloudFormation</a> to locate your own base URL in each environment.
 </p>
 </div>
 

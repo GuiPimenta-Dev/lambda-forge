@@ -7,7 +7,7 @@ JWT authentication is a secure method for transmitting information between parti
 The design for the Lambda functions we intend to create will look like this:
 
 <p align="center">
-  <img src="https://docs.lambda-forge.com/examples/images/auth.png" alt="alt text">
+  <img src="https://guipimenta-dev.github.io/lambda-forge/examples/images/auth.png" alt="alt text">
 </p>
 
 ## Setting Up the DynamoDB Tables

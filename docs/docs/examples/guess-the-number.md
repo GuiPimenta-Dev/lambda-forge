@@ -5,7 +5,7 @@ In this section, we will develop a "Guess the Number" game. Players will attempt
 The architecture of the Lambda functions we are going to create will be as follows:
 
 <p align="center">
-  <img src="https://docs.lambda-forge.com/examples/images/guess-the-number.png" alt="alt text">
+  <img src="https://guipimenta-dev.github.io/lambda-forge/examples/images/guess-the-number.png" alt="alt text">
 </p>
 
 ## Configuring DynamoDB Tables for Each Deployment Stage
