@@ -560,7 +560,7 @@ That's quite a bit of boilerplate code for such a straightforward task! 😰 Con
 
 To avoid duplicating the previous code throughout our project, let's establish a new `sm_utils` custom layer. This approach will streamline the process, allowing all lambda functions that need to retrieve a secret from Secrets Manager to do so with just a single line of code.
 
-Check out [AWS Lambda Development with Custom Layers](https://guipimenta-dev.github.io/lambda-forge/home/page5/#aws-lambda-development-with-custom-layers) to delve deeper into custom layers in Lambda development.
+Check out [Lambda Layers](https://guipimenta-dev.github.io/lambda-forge/home/lambda-layers/) to delve deeper into custom layers in Lambda development.
 
 To create the new custom layer, simply type:
 

@@ -15,6 +15,4 @@ With that in mind, let's kick off the project by running the command below:
 forge project --name lambda-forge-examples --repo-owner "$GITHUB-OWNER" --repo-name "$GITHUB-REPO" --bucket "$S3-BUCKET" --account "$AWS-ACCOUNT"
 ```
 
-**API Docs**: [https://api.lambda-forge.com/docs](https://examples.lambda-forge.com/docs).
-
 **Source code**: [https://github.com/GuiPimenta-Dev/lambda-forge/tree/master/docs/examples](https://github.com/GuiPimenta-Dev/lambda-forge/tree/master/docs/examples)

@@ -154,7 +154,7 @@ To make this possible, we must incorporate the base URL into the `cdk.json` file
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>
-Follow the article <a href="https://guipimenta-dev.github.io/lambda-forge/articles/locating-the-base-url/">Locating The Api Gateway Base URL on CloudFormation</a> to locate your own base URL in each environment.
+Locate your own base URL for each environment in the CloudFormation stack outputs (or in the API Gateway console) after deploying your project.
 </p>
 </div>
 
